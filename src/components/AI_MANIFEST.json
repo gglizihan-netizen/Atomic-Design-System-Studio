@@ -1,0 +1,225 @@
+{
+  "name": "Atomix UI Component Spec Manifest",
+  "version": "1.0.0",
+  "description": "这是为大型语言模型 (LLM) 与自动化前端 Agent 量身定制的「受约束组件原子契约库」。AI 必须按照该声明契约直接生成 JSON 协议，而非生成破坏性的野生代码，以此彻底根绝样式漂移。",
+  "framework": "React 18 & Tailwind CSS v4 & motion/react",
+  "layer_protocol": "Layer 5 (AI-Native Declarative Schema Runtime Spec)",
+  "components": {
+    "Button": {
+      "tag": "button",
+      "category": "Basic Action",
+      "description": "全局基准操作按钮原语。内置与当前全局设计系统令牌高频绑定的触控比例阻尼与微动效心跳机制。",
+      "props": {
+        "variant": {
+          "type": "string",
+          "enum": ["primary", "secondary", "outline", "text", "danger"],
+          "default": "primary",
+          "description": "按钮视觉形态：primary(主品牌键，权重最高)；secondary(次级键，起中性辅助作用)；outline(线框风，适合静默选择)；text(纯文字无背景，适合低感知跳转)；danger(高亮深红色，指代删除、抹除等毁灭动作，触发时伴随轻微反色警告)"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "基础大小。依据 spacings 弹性间距物理自适应：sm(高密度高度34px)；md(常规默认高度42px)；lg(宽裕醒目高度50px)"
+        },
+        "isLoading": {
+          "type": "boolean",
+          "default": false,
+          "description": "一键拉起菊花加载图表。为 true 时强制禁用所有的交互动作，并在原文本区域插入丝滑的圆形旋转 Loading 图标，防止用户疯狂重复点击造成后台逻辑溢出错误"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "一键锁定禁用态。为 true 时界面整体呈现高透明中性灰色，阻断 hover、active、focus 等行为，移除鼠标变咸状态为 not-allowed"
+        },
+        "children": {
+          "type": "ReactNode | string",
+          "required": true,
+          "description": "按钮内侧承载的核心主短文本。为了完美的视觉流排版，请尽量精炼在 6 个汉字以内"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.buttonPressScale (按下时微缩骨骼比例)",
+        "behaviors.motionCurve (物理反弹曲线姿态)",
+        "behaviors.motionDurationFast (边缘微动响应速)"
+      ]
+    },
+    "Input": {
+      "tag": "input",
+      "category": "Data Entry",
+      "description": "单行文本拾取原语。提供带有优雅标题、辅助说明和严格报错体系的输入安全网。",
+      "props": {
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "顶置标题标签，明确告诉用户我们需要录入什么业务实体（在设计规范里，若 error 有值，label 文本会自动亮红）"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "标题底部的次级灰色辅助释义文案，能极好支撑业务补充说明"
+        },
+        "placeholder": {
+          "type": "string",
+          "default": "请输入...",
+          "description": "文本框内容空虚时的灰色引导占位占位说明"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "password", "email", "number"],
+          "default": "text",
+          "description": "文本读取物理规范：text(纯文本)；password(隐藏密码球)；email(邮箱格式校验引导)；number(数字剔除阻拦)"
+        },
+        "value": {
+          "type": "string",
+          "required": true,
+          "description": "输入框当前受约绑定的动态字符串值"
+        },
+        "onChange": {
+          "type": "Function (event => void)",
+          "required": true,
+          "description": "每次用户敲击键盘变化字符时的通知函数"
+        },
+        "error": {
+          "type": "string",
+          "required": false,
+          "description": "输入字段表单校验的红色报警文本。如果 error 有值，页面组件周围瞬间出现玫瑰红色高亮防线，屏蔽常规聚焦圈，提醒用户尽快纠正！"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "锁定锁定，进入只读非透明灰度状态"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.inputFocusRing (聚焦时外光圈环绕律动)"
+      ]
+    },
+    "Dropdown": {
+      "tag": "select",
+      "category": "Data Selection",
+      "description": "高密度下拉单选组件原语。支持内置模糊检索搜索栏以及二级副标题说明槽，适合长数据选定而不溢出屏幕物理边界。",
+      "props": {
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "控件顶部字段标签，用以明确所选内容"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "副说明，提供附加帮助"
+        },
+        "placeholder": {
+          "type": "string",
+          "default": "请选择...",
+          "description": "尚未产生任何选择时的静默占位字"
+        },
+        "options": {
+          "type": "Array<{ label: string, value: string, description?: string }>",
+          "required": true,
+          "description": "供用户选择的数据数组。每一个元素可包含 label(大文案)、value(代码端硬编码、数据库使用的原数值)、description(这个选项专门的二级小字翻译，极大提升产品亲和力)"
+        },
+        "value": {
+          "type": "string",
+          "required": true,
+          "description": "当前已被选定的 option.value 字符"
+        },
+        "onChange": {
+          "type": "Function (value => void)",
+          "required": true,
+          "description": "一键切换所选时触发的回调通知"
+        },
+        "enableSearch": {
+          "type": "boolean",
+          "default": false,
+          "description": "为 true 时自动激活下拉面板头部的快捷即时模糊输入区。能极快地帮用户在多达几十甚至几百条的超长列表中筛选出包含该关键字的目标，强体验！"
+        },
+        "error": {
+          "type": "string",
+          "required": false,
+          "description": "高亮报警警示文。作用于触发器按钮边缘发红"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.inputFocusRing (激活下拉时外扩品牌环耀)",
+        "behaviors.motionCurve (面板徐徐滑开的物理弹性插值)"
+      ]
+    },
+    "Modal": {
+      "tag": "dialog",
+      "category": "Feedback Overlay",
+      "description": "系统对话框模态弹窗原语。深度锁定防穿透，用来提供阻断性的高危险重要决策或者复杂的表单信息确认。",
+      "props": {
+        "isOpen": {
+          "type": "boolean",
+          "required": true,
+          "description": "该弹窗实例此时是否渲染显化 (true/false)。打开时自动锁定页面后部的滚屏条(防止滚轮穿透)，关闭时智能秒级还原恢复"
+        },
+        "onClose": {
+          "type": "Function (() => void)",
+          "required": true,
+          "description": "用户点击右上角 [X] 图标或外部遮罩决定关闭退出时触发的关闭处理器"
+        },
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "弹窗顶部的霸气主黑体标题。缺省不填时更显简约高贵"
+        },
+        "children": {
+          "type": "ReactNode",
+          "required": true,
+          "description": "弹框中间部分的核心富媒体、表单输入、长图折线报表内容"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg", "xl"],
+          "default": "md",
+          "description": "弹框的宽度等级：sm(448px, 贴身警示告警)；md(512px, 常配细节)；lg(672px, 复杂表单两列并排)；xl(896px, 巨幅系统级仪表控制)"
+        },
+        "footer": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "置底的操作按钮区域槽。通常装夹：[我点错了(Button variant=\"outline\")] 与 [确认交付执行(Button variant=\"primary\")] 的完美水平对齐排列组合"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.modalDismissOverlay (🛡️ 极其关键的安全令牌：为 false 时锁定外部灰色磨砂反光区，点击外部死活也无法随便闪退弹窗，彻底拦截用户极度容易误触的毁灭风险)",
+        "behaviors.motionCurve (回弹动效物理属性)",
+        "behaviors.motionDurationSlow (长动画呼吸平滑感控制)"
+      ]
+    },
+    "Navbar": {
+      "tag": "nav",
+      "category": "Navigation",
+      "description": "统一的系统视窗置顶流式头部导航。内置 12 列响应式流限幅排布网格，阻断无限宽屏左右溢出，维持产品统一骨架。",
+      "props": {
+        "logo": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "自定义左边缘 LOGO 实像（缺省时自动使用 Atomix 预制的希腊 Ω 精致渐变圆形呼吸小章）"
+        },
+        "menuItems": {
+          "type": "Array<{ label: string, active?: boolean, onClick?: Function }>",
+          "required": true,
+          "description": "导航栏中央展示的核心路由跳转数组：label(选项字)；active(是否处于活跃期，组件智能提取 10% 品牌主色亮光形成低背阴高光环，自动加粗表示定位)；onClick(跳转响应)"
+        },
+        "rightActions": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "最右侧功能槽，一般用来停靠 [个人头像中心] 或是 [主题配置切换器]"
+        },
+        "sticky": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否设置为粘性物理置顶。为 true 会把 Navbar 钉在视窗最头端 (z-index: 40)，在长列表向下刷屏浏览时一并平滑滑过"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (导航高光底影滑动的阻尼响应)",
+        "behaviors.motionDurationNormal (切换过渡动画秒)"
+      ]
+    }
+  },
+  "usage_instruction_for_llm": "【⚠️ 关键人机协作准则】：当 AI (或任何 Agent) 收到为本项目拼装界面的用户 prompt（例如: “给我生成一个带确认的云节点配置和启动表单”）时，严禁使用 HTML 原生指令、非预装的外部三方 UI 组件等。AI 只能在上面列出的 5 大原子原语库中做挑选！AI 应根据意图组装符合 Layer 5 规范的「JSON Schema协议」，并将该 Schema 输出在文本中或直接传入 ScenarioSandbox 声明式解析运行时。如此能做到极致的一致性！"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Atomic Design System Studio",
+  "description": "An interactive playground to define atomic design tokens, customize core premium UI components (button, input, select, modal, nav), and export clean React/Tailwind code.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

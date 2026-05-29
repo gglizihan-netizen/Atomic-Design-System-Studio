@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- 
+===========================================================================
+文件名称: /index.html
+功能描述: 单页面应用（SPA - Single Page Application）的物理入口容器模板
+目标受众: 产品经理、体验设计师、全栈学习开发者。
+
+💡 概念普及：为什么现代页面只有这一个简单的 HTML 文件？
+传统的网页（多页面）要访问不同的路由就得从后端服务器下载完全不同的 HTML。
+而现代前端（使用 React、Vite）叫做“单页面应用”（SPA）：
+1. 用户的网页浏览器拉起本页面时，它其实只是一个几乎全空的“毛坯底盘”（就是下面的 <div id="root"></div>）。
+2. 然后，浏览器会紧接着加载第 10 行的打包代码（/src/main.tsx）。
+3. 这个 main.tsx 作为“电动火车头”，会在本地瞬间运转，把纯 JavaScript 编写的复杂组件（Button、Input、
+   Navbar、甚至是整个控制沙盒 Sandbox 及其中的状态变量）组装成真实的 HTML 节点。
+4. 随后，它把这套完美的 DOM 实体一键插进 <div id="root"></div> 里填满它。这就是“客户端渲染（Client-Side Rendering）”。
+===========================================================================
+-->
+<html lang="zh-CN">
+  <head>
+    <!-- 设置网页字符集编码为 UTF-8，彻底防止中文或其他语系文字出现难以辨认的乱码 -->
+    <meta charset="UTF-8" />
+    
+    <!-- 👁️ 视口配置（Viewport Settings）- 移动智能端适配的关键 -->
+    <!-- width=device-width 保证页面像素宽度刚好等于手持设备的真实屏幕实际物理尺寸 -->
+    <!-- initial-scale=1.0 页面默认不缩放，确保按原型 1:1 精致美白呈现 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- 网页浏览器标签卡标题 -->
+    <title>Atomix UI 体验沙盒与 AI 设计契约体系</title>
+  </head>
+  <body>
+    <!-- 
+      🏗️ 【黄金挂载点 - Root DOM Anchor】
+      它是整个前端世界的生根区。React 之后渲染出的千万百计组件、动效、弹框，
+      全部都被打包塞进这个小小的容器内部！若没有它，React 渲染器会因为找不到根点而挂起崩溃。
+    -->
+    <div id="root"></div>
+    
+    <!-- 
+      🚂 【超级列车乘车票 - Front-end Bootstrap Script】
+      这里声明了我们将使用极速的 ES 模块标准 (type="module")，从浏览器底座直接调用
+      TypeScript 的真正入口文件 main.tsx，开启现代流式打包的热更新运转！
+    -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
