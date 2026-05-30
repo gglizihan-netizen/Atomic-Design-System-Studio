@@ -169,6 +169,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const listContainerStyle: React.CSSProperties = {
     position: 'absolute' as const,
     zIndex: 50,
+    top: '100%',
+    left: 0,
     marginTop: '6px',
     width: '100%',
     backgroundColor: tokens.colors.bgCard,
@@ -203,107 +205,110 @@ export const Dropdown: React.FC<DropdownProps> = ({
         </p>
       )}
 
-      {/* 3. 触发器按钮 */}
-      <button
-        type="button"
-        style={triggerStyle}
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-      >
-        <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
-        <ChevronDown
-          className={`w-4.5 h-4.5 ml-2 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`}
-          style={{ 
-            color: tokens.colors.textMuted,
-            transitionDuration: `${tokens.behaviors.motionDurationFast}ms`
-          }}
-        />
-      </button>
+      {/* 触发器与弹层坐标隔离容器 */}
+      <div className="relative w-full">
+        {/* 3. 触发器按钮 */}
+        <button
+          type="button"
+          style={triggerStyle}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+        >
+          <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
+          <ChevronDown
+            className={`w-4.5 h-4.5 ml-2 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+            style={{ 
+              color: tokens.colors.textMuted,
+              transitionDuration: `${tokens.behaviors.motionDurationFast}ms`
+            }}
+          />
+        </button>
 
-      {/* 4. 下拉悬浮列表区 (支持 Framer Motion 物理引擎渐显插值) */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            {...getMotionConfig()}
-            style={listContainerStyle}
-          >
-            {/* 可按需激活的内部即时检索搜索栏 */}
-            {enableSearch && (
-              <div
-                className="flex items-center px-3 py-2.5 border-b"
-                style={{ borderColor: tokens.colors.border }}
-              >
-                <Search className="w-4 h-4 mr-2" style={{ color: tokens.colors.textMuted }} />
-                <input
-                  type="text"
-                  placeholder="检索过滤选项..."
-                  className="w-full text-sm bg-transparent outline-none border-none py-0.5 h-full"
-                  style={{ color: tokens.colors.textPrimary }}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-            )}
-
-            {/* 真实列表视口 */}
-            <div className="max-h-60 overflow-y-auto py-1">
-              {filteredOptions.length === 0 ? (
-                <div className="px-4 py-4 text-sm text-center" style={{ color: tokens.colors.textMuted }}>
-                  没有检索到匹配的数据
+        {/* 4. 下拉悬浮列表区 (支持 Framer Motion 物理引擎渐显插值) */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              {...getMotionConfig()}
+              style={listContainerStyle}
+            >
+              {/* 可按需激活的内部即时检索搜索栏 */}
+              {enableSearch && (
+                <div
+                  className="flex items-center px-3 py-2.5 border-b"
+                  style={{ borderColor: tokens.colors.border }}
+                >
+                  <Search className="w-4 h-4 mr-2" style={{ color: tokens.colors.textMuted }} />
+                  <input
+                    type="text"
+                    placeholder="检索过滤选项..."
+                    className="w-full text-sm bg-transparent outline-none border-none py-0.5 h-full"
+                    style={{ color: tokens.colors.textPrimary }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
-              ) : (
-                filteredOptions.map((option) => {
-                  const isSelected = option.value === value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className="w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors relative group cursor-pointer"
-                      style={{
-                        backgroundColor: isSelected ? `${tokens.colors.brand}12` : 'transparent',
-                      }}
-                      onClick={() => handleSelect(option.value)}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div
-                          className="text-sm font-medium truncate"
-                          style={{
-                            color: isSelected ? tokens.colors.brand : tokens.colors.textPrimary,
-                          }}
-                        >
-                          {option.label}
-                        </div>
-                        {option.description && (
+              )}
+
+              {/* 真实列表视口 */}
+              <div className="max-h-60 overflow-y-auto py-1">
+                {filteredOptions.length === 0 ? (
+                  <div className="px-4 py-4 text-sm text-center" style={{ color: tokens.colors.textMuted }}>
+                    没有检索到匹配的数据
+                  </div>
+                ) : (
+                  filteredOptions.map((option) => {
+                    const isSelected = option.value === value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className="w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors relative group cursor-pointer"
+                        style={{
+                          backgroundColor: isSelected ? `${tokens.colors.brand}12` : 'transparent',
+                        }}
+                        onClick={() => handleSelect(option.value)}
+                      >
+                        <div className="flex-1 min-w-0">
                           <div
-                            className="text-xs truncate mt-0.5"
+                            className="text-sm font-medium truncate"
                             style={{
-                              color: isSelected ? `${tokens.colors.brand}CC` : tokens.colors.textMuted,
+                              color: isSelected ? tokens.colors.brand : tokens.colors.textPrimary,
                             }}
                           >
-                            {option.description}
+                            {option.label}
                           </div>
+                          {option.description && (
+                            <div
+                              className="text-xs truncate mt-0.5"
+                              style={{
+                                color: isSelected ? `${tokens.colors.brand}CC` : tokens.colors.textMuted,
+                              }}
+                            >
+                              {option.description}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* 被选中时呈现的尊贵主色对号 */}
+                        {isSelected && (
+                          <Check
+                            className="w-4 h-4 shrink-0 self-center"
+                            style={{ color: tokens.colors.brand }}
+                          />
                         )}
-                      </div>
-                      
-                      {/* 被选中时呈现的尊贵主色对号 */}
-                      {isSelected && (
-                        <Check
-                          className="w-4 h-4 shrink-0 self-center"
-                          style={{ color: tokens.colors.brand }}
-                        />
-                      )}
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* 5. 报错显示 */}
       {error && (

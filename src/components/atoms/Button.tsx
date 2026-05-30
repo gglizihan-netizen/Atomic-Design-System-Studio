@@ -139,8 +139,8 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           ...base,
           backgroundColor: 'transparent',
-          borderColor: tokens.colors.border,
-          color: tokens.colors.textPrimary,
+          borderColor: tokens.colors.brand,
+          color: tokens.colors.brand,
         };
       case 'text':
         return {

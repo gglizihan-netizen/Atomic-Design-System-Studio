@@ -56,10 +56,11 @@ export const ShowcasePanel: React.FC = () => {
   const [dropValue, setDropValue] = useState('asia-east1-a');
 
   // 4. Modal Props states
-  const [modalSize, setModalSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
-  const [modalTitle, setModalTitle] = useState('终止并停用当前计算节点？');
+  const [modalSize, setModalSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('sm');
+  const [modalTitle, setModalTitle] = useState('提示');
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalHasFooter, setModalHasFooter] = useState(true);
+  const [modalIsAlertStyle, setModalIsAlertStyle] = useState(true);
 
   // 5. Navbar states
   const [navBrandName, setNavBrandName] = useState('NEXUS LOGISTICS');
@@ -317,32 +318,59 @@ export default function AppLayout() {
                     onClose={() => setModalIsOpen(false)}
                     title={modalTitle}
                     size={modalSize}
+                    borderless={true}
                     footer={
                       modalHasFooter ? (
-                        <div className="flex gap-2 justify-end w-full">
-                          <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
-                            取消取消
-                          </Button>
-                          <Button variant="danger" size="sm" onClick={() => setModalIsOpen(false)}>
-                            确定并终止实例
-                          </Button>
-                        </div>
+                        modalIsAlertStyle ? (
+                          <div className="flex gap-2 justify-end w-full">
+                            <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
+                              取消
+                            </Button>
+                            <Button variant="primary" size="sm" onClick={() => setModalIsOpen(false)}>
+                              确定
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2 justify-end w-full">
+                            <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
+                              暂返回修改
+                            </Button>
+                            <Button variant="danger" size="sm" onClick={() => setModalIsOpen(false)}>
+                              确定并终止实例
+                            </Button>
+                          </div>
+                        )
                       ) : undefined
                     }
                   >
-                    <div className="space-y-3 font-normal text-slate-600">
-                      <p className="text-sm">
-                        此操作为云集群高危级别操作，关闭该运行实例将会断开 <strong>Algonet-2</strong>{' '}
-                        分布式节点。包含 <strong>2.4TB</strong> 网络缓存也会永久清理。
-                      </p>
-                      <div className="p-3 bg-red-50 text-red-700 rounded-lg flex items-start gap-2 border border-red-100">
-                        <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                        <div className="text-xs">
-                          <strong>警告提示：</strong>
-                          本操作不可回滚。数据卷将同时被注销，无法重新还原。
+                    {modalIsAlertStyle ? (
+                      <div className="flex items-start gap-4 py-1.5 text-left">
+                        {/* 蓝色实像圆章 "i" 图标 */}
+                        <div 
+                          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white font-serif font-bold text-sm select-none"
+                          style={{ backgroundColor: tokens.colors.brand }}
+                        >
+                          i
+                        </div>
+                        <div className="text-sm font-normal pt-0.5 leading-relaxed" style={{ color: tokens.colors.textPrimary }}>
+                          请先完成首份技术标书编制，首份编制完成后解锁再写一份
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="space-y-3 font-normal text-slate-600 text-left">
+                        <p className="text-sm">
+                          此操作为云集群高危级别操作，关闭该运行实例将会断开 <strong>Algonet-2</strong>{' '}
+                          分布式节点。包含 <strong>2.4TB</strong> 网络缓存也会永久清理。
+                        </p>
+                        <div className="p-3 bg-red-50 text-red-700 rounded-lg flex items-start gap-2 border border-red-100">
+                          <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                          <div className="text-xs">
+                            <strong>警告提示：</strong>
+                            本操作不可回滚。数据卷将同时被注销，无法重新还原。
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </Modal>
 
                   <p className="text-[10px] text-slate-400 mt-4 max-w-xs font-mono select-none leading-normal">
@@ -754,6 +782,26 @@ export default function AppLayout() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <span className="text-xs font-medium text-slate-600">标书提示风格 (Simple Alert Style)</span>
+                  <input
+                    type="checkbox"
+                    checked={modalIsAlertStyle}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setModalIsAlertStyle(enabled);
+                      if (enabled) {
+                        setModalTitle('提示');
+                        setModalSize('sm');
+                      } else {
+                        setModalTitle('终止并停用当前计算节点？');
+                        setModalSize('md');
+                      }
+                    }}
+                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                  />
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100">

@@ -181,6 +181,11 @@
           "type": "ReactNode",
           "required": false,
           "description": "置底的操作按钮区域槽。通常装夹：[我点错了(Button variant=\"outline\")] 与 [确认交付执行(Button variant=\"primary\")] 的完美水平对齐排列组合"
+        },
+        "borderless": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否开启极致现代的无缝流式卡片模式，去除上下横跨的界限分割灰线，使得整体排版与内容高度一体（如提示、成功通知等精致会意卡片）"
         }
       },
       "behaviors_inherited": [

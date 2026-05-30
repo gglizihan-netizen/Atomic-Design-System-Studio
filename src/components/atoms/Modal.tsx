@@ -29,6 +29,7 @@ export interface ModalProps {
   children: React.ReactNode; // 弹框主体承载的任意模块、页面、表单内容
   size?: 'sm' | 'md' | 'lg' | 'xl'; // 弹框宽度等级 (对应 440px / 512px / 672px / 896px)
   footer?: React.ReactNode; // 下边缘操作槽 (一般放置：[取消]、[同意]、[删除并退出])
+  borderless?: boolean;    // 去离散线的现代极简风格 (默认为 true)
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -38,6 +39,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'md',
   footer,
+  borderless = true,
 }) => {
   const { tokens } = useDesignTokens();
 
@@ -136,8 +138,8 @@ export const Modal: React.FC<ModalProps> = ({
           >
             {/* ①. 弹窗顶部栏 (Header) */}
             <div
-              className="flex items-center justify-between px-6 py-4.5 border-b"
-              style={{ borderColor: tokens.colors.border }}
+              className={`flex items-center justify-between px-6 ${borderless ? 'pt-6 pb-2' : 'py-4.5 border-b'}`}
+              style={borderless ? {} : { borderColor: tokens.colors.border }}
             >
               {title ? (
                 <h3
@@ -154,10 +156,10 @@ export const Modal: React.FC<ModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1.5 transition-colors duration-150 outline-none flex items-center justify-center"
+                className="p-1.5 transition-colors duration-150 outline-none flex items-center justify-center cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
                 style={{ 
                   borderRadius: tokens.borders.radiusFull,
-                  backgroundColor: tokens.typography.headingFont === 'mono' ? '#1F2937' : '#E2E8F033',
+                  backgroundColor: borderless ? 'transparent' : (tokens.typography.headingFont === 'mono' ? '#1F2937' : '#E2E8F033'),
                   color: tokens.colors.textMuted
                 }}
               >
@@ -166,7 +168,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
 
             {/* ②. 弹窗中间滚动内容体 (Body) */}
-            <div className="flex-1 overflow-y-auto px-6 py-5.5 scrollbar-thin">
+            <div className={`flex-1 overflow-y-auto px-6 ${borderless ? 'py-3' : 'py-5.5'} scrollbar-thin`}>
               <div 
                 style={{ 
                   fontSize: tokens.typography.sizeBase, 
@@ -181,8 +183,8 @@ export const Modal: React.FC<ModalProps> = ({
             {/* ③. 弹窗底部操作区域 (Footer) */}
             {footer && (
               <div
-                className="flex items-center justify-end gap-3 px-6 py-4 border-t"
-                style={{ 
+                className={`flex items-center justify-end gap-3 px-6 pb-6 ${borderless ? 'pt-2' : 'py-4 border-t'}`}
+                style={borderless ? {} : { 
                   borderColor: tokens.colors.border,
                   backgroundColor: tokens.typography.headingFont === 'mono' ? '#111827' : `${tokens.colors.bgPage}66`
                 }}
