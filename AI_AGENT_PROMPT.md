@@ -1,135 +1,166 @@
-# 🤖 Atomix UI —— 其它 AI Agent / IDE 助手专属极速适配与低消耗唤醒指南 (.md)
-> **编写目的**：当您在 Cursor、Windsurf、VSCode Copilot、Claude Single-File-Agent 或其它 IDE 环境中打开此项目时，**直接将本文档的内容一键复制发给新手 AI 工具**。
-> 
-> **核心痛点解决**：本指南采用**「零冗余 Token 约束策略」**。无需让第三方 AI 漫无目的地读取整个项目的几十个深层代码文件，只需告诉它去读取 `AI_MANIFEST.json` 和本指南，就能立刻 100% 掌握本设计系统的调性与原子原语拼装契约，极度省钱、省时且绝不跑偏！
+# 🗺️ Atomix UI —— AI 自动适配、开发隔离与自我进化超级蓝图手册 (Master Playbook & Agent Directive)
+
+> **文档定位**：本项目（Atomix UI）的**绝对唯一真理源 (Single Source of Truth)**。无论在 Cursor、Windsurf、VSCode Copilot、ChatGPT 还是 Claude 协作环境中，**只要将本手册发给 AI，它就能在 3 秒内 100% 摸清系统规则、在安全隔离区编写业务、自我繁衍新组件，且绝不污染任何核心底层。**
+>
+> **核心痛点解决**：本手册彻底消灭了“东拼西凑、碎片化查找、多次修改改漏漏改、以及硬改核心库造成坍塌”的野生开发乱象。
 
 ---
 
-## 📋 锦囊一：一键复制给其它 AI 的“初始化启动指令” (The Master Prompt)
+## 📋 目录导航 (Table of Contents)
+- [🧬 第一章：一键初始化主指令 (The Master System Prompt)](#-第一章一键初始化主指令-the-master-system-prompt)
+- [🔍 第二章：物理代码仓库解剖图 (Anatomy of Core Files)](#-第二章物理代码仓库解剖图-anatomy-of-core-files)
+- [🚧 第三章：高潮保障——业务页面隔离设计模式 (Page Isolation Pattern)](#-第三章高潮保障业务页面隔离设计模式-page-isolation-pattern)
+- [🚀 第四章：自由度与标准化——逃生舱机制 (The Escape Hatch Rule)](#-第四章自由度与标准化逃生舱机制-the-escape-hatch-rule)
+- [🧩 第五章：自我进化协议——新原语繁衍四步法 (Self-Evolution protocol)](#-第五章自我进化协议新原语繁衍四步法-self-evolution-protocol)
+- [💎 第六章：AI 开发自检 Checklist (Dual-Test Prompts)](#-第六章-ai-开发自检-checklist-dual-test-prompts)
 
-当您在新的 AI 对话框或者 IDE 侧边栏开启新任务时，**请直接复制以下这段框内的中文指令发送给它：**
+---
+
+## 🧬 第一章：一键初始化主指令 (The Master System Prompt)
+
+当您在任何新 IDE 侧边栏或机器人会话中启动对本项目的修改任务时，**请直接全文复制并发送以下灰框指令给 AI：**
 
 ```text
 你现在是一个极高水准的前端交互设计专家与 React 研发架构师。
-当前我们项目使用了一套专为 AI-Native 声明式设计研发的【Atomix UI 规范组件库（五层架构体系）】。
+我们项目使用了一套专为 AI-Native 声明式设计研发的【Atomix UI 规范组件库（五层体系）】。
 
-为了【不消耗你的无用上下文 Token、拒绝野生废代码、拒绝样式漂移】，请你严格遵守以下原则进行工作：
+为了【不消耗你的无用上下文 Token、拒绝野生碎代码、拒绝样式漂移】，请你严格遵守以下原则进行工作：
 
-1. 🎯 【关键文件定位：只读不猜】
-   我们已经在项目中维护了以下核心认知文件，在开始为我实现任何新原型或修改需求前，你仅被允许读取：
-   - 配置索引库：/src/components/AI_MANIFEST.json (这里定义了所有合规的原语、Props与枚举值)
-   - 哲学指南手册：/src/components/AI_SPECS.md (这里阐释了五层令牌架构的设计原理)
+1. 🎯 【唯一的认知来源：读不猜】
+   在开始为我编写新功能、新组件或业务页面前，你仅被允许读取：
+   - 核心主控纲领：/AI_AGENT_PROMPT.md (即本手册)
+   - 类型契约文件：/src/types/components.ts (包含所有核心原子组件的最新 TypeScript 接口定义，用于极速了解可用字段)
+   - 元素属性配置面：/src/components/AI_MANIFEST.json (包含所有合法 primitives 的 props 交互解释字典)
 
-2. 🚫 【三大最高指令与“逃生舱机制”】
-   - ⚠️ 【防线一：断绝野生碎代码】严禁随意引入未受控的第三方庞杂UI库。严禁使用写死固化颜色（如 #ef4444）与写死间隙的原生 HTML 标签编写临时拼凑界面。
-   - 🧩 【防线二：原语优先】对于标准表单与操作，必须优先调用现成的 `Button`, `Input`, `Dropdown`, `Modal`, `Navbar` 原语。
-   - 🚀 【防线三：自由度逃生舱】若当前业务极为特殊、所有原语均不适用（如要写一个高级进度滑块 Slider、SVG 矢量节点或特定排线图表）：
-     * 你【可以使用 HTML/SVG 原生节点或 D3/Recharts 编写自定义视图】，但样式必须 100% 挂载全局令牌驱动（例如通过 Tailwind 类目或 `style={{ color: tokens.colors.textPrimary, borderRadius: tokens.borders.radiusMd }}` 动态绑定），绝不脱离设计系统。
-     * 你也可以将这套特定需求在 `atoms` 文件夹下有序封装并注册为一个新的高品质受控原语（如 `Slider.tsx`），保证其拥有完整的 4 套风格兼容及统一的 micro-behaviors。
-   - 全局响应性：所有的色彩（如边框、焦点）、间距、圆角，由 React Context 中的 `useDesignTokens` 无差支配，当需要微调外观组件样式时，读取 tokens.colors.brand 等标记。
+2. 🚫 【三大研发最高指令】
+   - 【防线一：断绝野生碎代码】严禁随意引入未受控的外部第三方庞杂库。严禁在代码中写死颜色 (如 #4F46E5) 与硬间距，必须无差继承 useDesignTokens。
+   - 【防线二：业务开发隔离】如果是用户新提的业务页面、完整的卡片管理或统计大盘，必须全部写在 /src/views/ 文件夹中。绝对不要在 /src/components/ 下的核心库里随意叠砌业务。
+   - 【防线三：开发逃生舱】若遇到特立独行、没有任何原语能套用的高级微操作（如 SVG 节点或 D3 图表），允许使用原生节点，但必须通过 Tailwind 语义类或 tokens 变量绑定样式，绝对保持主题感知。
 
-3. 🚀 【开发流支持（声明式渲染）】
-   如果你负责为我的主面板生成新的模拟组合或是界面。请【优先尝试输出符合 Layer 5 声明式的 JSON Schema】，也就是遵循 `AI_MANIFEST.json` 下的格式；或是去修改 `/src/components/ScenarioSandbox.tsx` 进行传统的原语组件直接拼装。
-
-现在，请简短回复我：“✨ Atomix UI 契约自锁机制已识别，我已定位相关核心规范文件。请告诉我你需要我为您构建什么场景的原型！”即可。
+现在，请简短回复我：“✨ Atomix UI 契约自锁机制已识别，我已定位 Master Playbook 以及隔离开发规范。请告诉我你需要我构建/繁衍什么模块！” 即可。
 ```
 
 ---
 
-## 🗺️ 锦囊二：极速精简 Token 的“文件剪枝阅读地图” (For AI Engine)
+## 🔍 第二章：物理代码仓库解剖图 (Anatomy of Core Files)
 
-如果后续的 IDE 工具有自动检索上下文（如 Cursor `@` 或者 codebase 全局检索）的习惯，它会容易“贪婪”地遍历整个 `/node_modules` 或者是大型编译日志。请直接将下表指引给它，让它对其他代码进行忽略，直奔核心防线：
+在开始写第一行代码前，AI **必须** 知晓仓库中现存四大系统模块的精确分工，**严禁乱改底层、严禁把功能逻辑错位放置：**
 
-| 优先级 | 文件路径 | AI 必读核心价值 (对 AI 而言的 Token 转化率) |
-| :--- | :--- | :--- |
-| **P0: 核心规则核心契约** | `/src/components/AI_MANIFEST.json` | **100% 极高。** 里面写满了每个原子组件接受的所有 Props、Enum 限定、默认值与中文注释，AI 必看！ |
-| **P1: 上下文上下文生命源** | `/src/components/base/DesignTokensContext.tsx` | **95% 高。** 这里面有整个视觉调性（Colors、Spacings、Margins、Behaviors）一键切换的逻辑与配置项。 |
-| **P2: 物理实体与微动效** | `/src/components/atoms/` 目录 | **60% 中级。** AI 不需要每次都完整遍历其 React 实现。只有当 AI 需要为组件库扩充新的微交互细节，或者微调 framer motion 缓动阻尼时才需要对这个文件夹进行 `view_file`。 |
-| **P3: 沙盒环境与动态解析运行时** | `/src/components/ScenarioSandbox.tsx` | **80% 高。** AI 如果想要扩充新的场景、新指令、丰富表单展示、在 Playground 里面加个新的模板，去修改这个文件是非常高效的入口。 |
-| **P4: 编译脚本与第三方配置** | `package.json`, `index.html`, `vite.config.ts`, `.gitignore` | **20% 极低。** 除非编译报错或者需要依赖升级安装，否则严禁 AI 主动重写或读取这些，保证开发安全性。 |
-
----
-
-## 💡 锦囊三：极简优雅的代码交互范式 (Examples for AI Reference)
-
-为了防止其他 AI Agent 虽然知晓规矩，但写出的 React 组件臃肿难看、缺乏呼吸节奏，以下列举两种典型的情景演示：
-
-### ❌ 坏的典型（野生 AI 制造的设计垃圾 —— 零呼吸感、野生样式漂移、无主设计）
-```tsx
-// ❌ 错误：不使用原语组件、随意捏写乱七八糟的 CSS 阴影、生硬写死无主颜色、不具备主题上下文切换联动
-export const BadForm = () => {
-  return (
-    <div style={{ background: '#ffffff', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-      <h3 style={{ color: '#1a1a1a', fontSize: '20px', marginBottom: '15px' }}>输入服务器别名</h3>
-      <input type="text" placeholder="随意输入..." style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '10px' }} />
-      <button style={{ backgroundColor: '#4f46e5', color: '#fff', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}>提交</button>
-    </div>
-  )
-}
-```
-
-### ✅ 好的典型（符合 Atomix UI 精致契约的积木化工程 —— 淡雅呼吸、完全解耦、令牌统一）
-```tsx
-// ✅ 正确：组件之间不滥用硬线条，通过淡色调（tokens.colors.bgPage）区隔页面，核心视觉与行为属性完美受约！
-import React, { useState } from 'react';
-import { useDesignTokens } from '../base/DesignTokensContext';
-import { Button } from './atoms/Button';
-import { Input } from './atoms/Input';
-
-export const ElegantForm: React.FC = () => {
-  const { tokens } = useDesignTokens();
-  const [hostVal, setHostVal] = useState('host-node-01');
-
-  return (
-    <div 
-      className="p-6 transition-all"
-      style={{ 
-        backgroundColor: tokens.colors.bgCard, // 跟着设计系统令牌统一缩放变白或暖灰
-        borderRadius: tokens.borders.radiusLg, // 大角大调，绝无野生生硬直角
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: tokens.colors.border
-      }}
-    >
-      <h4 
-        className="text-md font-bold mb-4 token-font-heading" 
-        style={{ color: tokens.colors.textPrimary }}
-      >
-        云物理容器命名控制台
-      </h4>
-      
-      <div className="space-y-4">
-        {/* 单行输入原语组件：内置了错误警醒联动与聚焦阴影 */}
-        <Input 
-          label="输入服务器唯一主机名 (Hostname)"
-          description="后缀会自动关联系统当前子网区，无需手动加入"
-          value={hostVal}
-          onChange={(e) => setHostVal(e.target.value)}
-          placeholder="请输入名字..."
-        />
-
-        {/* 基准按钮原语组件：继承自 behaviors.buttonPressScale 微小压下阻尼感 */}
-        <Button 
-          variant="primary" 
-          size="md" 
-          onClick={() => alert(`安全拉起主机: ${hostVal}`)}
-          className="w-full mt-2"
-        >
-          确定并连接云端
-        </Button>
-      </div>
-    </div>
-  );
-};
-```
+| 模块文件名 | 物理文件路径 | 核心业务功能与边界 | AI 修改/保护准则 |
+| :--- | :--- | :--- | :--- |
+| **类型定义契约**<br>`components.ts` | `/src/types/components.ts` | 原子底座核心 Props 接口声明的大一统，供 AI 极速加载、不损耗 Token 获取所有组件字段细节。 | **优先读取。** 严禁在此处写任何具体功能实现；新增通用原子组件必须同步在此增加 TS 契约声明。 |
+| **原子原语类**<br>`Button / Input / Dropdown` | `/src/components/atoms/*` | 系统的核心肌肉与关节。提供带微动效、 loading 阻断、错误校验的纯净基础原语。 | **保护为主。** 除非用户明确要求“完善/扩展该原语自身的交互细节”，否则平时业务开发绝对禁止改动。 |
+| **全局令牌源**<br>`DesignTokensContext` | `/src/components/base/*` | 整个设计系统的血液与灵魂。定义了 4 款主题（极客现代、冷酷极客、复古暖纸、软萌糖果）的颜色、圆角、字重、回弹曲线及安全机制。 | **只读严禁覆盖。** 新增组件时只需调用 `useDesignTokens` 取值，不能私自改写现有 4 套主题的基础配方。 |
+| **核心工坊面板**<br>`ShowcasePanel.tsx` | `/src/components/ShowcasePanel.tsx` | "原子组件工坊(Atoms)" 工作区的纯物理实现，渲染所有 Atoms 的 Props 调节表和状态测试，供设计师直观微调。 | **专职测试面板。** 后续如果物理繁衍了新原语，可在此增添原语的测试项。平时绝对禁止在此写业务视图。 |
+| **变量配置面板**<br>`DesignTokenPanel.tsx` | `/src/components/DesignTokenPanel.tsx` | "全局令牌配置(Tokens)" 工作区，将 Context 里的各项数值以高级可视化、代码框导出方式呈报出来，供 UI 验收。 | **工具性只读面板。** 仅当令牌系统的数据结构整体重构时才允许进行微量属性对接，禁止在此干涉组件。 |
+| **实战拼装沙盒**<br>`ScenarioSandbox.tsx` | `/src/components/ScenarioSandbox.tsx` | "实战拼装沙盒(Sandbox)"。内置了一个经典的“云容器实例初始化表单”拼装实战，并提供了一个可以通过 **声明式 JSON Schema** 直接转 React 页面及 Prompt 校验的运行时机器。 | **示例级拼装。** 这里可以修改或新增 JSON 协议运行模板，用以向高层汇报“标准件复用率”。业务页面严禁挤在这里。 |
+| **标准协作规范**<br>`FrameworkDocs.tsx` | `/src/components/FrameworkDocs.tsx` | "集成设计规范(Blueprint)"，将 PM-UI-DEV 三端协作共识表格化呈现，阐述无缝对接理论。 | **文档面板。** 纯静态，极少需要改动。 |
 
 ---
 
-## 💎 锦囊四：高成效研发自检 Checklist
+## 🚧 第三章：业务页面隔离设计模式 (Page Isolation Pattern)
 
-不论后续的 AI 工具协助您扩充了几个组件（比如后续可能想增添 `Checkbox`, `Tabs`, `Alert` 分流原语），它必须在完成产出后默念自我审核这四部曲：
+这是回答 **“在实际业务中想编写一个新页面（例如用户大盘、实例监控中心、历史账单等）需要写在什么地方，怎么生效，才不污染现有组件库系统？”** 的终极方案。
 
-1.  **色彩无一野生**：我有手动写过 `#XXXXXX` 或 `rgb()` 这种没有在 `tokens` 中注册的临时颜色吗？如果没有，才是高分。
-2.  **动效无一乱用**：所有的打开下拉滑坡、弹窗平滑，均使用的是配合 `tokens.behaviors.motionCurve` 驱动的 `motion/react` 封装吗？
-3.  **零多余 DOM 废代码**：所有的界面排布依然能百分之百兼容 Layer 5 级别的 JSON 抽象表示吗？
-4.  **12 栅格自适应**：所有的栏目组装，均良好落在了 12 响应式栅格结构内，且没有在宽屏幕上出现失重拉扯吗？
+### 1. 【隔离开发金律】
+- **所有后续新编写的高保真业务功能、完整管理模块、全栈功能卡片，一律创建在 `/src/views/` 目录下！** （如：`/src/views/MyBusinessDashboard.tsx`）
+- 严禁在 `/src/components/` 的任意地方、或是核心原语 `atoms` 文件夹下揉捏、撰写带着临时接口、特定逻辑的业务性大型组件。
+
+### 2. 【主动挂载打通预览（Auto-Wiring Gold Rule - MANDATORY）】
+- **【绝不容忍代码孤岛】**: 无论后续你在 `/src/views/` 目录下创办、编写了什么全新的定制化业务高保真面板（如：`NetworkGraphEditModal.tsx` 或实例详情页）：**你必须把“主动挂载预览”视为你的绝对自觉义务，无需等待用户请示或下令！**
+- **【标准两部曲主动落地】**:
+  - **第一步 [物理落地]**: 确保你的 React 页面完全编写在独立的 `/src/views/` 目录下（如 `/src/views/NetworkGraphEditModal.tsx`）。
+  - **第二步 [大盘注册]**: 立即、直接修改中央视图分发控制器 => `/src/views/index.tsx`，在 `VIEWS_REGISTRY` 列表中将刚才物理落地的新组件执行 Named Import，并提供对应的 `id`、`name`（如：网络图信息修改弹窗）、`desc` 描述、以及标签，让其无感登记。
+- **【极速演示规范】**:
+  当你修改完后，请在最终回复中，自信且清晰地引导用户：“✨ 我已经将刚才为您编写的【XXXX 页面】自动挂载并打通了预览入口。您现在可以在屏幕上方点击 **页面业务沙盒(Views)** Tab 选项卡，在子选项条目中选中 **‘XXXX’** 即可立刻零门槛、零断层渲染查验！”
+
+这样，原本散落在四周的业务功能拥有了绝对集中且平滑的展示舞台，且底层的所有 Atoms 库（没有杂质）随时允许作为独立的 pure packages 导出或发布，清爽解耦！
+
+---
+
+## 🚀 第四章：自由度与标准化——逃生舱机制 (The Escape Hatch Rule)
+
+我们不希望由于“过度的标准化约束”扼杀业务页面对非对称、灵活多变高保真视觉效果的追求。本规范支持完美自锁的 **逃生舱机制 (Escape Hatch)**：
+
+```
+                    【面临研发场景分类判断】
+                               |
+            +------------------+------------------+
+            |                                     |
+    【标准基础表单/交互】                 【特殊非常规复杂视觉】
+    (Input, Button, Dropdown)         (如 拓扑 SVG、D3 曲线、数字连线)
+            |                                     |
+            v                                     v
+    【强制走标准 Atoms 轨道】               【进入逃生舱通道 (Escape Hatch)】
+    * 拼装 AI_MANIFEST.json             * 自由使用原生 HTML5 / SVG / D3。
+    * 自愈微交互体验                     * 样式绑定：必须与 tokens 令牌深度咬合。
+    * 支持一键 4 主题无差切变。             * `style={{ color: tokens.colors.brand }}`
+```
+
+### 🔓 逃生舱实操范例
+如果你要编写一个极其特殊的百分比进度滑块，当前的 `Input` 和 `Button` 做不出来：
+1. **允许通过 HTML 拼装自定义的交互结构**。
+2. **样式契约锁定**：绝对**不允许**写：`<div className="rounded-lg border border-slate-200 text-blue-600 bg-white shadow-xl">`（这些在黑色主题或糖果主题下会显得混乱）。
+3. **正确解法**：
+   ```tsx
+   import { useDesignTokens } from '../components/base/DesignTokensContext';
+   
+   export const FancySlider = () => {
+     const { tokens } = useDesignTokens();
+     return (
+       <div 
+         className="p-4 transition-all"
+         style={{
+           backgroundColor: tokens.colors.bgCard, // 卡片表面一律随主题底色变白或微暖
+           border: `1px solid ${tokens.colors.border}`,
+           borderRadius: tokens.borders.radiusMd // 圆角一律随主题变锐或极圆润
+         }}
+       >
+         <span style={{ color: tokens.colors.textPrimary }}>滑动进度</span>
+         {/* 原生滑块，但配色死锁 */}
+         <input 
+           type="range" 
+           style={{ accentColor: tokens.colors.brand }} // 品牌点缀随之缩放
+         />
+       </div>
+     );
+   }
+   ```
+
+---
+
+## 🧩 第五章：自我进化协议——新原语繁衍四步法 (Self-Evolution protocol)
+
+当用户的诉求需要我们在底层 Atoms 库中繁殖一个真正的高品质通用基建原语时（如：后续可能需要增添的 `Badge.tsx`, `Checkbox.tsx` 等），AI 必须严格执行以下四步强事务，**错一步、少一步均被判为进化失败。**
+
+### 1. 双契约先行 (Dual-Contract First)
+在真正落地物理文件前，必须率先在以下两个控制中心登记，形成声明契约：
+- **TS 类型契约登记**：在 `/src/types/components.ts` 中新增该原语对应的 TypeScript `interface` Props 接口（作为标准类型契约，供后续开发快速查阅）；
+- **JSON 交互契约登记**：在 `/src/components/AI_MANIFEST.json` 的 `"components"` 列表中追加属性元数据与交互描述解释（作为沙盒和 JSON 动态拼装的依据）。
+
+### 2. 物理繁衍 (Physical Creation)
+在 `/src/components/atoms/` 下，建立符合类型约束且拥有中文交互保姆注释的 `.tsx` 实体：
+- 首行 Named Import，绝不使用 `import type` 引用 TS Enums。
+- 导入并解析 `useDesignTokens`，将配色、字体字重、动画回弹曲线应用到其视图层实现，绝对做到多品牌一秒兼容。
+
+### 3. 运行时挂载 (Runtime Mapping)
+由于系统具有 Layer 5 声明式渲染的实战沙盒特性，你必须在 `/src/components/ScenarioSandbox.tsx` 中的渲染匹配分支（如 `parseDeclarativeElement` 函数）内注册新写原语的翻译动作，好让它支持模拟 Prompt 实时生成和展示。
+
+### 4. 编译闭环校验 (Verify & Lint)
+不把带病的组件留给用户，本地静静运行：
+- `npm run lint` 或者 `tsc --noEmit`，100% 确认无挂载引用脱节、无多余未引用变量，保证合并干净流畅。
+
+---
+
+## 💎 第六章：AI 开发自检 Checklist (Dual-Test Prompts)
+
+作为对自己的极限把关，所有协助开发的 IDE 助手在告知用户开发完毕前，**必须自己在心中默念并验证完毕以下 4 道自测防线，才算金牌交付：**
+
+1. 🎯 **「颜色血统度量」**：在查看刚才修改和增补的文件时，里面包含任何硬编码色彩（如 `#ef4444` `rgb()` `bg-[#333]`）或者是硬定义圆角（如常规的 `rounded-[10px]`）吗？如果有，请立刻使用 `tokens` 变量或 Tailwind 标准通用原子阶梯类进行覆盖。
+2. 🔀 **「死锁回弹测定」**：引入的动画是否在甜美糖果与经典黑白主题下，正确调用了 `tokens.behaviors.motionCurve` 做阻尼自适应？在终端运行时是否有卡顿与 HMR 崩裂报错？
+3. 📦 **「非侵入隔离审查」**：新页面是不是干干净净地呆在独立的 `/src/views/` 文件夹下？它的样式变化对于其他不相关的组件测试面、文档面是不是没有任何溢出和挤压？
+4. 🚀 **「双校验指示灯」**：`tsc --noEmit` 打包有没有发生任何 ts 类型报错与变量未定义遗漏？
+
+---
+
+> 🎉 **恭喜，开启你在这套美妙而优雅的 AI-Native 五层架构下的创作之旅吧！**

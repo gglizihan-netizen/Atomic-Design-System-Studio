@@ -1,0 +1,29 @@
+# .claudecoderules - Atomix UI 开发智能自锁与令牌契约守则
+
+# ============== AI Token 减排与契约读取防线 (MANDATORY) ==============
+
+- **【高频高损耗痛点防范】**: 当用户要求你编写新视图、弹窗或新业务时，**严禁使用 Glob 工具遍历或用 Read 工具读取 `src/components/atoms/*.tsx` 核心物理组件的原件全代码！**
+- **理由**: 原子组件（如 Button.tsx, Modal.tsx）包含大量的多主题过渡曲线过渡时长转换，以及微行为交互 transform 变换的物理计算代码（往往在 200~300 行）。直接读取它们会造成大量的 Token 浪费。
+- **【精简查找规范】**:
+  1. 如果你要获知组件的 **接口 Props、可选参数、回调方法**：你**必须且仅被允许**读取统一契约文件 => `/src/types/components.ts` 或者是规范文件 => `/src/components/AI_MANIFEST.json`。
+  2. 这两个契约文件（只有几十行纯类型）已经对系统中所有标准组件（如 `Button`, `Input`, `Dropdown`, `Modal`, `Navbar`）做好了 100% 的契约参数覆盖。 
+  3. 导入时在页面中正常执行 Named Imports 即可：
+     `import { Button } from '../components/atoms/Button';`
+
+# ============== 开发与隔离规范 (Page Isolation Rule) ==============
+
+- **【核心红线】**: 业务页面和复杂的网络拓扑页面，**绝不允许硬塞到 `src/components/` 下**！
+- **【放置规范】**:
+  - 新业务页面一律编写在 `/src/views/` 目录下（例如：`/src/views/MyDashboard.tsx`）。
+  - **【主动挂载打通预览（Auto-Wiring Gold Rule - MANDATORY）】**：当你在 `/src/views/` 目录下物理新建任何定制化页面后，**你必须把它作为开箱即用功能的绝对自觉，无需等候用户下达额外指示或催促，主动在 `/src/views/index.tsx` 的 `VIEWS_REGISTRY` 列表中登记当前组件**，提供其 Named Import 与对应的展示 `id`, `name`, `desc` 属性。确保新页面立刻能在系统的“页面业务沙盒 (Views)”二级选项条中一键切换 and 查验！严禁使其变成无预览入口的“代码孤岛”。
+- **【风格继承机制】**: 
+  - 所有新写的业务页面，必须首先在顶部解构 `const { tokens } = useDesignTokens();` 并提取色彩、圆角变量进行 UI 计算渲染。
+  - **严禁任何硬编码十六进制色彩（如 `#ffffff` 或 `#1e1b4b`）**，当要微调特定组件时，使用 `tokens.colors.brand` 或 `tokens.colors.border` 进行无差支配。
+
+# ============== 自动化繁衍规范 (Self-Evolution) ==============
+
+如果用户明确命令你需要 **“向下扩充一个新的通用原子原语（如 Checkbox, Slider）并向母体备案”**，说明面临原子组件的自我繁衍：
+1. **第一步 [契约备案]**: 先在 `/src/components/AI_MANIFEST.json` 追加新增组件的 Props & Category 元数据。
+2. **第二步 [物理落地]**: 在 `/src/components/atoms/` 建立同名 `.tsx` 实体。组件必须支持 `useDesignTokens`，确保在「甜美糖果、冷酷极客、极简现代、复古微暖」四大主题中具备全景自适应配色，不发生色彩穿帮。
+3. **第三步 [沙盒登记]**: 在 `/src/components/ScenarioSandbox.tsx` 里的声明式 UI 解析机（如 `parseDeclarativeElement`）下绑定分支节点，使该原语具有运行时 JSON Schema 拼装展示能力。
+4. **第四步 [编译自愈]**: 本地默默进行编译，不允许带着 TypeScript 隐性类型报错交付给用户。

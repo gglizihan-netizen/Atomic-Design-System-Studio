@@ -9,6 +9,7 @@ import { DesignTokenPanel } from './components/DesignTokenPanel';
 import { ShowcasePanel } from './components/ShowcasePanel';
 import { ScenarioSandbox } from './components/ScenarioSandbox';
 import { FrameworkDocs } from './components/FrameworkDocs';
+import ViewsStudioContainer from './views/index';
 import {
   Sparkles,
   Settings,
@@ -19,12 +20,13 @@ import {
   Github,
   HelpCircle,
   FileCode,
+  Layout,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 function StudioLayout() {
   const { tokens } = useDesignTokens();
-  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'tokens' | 'playground' | 'sandbox' | 'docs'>('playground');
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'tokens' | 'playground' | 'sandbox' | 'docs' | 'views'>('playground');
 
   const workspaceTabs = [
     {
@@ -44,6 +46,12 @@ function StudioLayout() {
       label: '实战拼装沙盒 (Sandbox)',
       desc: '原子级积木组装真实高危交互场景',
       icon: <LayoutTemplate className="w-4 h-4" />,
+    },
+    {
+      id: 'views' as const,
+      label: '页面业务沙盒 (Views)',
+      desc: '独立隔离高保真业务界面开发演示',
+      icon: <Layout className="w-4 h-4" />,
     },
     {
       id: 'docs' as const,
@@ -181,6 +189,7 @@ function StudioLayout() {
               {activeWorkspaceTab === 'tokens' && <DesignTokenPanel />}
               {activeWorkspaceTab === 'playground' && <ShowcasePanel />}
               {activeWorkspaceTab === 'sandbox' && <ScenarioSandbox />}
+              {activeWorkspaceTab === 'views' && <ViewsStudioContainer />}
               {activeWorkspaceTab === 'docs' && <FrameworkDocs />}
             </motion.div>
           </AnimatePresence>
