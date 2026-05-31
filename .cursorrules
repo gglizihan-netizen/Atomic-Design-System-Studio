@@ -16,9 +16,11 @@
 - **【放置规范】**:
   - 新业务页面一律编写在 `/src/views/` 目录下（例如：`/src/views/MyDashboard.tsx`）。
   - **【主动挂载打通预览（Auto-Wiring Gold Rule - MANDATORY）】**：当你在 `/src/views/` 目录下物理新建任何定制化页面后，**你必须把它作为开箱即用功能的绝对自觉，无需等候用户下达额外指示或催促，主动在 `/src/views/index.tsx` 的 `VIEWS_REGISTRY` 列表中登记当前组件**，提供其 Named Import 与对应的展示 `id`, `name`, `desc` 属性。确保新页面立刻能在系统的“页面业务沙盒 (Views)”二级选项条中一键切换和查验！严禁使其变成无预览入口的“代码孤岛”。
-- **【风格继承机制】**: 
-  - 所有新写的业务页面，必须首先在顶部解构 `const { tokens } = useDesignTokens();` 并提取色彩、圆角变量进行 UI 计算渲染。
-  - **严禁任何硬编码十六进制色彩（如 `#ffffff` 或 `#1e1b4b`）**，当要微调特定组件时，使用 `tokens.colors.brand` 或 `tokens.colors.border` 进行无差支配。
+- **【风格继承机制与设计系统严契防线（核心警示：勿因对齐微调而硬编码）】**: 
+  - 所有新写的原子组件、业务页面、装饰卡片，绝对不要尝试编写硬编码颜色、背景色（如 `style={{ background: '#F1F5F9' }}`）或圆角值，也不允许在 class 中混入未经令牌化、未与换肤咬合的硬编码 Tailwind 颜色（如 `bg-[#333]`）。
+  - 当 AI 为了高保真对齐特定设计稿或截图时，**如果发现全局 `tokens` 中根本没有能支持具体微细状态语义的 Slot（例如：缺少药丸标签底色、已选择非Hover底色等）：你严禁图省事硬编码 16 进制颜色！这是不可饶恕的主题穿帮死罪！**
+  - **【唯一正确解法（增补三部曲）】**：先前往 `/src/types/tokens.ts` 下的 `ColorSet` 添加你需要的语义 Slot 声明，随后立即在 `/src/constants/presets.ts` 将系统支持的**所有四套预设主题**全量补齐该 Slot 对应的精细色值，最后在组件中引用这个新增的 `tokens.colors.你的新Slot`。唯有这样，才能确保四大主题一键换肤、换动效时色彩 100% 协调而不穿帮！
+  - 提取色彩、圆角变量进行 UI 计算渲染，使用 `tokens.colors.brand` 或 `tokens.colors.border` 进行排布支配。
 
 # ============== 自动化繁衍规范 (Self-Evolution) ==============
 

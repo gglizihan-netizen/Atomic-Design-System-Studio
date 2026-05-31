@@ -27,6 +27,8 @@ import { Button } from './atoms/Button';
 import { Input } from './atoms/Input';
 import { Dropdown } from './atoms/Dropdown';
 import { Modal } from './atoms/Modal';
+import { Breadcrumb } from './atoms/Breadcrumb';
+import { Home } from 'lucide-react';
 import {
   Server,
   Terminal,
@@ -258,11 +260,35 @@ export const ScenarioSandbox: React.FC = () => {
           }
         ]
       }
+    },
+    navTree: {
+      title: '生成智能超长路径折叠面包屑 [NavPath]',
+      prompt: '“生成一个展示虚拟机性能大盘深层路径的面包屑导航条。最深到监控详情页。限制最大可见为3个节点，首尾各保留一个，以防多行拥挤。”',
+      schema: {
+        type: 'NavigationPath',
+        title: '云监控多层物理路径导航 (Breadcrumb)',
+        children: [
+          {
+            element: 'Breadcrumb',
+            props: {
+              items: [
+                { label: '系统根节点', href: '#/' },
+                { label: '北京群集可用单元', href: '#/clusters' },
+                { label: '二区分散拓扑网络', href: '#/topology' },
+                { label: '高频性能指标实时大盘监控' }
+              ],
+              maxItems: 3,
+              itemsBeforeCollapse: 1,
+              itemsAfterCollapse: 1
+            }
+          }
+        ]
+      }
     }
   };
 
   // 选择哪一个 AI 模拟模板
-  const [activeAITemplate, setActiveAITemplate] = useState<'auth' | 'risk' | 'filter'>('auth');
+  const [activeAITemplate, setActiveAITemplate] = useState<'auth' | 'risk' | 'filter' | 'navTree'>('auth');
   const currentAIPayload = AI_SAMPLE_PROMPTS[activeAITemplate];
   
   // 内存中可直接被 PM 编辑的 JSON 协议字符串
@@ -275,7 +301,7 @@ export const ScenarioSandbox: React.FC = () => {
   const [runTimeModalOpen, setRunTimeModalOpen] = useState(false);
 
   // 当用户点击切换左侧 AI 快捷指令时，动态填充文本
-  const handleSelectAITemplate = (id: 'auth' | 'risk' | 'filter') => {
+  const handleSelectAITemplate = (id: 'auth' | 'risk' | 'filter' | 'navTree') => {
     setActiveAITemplate(id);
     setEditableSchemaStr(JSON.stringify(AI_SAMPLE_PROMPTS[id].schema, null, 2));
     setJsonError('');
@@ -496,6 +522,50 @@ export const ScenarioSandbox: React.FC = () => {
         );
       }
 
+      // 💥 模式四：AI 组装的面包屑多层路径导航
+      if (schemaObj.type === 'NavigationPath') {
+        return (
+          <div 
+            className="p-5 border transition-all"
+            style={{
+              backgroundColor: tokens.colors.bgCard,
+              borderRadius: tokens.borders.radiusLg,
+              borderColor: tokens.colors.border,
+            }}
+          >
+            <div className="mb-3.5 pb-2.5 border-b border-dashed" style={{ borderColor: tokens.colors.border }}>
+              <h5 className="text-xs font-bold tracking-wider flex items-center gap-1" style={{ color: tokens.colors.textSecondary }}>
+                <Server className="w-4 h-4 text-indigo-500 shrink-0" />
+                {schemaObj.title || '层级路径导航'}
+              </h5>
+            </div>
+            
+            <div className="py-2.5 px-3 rounded" style={{ backgroundColor: tokens.colors.bgPage }}>
+              {schemaObj.children?.filter((c: any) => c.element === 'Breadcrumb').map((child: any, idx: number) => (
+                <Breadcrumb
+                  key={`ai-breadcrumb-${idx}`}
+                  items={
+                    child.props?.items?.map((item: any, i: number) => {
+                      // 给首个项挂一个 Home 图标，体验更加真实
+                      if (i === 0) {
+                        return { ...item, icon: <Home size={14} /> };
+                      }
+                      return item;
+                    }) || []
+                  }
+                  maxItems={child.props?.maxItems}
+                  itemsBeforeCollapse={child.props?.itemsBeforeCollapse}
+                  itemsAfterCollapse={child.props?.itemsAfterCollapse}
+                  onItemClick={(item) => {
+                    alert(`🚀 [Breadcrumb Runtime Click] 点击了契约节点: "${item.label}"`);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       // 备份防空
       return <div className="text-xs text-slate-400">未知 Schema 结构变种</div>;
 
@@ -575,7 +645,7 @@ export const ScenarioSandbox: React.FC = () => {
               </h4>
               
               <div className="flex flex-col gap-2">
-                {(['auth', 'risk', 'filter'] as const).map((id) => (
+                {(['auth', 'risk', 'filter', 'navTree'] as const).map((id) => (
                   <button
                     key={id}
                     onClick={() => handleSelectAITemplate(id)}

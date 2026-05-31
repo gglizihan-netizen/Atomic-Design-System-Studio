@@ -9,21 +9,21 @@ export const DesignTokenPanel: React.FC = () => {
 
   const presetsList: { id: ThemePreset; name: string; desc: string; colors: string[] }[] = [
     {
+      id: 'intelligent_workspace',
+      name: 'Intelligent Workspace',
+      desc: '截图提炼·高密极简、品牌皇家蓝与超轻空气感',
+      colors: ['#1E40AF', '#F3F4F6', '#111827', '#E5E7EB'],
+    },
+    {
       id: 'swiss_modern',
       name: 'Swiss Modern',
       desc: '精准理性、黑白灰蓝、小圆角',
       colors: ['#0F2C59', '#F8FAFC', '#0F172A', '#E2E8F0'],
     },
     {
-      id: 'tech_mono',
-      name: 'Terminal Mono',
-      desc: '单色黑客、极窄间隙、直角锋利',
-      colors: ['#10B981', '#090D16', '#F3F4F6', '#1F2937'],
-    },
-    {
       id: 'editorial_warm',
       name: 'Editorial Warm',
-      desc: '人文学学风、象牙黄、温润红与衬线体',
+      desc: '人文学风、象牙黄、温润红与衬线体',
       colors: ['#7C1C1C', '#FCFBF6', '#291811', '#E8E5DD'],
     },
     {

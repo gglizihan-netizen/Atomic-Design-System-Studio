@@ -170,17 +170,17 @@ export const Icon: React.FC<IconProps> = ({
   const getColorValue = (v: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'custom' | 'none') => {
     switch (v) {
       case 'primary':
-        return tokens.colors.brand;
+        return tokens.colors.iconBrand || tokens.colors.brand;
       case 'success':
         return tokens.colors.success || '#10B981';
       case 'warning':
-        return '#F59E0B'; // 经典醒目琥珀色 (Amber)
+        return tokens.colors.warning || '#F59E0B';
       case 'danger':
         return tokens.colors.error || '#EF4444';
       case 'info':
-        return tokens.colors.brand; // 信息默认共享品牌色或特定的亮蓝色
+        return tokens.colors.info || tokens.colors.brand;
       case 'default':
-        return tokens.colors.textMuted || '#94A3B8';
+        return tokens.colors.iconSecondary || tokens.colors.textMuted || '#94A3B8';
       case 'none':
       default:
         return undefined;

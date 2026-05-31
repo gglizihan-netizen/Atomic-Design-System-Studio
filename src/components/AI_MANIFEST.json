@@ -98,7 +98,7 @@
     "Dropdown": {
       "tag": "select",
       "category": "Data Selection",
-      "description": "高密度下拉单选组件原语。支持内置模糊检索搜索栏以及二级副标题说明槽，适合长数据选定而不溢出屏幕物理边界。",
+      "description": "高密度下拉单选/多选择一体化组件原语。支持内置模糊检索搜索栏栏以及选项二级副标题说明。在多选模式下提供 removable tag 药丸式微交互反馈与圆润多态复选框对齐。",
       "props": {
         "label": {
           "type": "string",
@@ -121,19 +121,24 @@
           "description": "供用户选择的数据数组。每一个元素可包含 label(大文案)、value(代码端硬编码、数据库使用的原数值)、description(这个选项专门的二级小字翻译，极大提升产品亲和力)"
         },
         "value": {
-          "type": "string",
+          "type": "string | Array<string>",
           "required": true,
-          "description": "当前已被选定的 option.value 字符"
+          "description": "当前选定的值。单选模式下对应 option.value 字符；多选模式下为字符数组 Array<string>"
         },
         "onChange": {
           "type": "Function (value => void)",
           "required": true,
-          "description": "一键切换所选时触发的回调通知"
+          "description": "一键切换所选时触发的回调通知。多选模式下将传递更新后的已选数组对象"
         },
         "enableSearch": {
           "type": "boolean",
           "default": false,
           "description": "为 true 时自动激活下拉面板头部的快捷即时模糊输入区。能极快地帮用户在多达几十甚至几百条的超长列表中筛选出包含该关键字的目标，强体验！"
+        },
+        "multiple": {
+          "type": "boolean",
+          "default": false,
+          "description": "多选开关。开启后，下拉框支持复选并且会在选择触发器内直接展示 Removable Tags 标签流"
         },
         "error": {
           "type": "string",
@@ -269,6 +274,150 @@
       },
       "behaviors_inherited": [
         "behaviors.motionDurationFast (切换或悬停状态变色过渡时长的阻尼)"
+      ]
+    },
+    "Breadcrumb": {
+      "tag": "nav",
+      "category": "Navigation",
+      "description": "智能超长路径折叠面包屑原语。自适应系统的排版字型令牌（headingFont），且支持通过内置的微交互进行一键全链条平滑展开，防止深层路径折行挤压。",
+      "props": {
+        "items": {
+          "type": "Array<{ label: string | ReactNode, href?: string, icon?: ReactNode }>",
+          "required": true,
+          "description": "面包屑节点链路列表。label(节点名称)；href(可点击的路由，不传表示节点不可点击)；icon(前置个性化或业务图标)"
+        },
+        "maxItems": {
+          "type": "number",
+          "default": 4,
+          "description": "路径显示的最大节点数。超出阈值的中间节点会被自动折叠成“...”，点击即可无缝平铺全展开"
+        },
+        "itemsBeforeCollapse": {
+          "type": "number",
+          "default": 1,
+          "description": "折叠时，左侧/前端保留不被折叠的节点个数"
+        },
+        "itemsAfterCollapse": {
+          "type": "number",
+          "default": 1,
+          "description": "折叠时，右侧/末端（含有当前页面）保留不被折叠的节点个数"
+        },
+        "separator": {
+          "type": "ReactNode | string",
+          "required": false,
+          "description": "自定义分隔符。如果不传，系统会捕获字型属性自适应分发优雅的分隔符形态（如 / 或向右细箭头）"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (点击“...”合并项一键展平的平滑物理插值)",
+        "behaviors.motionDurationFast (悬停药丸气垫微光圈淡入淡出动画秒)"
+      ]
+    },
+    "Pagination": {
+      "tag": "nav",
+      "category": "Navigation",
+      "description": "物理自适应分页器。高度对位全局设计令牌设计规则，自带极速自适应折略省略号计算机制与内置每页条数下拉更换框选择器（Dropdown复用型）。",
+      "props": {
+        "currentPage": {
+          "type": "number",
+          "required": true,
+          "description": "当前选定的活跃页码标识"
+        },
+        "totalPages": {
+          "type": "number",
+          "required": true,
+          "description": "当前的记录总页数"
+        },
+        "onPageChange": {
+          "type": "Function (page => void)",
+          "required": true,
+          "description": "当用户触发点击页号切换、或上一页下一页上一页快捷双向按键时发起的回调通知"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "分页组件大小梯度：sm (32px)；md (38px默认)；lg (44px宽幅体验)"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["classic", "modern", "minimal"],
+          "default": "classic",
+          "description": "显示样式变体：classic (经典圆角线框格，具有干净的边框及高保真悬浮高亮)；modern (轻量一体化，抹去沉重边框)；minimal (极简数字页码 Page x of y 布局模式)"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否强锁定为禁用态。激活后整个条带淡化哑光并阻拦一切用户点击和微动画"
+        },
+        "showFirstLast": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否显示一键跳转到第一页/最后一页的快捷双箭头功能按钮"
+        },
+        "showPageSizeChanger": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否在后方开启每页数量更改下拉选项器"
+        },
+        "pageSize": {
+          "type": "number",
+          "default": 10,
+          "description": "当 showPageSizeChanger 为 true 时受控绑定的当前分页尺寸"
+        },
+        "onPageSizeChange": {
+          "type": "Function (size => void)",
+          "required": false,
+          "description": "当每页条数改变下拉选择触发时发起的回调"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.buttonPressScale (Q弹点击缩水感)",
+        "behaviors.motionCurve (各种缓动物理模型曲线自适应)",
+        "behaviors.motionDurationFast (悬停变色、背景微调过度周期)"
+      ]
+    },
+    "Steps": {
+      "tag": "div",
+      "category": "Navigation",
+      "description": "高精度物理自适应步骤条。内置支持 error 警戒线等混合流状态计算，具备 process 进行中主色背景沉稳高亮视觉设计、以及 horizontal 和 vertical 双方向布局桥接，100% 对位全局设计系统预置主题感知。",
+      "props": {
+        "current": {
+          "type": "number",
+          "required": true,
+          "description": "当前进度活跃位置的下标 (0-indexed: 0 代表第一步)"
+        },
+        "items": {
+          "type": "StepItem[]",
+          "required": true,
+          "description": "步骤列表。单节点 StepItem 的字段含有: title (标题必填), description (说明二选一), icon (Lucide 矢量名), disabled (是否禁用 clickable), status (选填 'wait' | 'process' | 'finish' | 'error')"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["horizontal", "vertical"],
+          "default": "horizontal",
+          "description": "呈现方向排列：horizontal（横向流程指示器）; vertical（纵向大跨度表单侧栏）"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "步骤圆环及尺寸密度级别规格"
+        },
+        "clickable": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否允许用户直接点击步骤节点（如果开启，则有 Hover 变色及点击 Q 弹，阻尼微振动画并且回调 onStepChange 事件）"
+        },
+        "onStepChange": {
+          "type": "Function (index => void)",
+          "required": false,
+          "description": "步骤索引被用户成功切用、甚至直接跳跃跨度修改时的交互动作"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.buttonPressScale (点击按压圆圈果冻捏缩感)",
+        "behaviors.motionCurve (横纵向切换平滑自适应、动作插值和过渡曲线)",
+        "behaviors.motionDurationFast (色彩、Hover渐淡高保真感知耗时)"
       ]
     }
   },

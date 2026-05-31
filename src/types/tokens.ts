@@ -29,12 +29,30 @@ export interface ColorSet {
   bgPage: string;      // 页面底色 (整个应用的最大背景画布颜色)
   bgCard: string;      // 卡片底色 (处于画布之上的内容板块、卡片容器底色)
   bgInput: string;     // 表单输入框底色 (让输入区域在卡片里有轻微下凹感)
-  textPrimary: string; // 一级文本色 (用于大标题、正文核心文字，高对比度)
-  textMuted: string;   // 辅助文本色 (用于说明、标签、次要备注，中性淡色)
+  textPrimary: string; // 一级标题和高对比文本色 (用于大标题、主标签，极高对比度)
+  textSecondary: string; // 二级段落文本色 (主要高密文本段落、次级说明、普通正文)
+  textMuted: string;   // 三级轻柔辅助文本色 (用于不瞩目说明、微小注音、超次要备注，中性低强)
+  textInverse: string; // 反色/品牌色上文本色 (如填充品牌色或警示色按钮内部的白/亮文字)
   border: string;      // 默认边框和网格分割线色 (用于区分不同区域)
   borderFocus: string; // 聚焦边框色 (文本框、选择框获得键盘焦点时的强对比色)
+  bgHover: string;     // 通用中性悬停背景色 (适用于下拉列表Hover、一般列表Hover项、轻量按钮Hover等)
+  bgActive: string;    // 通用中性激活/选中背景色 (适用于列表选中态、键盘导航选中项目焦点等)
+  bgDisabled: string;  // 禁用控制组件的底板底色 
+  textDisabled: string; // 禁用按钮、文本框内的灰色文字色
+  borderDisabled: string; // 禁用控件的外框轮廓色
+  iconPrimary: string; // 强相关功能图标的色彩（往往紧跟 textPrimary 的视觉重量）
+  iconSecondary: string; // 弱辅助图标、装饰小箭头图标色（紧跟 textMuted）
+  iconBrand: string;   // 品牌特色高亮标志或动作控制图标色
+  focusRing: string;   // 聚焦环扩张光晕颜色 (可带有透明度如 rgba0.15 确保自然发散)
   success: string;     // 成功反馈色 (绿色系，用于表单校验正确、保存成功状态)
+  successBg: string;   // 成功状态轻描背景色 (搭配 success 文字共同构成友好通知卡，如淡绿底)
   error: string;       // 错误反馈色 (红色系，用于表单报错、高危毁灭性操作警告)
+  errorBg: string;     // 错误状态轻描背景色 (搭配 error 文字共同构成高能警示框，如淡红底)
+  warning: string;     // 警告警告色 (橙色系，介于成功与错误之间，用于温馨指正或不致命告急)
+  warningBg: string;   // 警告状态轻描背景色 (搭配 warning 文字，如淡橙底)
+  info: string;        // 提示信息色 (深蓝、天蓝系，用于 system 层全局通知或中性向导指引)
+  infoBg: string;      // 引导状态轻描背景色 (搭配 info 文字，如淡蓝底)
+  bgTag: string;       // 药丸式标签 (Tags/Pills) 的纯净轻柔衬托背景底色 (解耦自 input/hover，更加纯净独立)
 }
 
 /**
@@ -122,4 +140,4 @@ export interface DesignTokens {
 /**
  * 🏷️ 系统支持的四套默认经典设计主题键名定义
  */
-export type ThemePreset = 'swiss_modern' | 'tech_mono' | 'editorial_warm' | 'sweet_rounded';
+export type ThemePreset = 'intelligent_workspace' | 'swiss_modern' | 'editorial_warm' | 'sweet_rounded';

@@ -81,7 +81,7 @@ export const Input: React.FC<InputProps> = ({
 
   // 3. 计算当前的边框色彩 (无缝响应 默认/聚焦/报错/禁用 状态)
   const getBorderColor = () => {
-    if (disabled) return tokens.typography.headingFont === 'mono' ? '#374151' : '#CBD5E1';
+    if (disabled) return tokens.colors.borderDisabled;
     if (error) return tokens.colors.error;
     if (isFocused) return tokens.colors.borderFocus;
     return tokens.colors.border;
@@ -103,7 +103,7 @@ export const Input: React.FC<InputProps> = ({
     
     // 读取系统令牌的行为倾向：有些主题（如代码终端）严格禁止外聚焦光圈，有些（如软萌香芋）需要梦幻发散光圈
     if (tokens.behaviors.inputFocusRing) {
-      return `0 0 0 3px ${tokens.colors.brand}22`; // 品牌主色的梦幻光雾
+      return `0 0 0 3px ${tokens.colors.focusRing}`; // 使用颜色令牌定义中的聚焦气垫光圈
     }
     
     return tokens.shadows.none; // 反之，拒绝发光圈
@@ -113,7 +113,7 @@ export const Input: React.FC<InputProps> = ({
     display: 'flex',
     alignItems: 'center',
     position: 'relative' as const,
-    backgroundColor: disabled ? (tokens.typography.headingFont === 'mono' ? '#111827' : '#F8FAFC') : tokens.colors.bgInput,
+    backgroundColor: disabled ? tokens.colors.bgDisabled : tokens.colors.bgInput,
     borderRadius: tokens.borders.radiusMd,
     borderWidth: '1px',
     borderStyle: 'solid',
@@ -128,7 +128,7 @@ export const Input: React.FC<InputProps> = ({
     backgroundColor: 'transparent',
     border: 'none',
     outline: 'none',
-    color: disabled ? '#64748B' : tokens.colors.textPrimary,
+    color: disabled ? tokens.colors.textDisabled : tokens.colors.textPrimary,
     fontFamily: 'inherit',
     ...currentSize,
     paddingLeft: iconLeft ? '38px' : tokens.spacings.md,

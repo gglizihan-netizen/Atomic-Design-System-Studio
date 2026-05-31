@@ -6,6 +6,9 @@ import { Dropdown } from './atoms/Dropdown';
 import { Modal } from './atoms/Modal';
 import { Navbar } from './atoms/Navbar';
 import { Icon } from './atoms/Icon';
+import { Breadcrumb } from './atoms/Breadcrumb';
+import { Pagination } from './atoms/Pagination';
+import { Steps } from './atoms/Steps';
 import { IconName } from '../types/components';
 import {
   Code,
@@ -22,12 +25,39 @@ import {
   ArrowRight,
   ShieldAlert,
   Menu,
+  Home,
 } from 'lucide-react';
 
 export const ShowcasePanel: React.FC = () => {
   const { tokens } = useDesignTokens();
-  const [activeTab, setActiveTab] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon'>('button');
+  const [activeTab, setActiveTab] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps'>('button');
   const [copied, setCopied] = useState(false);
+
+  // 9. Steps Demo states
+  const [stepsCurrent, setStepsCurrent] = useState<number>(1);
+  const [stepsDirection, setStepsDirection] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [stepsSize, setStepsSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [stepsClickable, setStepsClickable] = useState<boolean>(true);
+  const [stepsShowDesc, setStepsShowDesc] = useState<boolean>(true);
+  const [stepsHasIcons, setStepsHasIcons] = useState<boolean>(true);
+  const [stepsHasError, setStepsHasError] = useState<boolean>(false);
+
+  // 8. Pagination Demo states
+  const [pagCurrentPage, setPagCurrentPage] = useState<number>(3);
+  const [pagTotalPages, setPagTotalPages] = useState<number>(10);
+  const [pagSize, setPagSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [pagVariant, setPagVariant] = useState<'classic' | 'modern' | 'minimal'>('classic');
+  const [pagDisabled, setPagDisabled] = useState<boolean>(false);
+  const [pagShowFirstLast, setPagShowFirstLast] = useState<boolean>(true);
+  const [pagShowSizeChanger, setPagShowSizeChanger] = useState<boolean>(true);
+  const [pagPageSize, setPagPageSize] = useState<number>(10);
+
+  // 7. Breadcrumb Demo states
+  const [breadMaxItems, setBreadMaxItems] = useState<number>(4);
+  const [breadItemsBefore, setBreadItemsBefore] = useState<number>(1);
+  const [breadItemsAfter, setBreadItemsAfter] = useState<number>(1);
+  const [breadSeparator, setBreadSeparator] = useState<'default' | 'slash' | 'chevron' | 'hyphen' | 'arrow'>('default');
+  const [breadClickedLog, setBreadClickedLog] = useState<string>('暂无（点击上方可点击节点触发点击事件记录）');
 
   // 6. Icon Demo states
   const [iconName, setIconName] = useState<IconName>('ai');
@@ -64,7 +94,18 @@ export const ShowcasePanel: React.FC = () => {
   const [dropError, setDropError] = useState('');
   const [dropSearch, setDropSearch] = useState(true);
   const [dropDisabled, setDropDisabled] = useState(false);
-  const [dropValue, setDropValue] = useState('asia-east1-a');
+  const [dropValue, setDropValue] = useState<string | string[]>('asia-east1-a');
+  const [dropMultiple, setDropMultiple] = useState(false);
+  const [dropShowDesc, setDropShowDesc] = useState(false);
+
+  const handleToggleMultiple = (checked: boolean) => {
+    setDropMultiple(checked);
+    if (checked) {
+      setDropValue(typeof dropValue === 'string' ? [dropValue] : (Array.isArray(dropValue) ? dropValue : ['asia-east1-a']));
+    } else {
+      setDropValue(Array.isArray(dropValue) && dropValue.length > 0 ? dropValue[0] : 'asia-east1-a');
+    }
+  };
 
   // 4. Modal Props states
   const [modalSize, setModalSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('sm');
@@ -99,6 +140,9 @@ export const ShowcasePanel: React.FC = () => {
     { id: 'modal' as const, label: '模态视窗 (Modal Overlay)' },
     { id: 'navbar' as const, label: '导航系统 (Navbar Navigation)' },
     { id: 'icon' as const, label: '智能图标 (Icon & Feedback)' },
+    { id: 'breadcrumb' as const, label: '智能面包屑 (Breadcrumb)' },
+    { id: 'pagination' as const, label: '自适应分页 (Pagination)' },
+    { id: 'steps' as const, label: '级阶步骤条 (Steps Stepper)' },
   ];
 
   // Dynamically build sample code based on props
@@ -142,6 +186,7 @@ export default function MyPage() {
 }`;
       case 'dropdown':
         return `import { Dropdown } from './components/atoms/Dropdown';
+import { useState } from 'react';
 
 const OPTIONS = [
   { label: '华东1区 (杭州) - 可用区A', value: 'cn-hangzhou-a', description: '低空载...' },
@@ -149,18 +194,18 @@ const OPTIONS = [
 ];
 
 export default function MyPage() {
-  const [subnet, setSubnet] = useState('asia-east1-a');
+  const [value, setValue] = useState(${dropMultiple ? "['asia-east1-a']" : "'asia-east1-a'"});
 
   return (
     <Dropdown
       label="${dropLabel}"
       description="${dropDesc}"
       options={OPTIONS}
-      value={subnet}
-      onChange={setSubnet}
+      value={value}
+      onChange={setValue}
       size="${dropSize}"${dropSearch ? '\n      enableSearch' : ''}${dropDisabled ? '\n      disabled' : ''}${
           dropError ? `\n      error="${dropError}"` : ''
-        }
+        }${dropMultiple ? '\n      multiple' : ''}${dropShowDesc ? '\n      showDescription' : ''}
     />
   );
 }`;
@@ -230,6 +275,79 @@ export default function MyPage() {
     <Icon
       name="${iconName}"
       size={${iconSizeType === 'custom' ? iconCustomSize : `'${iconSize}'`}}${iconVariant !== 'default' ? `\n      variant="${iconVariant}"` : ''}${iconHoverVariant !== 'none' ? `\n      hoverVariant="${iconHoverVariant}" font-mono` : ''}${iconSpinning ? '\n      spinning' : ''}
+    />
+  );
+}`;
+      case 'breadcrumb':
+        return `import { Breadcrumb } from './components/atoms/Breadcrumb';
+import { Home } from 'lucide-react';
+
+export default function MyPage() {
+  const items = [
+    { label: '系统根节点', href: '#/', icon: <Home size={14} /> },
+    { label: '安全审计与可用群集', href: '#/clusters' },
+    { label: '边缘计算节点管理', href: '#/edge' },
+    { label: '北京二区虚拟机拓扑组', href: '#/topology' },
+    { label: '当前拓扑图和性能大盘详情' },
+  ];
+
+  return (
+    <Breadcrumb
+      items={items}
+      maxItems={${breadMaxItems}}
+      itemsBeforeCollapse={${breadItemsBefore}}
+      itemsAfterCollapse={${breadItemsAfter}}${
+        breadSeparator !== 'default' 
+          ? `\n      separator="${
+              breadSeparator === 'slash' ? '/' 
+              : breadSeparator === 'chevron' ? '→' 
+              : breadSeparator === 'hyphen' ? '—' 
+              : '›'
+            }"` 
+          : ''
+      }
+      onItemClick={(item, index) => console.log('Clicked:', item, index)}
+    />
+  );
+}`;
+      case 'pagination':
+        return `import { Pagination } from './components/atoms/Pagination';
+import { useState } from 'react';
+
+export default function MyPage() {
+  const [currentPage, setCurrentPage] = useState(${pagCurrentPage});
+  const [pageSize, setPageSize] = useState(${pagPageSize});
+
+  return (
+    <Pagination
+      currentPage={currentPage}
+      totalPages={${pagTotalPages}}
+      onPageChange={setCurrentPage}
+      size="${pagSize}"
+      variant="${pagVariant}"${pagDisabled ? '\n      disabled' : ''}${!pagShowFirstLast ? '\n      showFirstLast={false}' : ''}${pagShowSizeChanger ? `\n      showPageSizeChanger\n      pageSize={pageSize}\n      onPageSizeChange={setPageSize}` : ''}
+    />
+  );
+}`;
+      case 'steps':
+        return `import { Steps } from './components/atoms/Steps';
+import { useState } from 'react';
+
+export default function MyPage() {
+  const [current, setCurrent] = useState(${stepsCurrent});
+
+  const steps = [
+    { title: '实名身份验证',${stepsShowDesc ? " description: '核验绑定真实身分姓名与身份证照'," : ""}${stepsHasIcons ? " icon: 'user'" : ""} },
+    { title: '银行卡账户连接',${stepsShowDesc ? " description: '自主添加结算银联并完成协议代扣签约'," : ""}${stepsHasIcons ? " icon: 'creditcard'" : ""}${stepsHasError ? ", status: 'error'" : ""} },
+    { title: '完成最终安全测评',${stepsShowDesc ? " description: '完成问卷安全答卷并自动归档保存'," : ""}${stepsHasIcons ? " icon: 'lock'" : ""} }
+  ];
+
+  return (
+    <Steps
+      current={current}
+      items={steps}
+      direction="${stepsDirection}"
+      size="${stepsSize}"${stepsClickable ? '\n      clickable' : ''}
+      onStepChange={setCurrent}
     />
   );
 }`;
@@ -323,9 +441,11 @@ export default function MyPage() {
                     error={dropError}
                     enableSearch={dropSearch}
                     disabled={dropDisabled}
+                    multiple={dropMultiple}
+                    showDescription={dropShowDesc}
                   />
                   <p className="text-[10px] text-slate-400 mt-6 text-center font-mono select-none">
-                    * 复杂行为：展开后提供搜索过滤。选中项具有微过渡样式和背景着色标识
+                    * 属性联动：展开后提供搜索过滤。当前支持<strong>单选</strong>与<strong>多选（带 checkbox 并支持可移除 tag 药丸）</strong>两种变体模式自适应
                   </p>
                 </div>
               )}
@@ -471,6 +591,147 @@ export default function MyPage() {
                   </div>
                 </div>
               )}
+
+              {activeTab === 'breadcrumb' && (
+                <div className="w-full animate-fade-in flex flex-col items-center">
+                  <div 
+                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[100px]"
+                    style={{ 
+                      borderRadius: tokens.borders.radiusMd,
+                      backgroundColor: tokens.colors.bgCard
+                    }}
+                  >
+                    <Breadcrumb
+                      items={[
+                        { label: '系统根节点', href: '#/', icon: <Home size={14} /> },
+                        { label: '安全审计与可用群集', href: '#/clusters' },
+                        { label: '边缘计算节点管理', href: '#/edge' },
+                        { label: '北京二区虚拟机拓扑组', href: '#/topology' },
+                        { label: '当前拓扑图和性能大盘详情', href: '#/details' },
+                      ]}
+                      maxItems={breadMaxItems}
+                      itemsBeforeCollapse={breadItemsBefore}
+                      itemsAfterCollapse={breadItemsAfter}
+                      separator={
+                        breadSeparator === 'slash' ? (
+                          <span className="text-slate-400 font-mono mx-1.5 text-xs">/</span>
+                        ) : breadSeparator === 'chevron' ? (
+                          <span className="text-slate-400 font-mono mx-1.5 text-xs">→</span>
+                        ) : breadSeparator === 'hyphen' ? (
+                          <span className="text-slate-400 font-mono mx-1.5 text-xs">—</span>
+                        ) : breadSeparator === 'arrow' ? (
+                          <span className="text-slate-400 font-mono mx-1.5 text-xs">›</span>
+                        ) : undefined // Use auto designer token defaults
+                      }
+                      onItemClick={(item, index, e) => {
+                        e.preventDefault();
+                        setBreadClickedLog(`点击了节点 "${typeof item.label === 'string' ? item.label : 'Root'}"，节点索引 [${index}]`);
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
+                    <div className="text-xs transition-all text-indigo-600 font-bold">{breadClickedLog}</div>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
+                    * 体验微交互：点击中间的 “...” 折叠块可实现瞬间平滑全展开。点击链接节点，可触发下方微交互动作日志纪录联动。
+                  </p>
+                </div>
+              )}
+
+              {activeTab === 'pagination' && (
+                <div className="w-full animate-fade-in flex flex-col items-center">
+                  <div 
+                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[120px]"
+                    style={{ 
+                      borderRadius: tokens.borders.radiusMd,
+                      backgroundColor: tokens.colors.bgCard
+                    }}
+                  >
+                    <Pagination
+                      currentPage={pagCurrentPage}
+                      totalPages={pagTotalPages}
+                      onPageChange={setPagCurrentPage}
+                      size={pagSize}
+                      variant={pagVariant}
+                      disabled={pagDisabled}
+                      showFirstLast={pagShowFirstLast}
+                      showPageSizeChanger={pagShowSizeChanger}
+                      pageSize={pagPageSize}
+                      onPageSizeChange={setPagPageSize}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
+                    <div className="text-xs transition-all text-indigo-600 font-bold">
+                      当前选定页码: Page {pagCurrentPage} | 每页显示条数: {pagPageSize} 条 | 累计总页数: {pagTotalPages} 页
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
+                    * 体验高保真换肤集成：在不同设计主题下，分页器的主色、悬停高光、Q弹按压比例和圆角大小将动态自适应！
+                  </p>
+                </div>
+              )}
+
+              {activeTab === 'steps' && (
+                <div className="w-full animate-fade-in flex flex-col items-center">
+                  <div 
+                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[160px]"
+                    style={{ 
+                      borderRadius: tokens.borders.radiusMd,
+                      backgroundColor: tokens.colors.bgCard
+                    }}
+                  >
+                    <div className="w-full max-w-2xl">
+                      <Steps
+                        current={stepsCurrent}
+                        items={[
+                          { 
+                            title: '身份信息认证', 
+                            description: stepsShowDesc ? "完成真实银行及身分二要素、OCR身份证扫校验证" : undefined, 
+                            icon: stepsHasIcons ? 'user' : undefined 
+                          },
+                          { 
+                            title: '连接清算银行', 
+                            description: stepsShowDesc ? "连接清算划扣行、授权银行代扣及协议绑定结算" : undefined, 
+                            icon: stepsHasIcons ? 'creditcard' : undefined,
+                            status: stepsHasError ? 'error' : undefined
+                          },
+                          { 
+                            title: '安全问卷校验', 
+                            description: stepsShowDesc ? "通过信贷反欺诈特征校验，并生成电子安全测评单" : undefined, 
+                            icon: stepsHasIcons ? 'lock' : undefined 
+                          },
+                        ]}
+                        direction={stepsDirection}
+                        size={stepsSize}
+                        clickable={stepsClickable}
+                        onStepChange={setStepsCurrent}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
+                    <div className="text-xs transition-all text-indigo-600 font-bold">
+                      当前激活进度: 步骤 [{stepsCurrent + 1}] - {
+                        stepsCurrent === 0 ? '身份信息认证阶段' 
+                        : stepsCurrent === 1 ? (stepsHasError ? '连接清算银行 [系统响应错误]' : '连接清算银行阶段') 
+                        : stepsCurrent === 2 ? '安全问卷最后校验' 
+                        : '所有步骤已完结'
+                      } | 页签可点交互状态: {stepsClickable ? '已开启' : '已锁定'}
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
+                    * 体验微交互集成：改变右侧控制面板方向，步骤条可在“横向轻盈跨度”与“纵向细节流”间瞬间平滑自适应切换！开启 clickable 后点击节点即可快速切换。
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -555,7 +816,7 @@ export default function MyPage() {
                 <>
                   <p>
                     <strong>色彩分流与视觉层级保护：</strong>
-                    绝大部分常规操作、配置和导航图标在未选中时，保持温和的<b>中性浅灰</b>（<code>tokens.colors.textMuted</code>/<code>#94A3B8</code>），以此避免对界面内容和结构构成多余的喧宾夺主，保持画面的极简和空气感！
+                    绝大部分常规操作、配置和导航图标在未选中时，保持温和的<b>中性浅灰</b>（<code>tokens.colors.textMuted</code>/<code>#94A3B8</code>），以此避免对界面内容 and 结构构成多余的喧宾夺主，保持画面的极简和空气感！
                   </p>
                   <p className="pt-1.5 border-t border-slate-100">
                     <strong>固化语义色安全阀：</strong>
@@ -564,6 +825,54 @@ export default function MyPage() {
                   <p className="pt-1.5 border-t border-slate-100">
                     <strong>悬吊微反馈 (Trash hover to red)：</strong>
                     删除 (trash/delete) 图标自带悬浮安全暗示——不管初始呈现多么暗淡，在鼠标贴合的一瞬间将转变为<b>警告朱红</b>，暗示危险毁灭动作。
+                  </p>
+                </>
+              )}
+              {activeTab === 'breadcrumb' && (
+                <>
+                  <p>
+                    <strong>折叠折行规避：</strong>
+                    在大纵深或长命名的路由导航路径下，页面极易遭遇挤压和折行灾难。通过设置 <code>maxItems</code> 来开启智能 ellipsis 折叠，确保在一行内紧凑展示。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>一键全平链条微交互：</strong>
+                    由于系统采用高保真行为动效，点击中间的 <code>...</code> 折叠块，系统不会进行粗暴、跳转级别的刷新，而是以平滑的过渡展示未缩折的完整层级。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>个性化分隔符与字重平衡：</strong>
+                    系统自动捕获当前的 <code>tokens.typography.headingFont</code>。例如在 Mono（极客风）下自动搭配无图标的 <code>/</code> 斜杠分割线以营造极简的工业精密度，在普通模式下提供矢量右箭头，同时最后一个代表当前页面的节点自带主色字重加粗。
+                  </p>
+                </>
+              )}
+              {activeTab === 'pagination' && (
+                <>
+                  <p>
+                    <strong>自适应页码折叠：</strong>
+                    对于大规模的数据展现，页码极大时无法完整显示。系统采用自适应折叠算法，始终保留首尾端锚点以及当前选中页的前后邻居页码。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>物理粒子微动：</strong>
+                    页码按键的悬停背景、过渡曲线和点击比例（如萌系下的 Q 弹捏捏感、极客下的沉稳微凹）完美耦合于 <code>behaviors</code> 动作令牌。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>内置页数尺寸改换器：</strong>
+                    通过 <code>showPageSizeChanger</code> 开启轻型 Dropdown 下拉器，不仅在单页面中支持尺寸调节，还能复用系统已有的 <code>Dropdown</code> 原子交互，提高交互一致性。
+                  </p>
+                </>
+              )}
+              {activeTab === 'steps' && (
+                <>
+                  <p>
+                    <strong>多状态精准描画：</strong>
+                    组件自动计算进度并判定 <code>wait</code> (未开始)、<code>process</code> (进行中)、<code>finish</code> (已完成) 状态，甚至支持显式传入 <code>error</code> 渲染，呈现高对比等压警示框。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>精细饱满的纯色聚焦：</strong>
+                    进行中 (process) 的节点外圈自动配以饱满的主色背景，内显反白醒目序号，去除冗余的视觉动态干扰，确保焦点在阅读流中静谧凸显。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>桥接连线自动着色：</strong>
+                    根据流程的走向，串联起步骤的 “桥接线 Bridge Connector” 会随之平滑渡色，在横纵两种维度下完美保持视觉流的连贯和完整性。
                   </p>
                 </>
               )}
@@ -784,24 +1093,44 @@ export default function MyPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">禁用状态</span>
+                <div className="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">禁用状态</span>
                     <input
                       type="checkbox"
                       checked={dropDisabled}
                       onChange={(e) => setDropDisabled(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">开启搜索检索</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">搜索搜索</span>
                     <input
                       type="checkbox"
                       checked={dropSearch}
                       onChange={(e) => setDropSearch(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">开启多选</span>
+                    <input
+                      type="checkbox"
+                      checked={dropMultiple}
+                      onChange={(e) => handleToggleMultiple(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">二级说明</span>
+                    <input
+                      type="checkbox"
+                      checked={dropShowDesc}
+                      onChange={(e) => setDropShowDesc(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
                     />
                   </div>
                 </div>
@@ -1131,6 +1460,336 @@ export default function MyPage() {
                     onChange={(e) => setIconSpinning(e.target.checked)}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'breadcrumb' && (
+              <div className="space-y-4 animate-fade-in">
+                {/* 1. 最大显示项 */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-semibold text-slate-600">最大可见节点数 (maxItems)</label>
+                    <span className="text-xs font-mono font-bold text-indigo-600">{breadMaxItems} 个</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="2"
+                    max="5"
+                    value={breadMaxItems}
+                    onChange={(e) => setBreadMaxItems(Number(e.target.value))}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1 font-normal leading-normal">超过此阈值，中间层级节点会自动被合并</p>
+                </div>
+
+                {/* 2. 折叠前保留数 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">折叠前保留数 (itemsBeforeCollapse)</label>
+                  <select
+                    value={breadItemsBefore}
+                    onChange={(e) => setBreadItemsBefore(Number(e.target.value))}
+                    className="w-full text-xs border rounded p-1.5 bg-white cursor-pointer"
+                  >
+                    <option value={1}>保留 1 个节点 (默认)</option>
+                    <option value={2}>保留 2 个节点</option>
+                    <option value={0}>不保留 (全部隐藏)</option>
+                  </select>
+                </div>
+
+                {/* 3. 折叠后保留数 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">折叠后保留数 (itemsAfterCollapse)</label>
+                  <select
+                    value={breadItemsAfter}
+                    onChange={(e) => setBreadItemsAfter(Number(e.target.value))}
+                    className="w-full text-xs border rounded p-1.5 bg-white cursor-pointer"
+                  >
+                    <option value={1}>保留 1 个节点 (默认)</option>
+                    <option value={2}>保留 2 个节点</option>
+                  </select>
+                </div>
+
+                {/* 4. 分隔符自定义 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">物理分隔符 (Separator Style)</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'default', label: '智能设计分发 (Auto)' },
+                      { id: 'slash', label: '斜杠 [ / ]' },
+                      { id: 'chevron', label: '单右箭头 [ → ]' },
+                      { id: 'hyphen', label: '长连字符 [ — ]' },
+                      { id: 'arrow', label: '细右角形 [ › ]' },
+                    ].map((sep) => (
+                      <button
+                        key={sep.id}
+                        onClick={() => setBreadSeparator(sep.id as any)}
+                        className={`py-1.5 px-2 text-[11px] border rounded transition-all cursor-pointer text-left ${
+                          breadSeparator === sep.id
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {sep.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. 恢复折叠按钮 */}
+                <button
+                  onClick={() => {
+                    // Force state component recreation toggling activeTab to trigger re-folding
+                    const prevTab = activeTab;
+                    setActiveTab('button');
+                    setTimeout(() => setActiveTab(prevTab), 15);
+                  }}
+                  className="w-full py-1.5 text-xs text-center border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded cursor-pointer transition-colors"
+                >
+                  重置/恢复初始折叠状态 (Collapse Again)
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'pagination' && (
+              <div className="space-y-4 animate-fade-in">
+                {/* 1. Page settings */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-semibold text-slate-600">当前选定页码 (currentPage)</label>
+                    <span className="text-xs font-mono font-bold text-indigo-600">Page {pagCurrentPage} / {pagTotalPages}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max={pagTotalPages}
+                    value={pagCurrentPage}
+                    onChange={(e) => setPagCurrentPage(Number(e.target.value))}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-semibold text-slate-600">总共记录页码数 (totalPages)</label>
+                    <span className="text-xs font-mono font-bold text-indigo-600">{pagTotalPages} 页</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="3"
+                    max="30"
+                    value={pagTotalPages}
+                    onChange={(e) => {
+                      const newTotal = Number(e.target.value);
+                      setPagTotalPages(newTotal);
+                      if (pagCurrentPage > newTotal) {
+                        setPagCurrentPage(newTotal);
+                      }
+                    }}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  />
+                </div>
+
+                {/* 2. Sizing and Style variants */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">组件尺寸梯度 (Pagination Size)</label>
+                  <div className="flex gap-1.5">
+                    {(['sm', 'md', 'lg'] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setPagSize(s)}
+                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
+                          pagSize === s ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {s.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">视觉架构变体 (Variant Model)</label>
+                  <div className="flex gap-1.5">
+                    {[
+                      { id: 'classic' as const, label: '经典框线' },
+                      { id: 'modern' as const, label: '轻型现代' },
+                      { id: 'minimal' as const, label: '极简数字' },
+                    ].map((v) => (
+                      <button
+                        key={v.id}
+                        onClick={() => setPagVariant(v.id)}
+                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
+                          pagVariant === v.id ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Logical/Toggle features */}
+                <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">锁定禁用态 (Disable Interactivity)</span>
+                      <span className="text-[10px] text-slate-400 font-normal leading-normal">一键硬性锁定，阻断点击并降级为灰色哑光态</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={pagDisabled}
+                      onChange={(e) => setPagDisabled(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">双箭头快捷页 (Show First/Last Keys)</span>
+                      <span className="text-[10px] text-slate-400 font-normal leading-normal">是否展示最前一页/最后一页的快捷双侧按键</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={pagShowFirstLast}
+                      onChange={(e) => setPagShowFirstLast(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">每页条数改换 (Show Size Changer)</span>
+                      <span className="text-[10px] text-slate-400 font-normal leading-normal">开启每页记录条数调整下拉，并复用 Dropdown 原语</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={pagShowSizeChanger}
+                      onChange={(e) => setPagShowSizeChanger(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'steps' && (
+              <div className="space-y-4 animate-fade-in">
+                {/* 1. Current Step select */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">仿真当前具体步进进度 (current)</label>
+                  <div className="flex gap-1 font-mono">
+                    {[0, 1, 2, 3].map((idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setStepsCurrent(idx)}
+                        className={`flex-1 py-1.5 text-xs font-bold border rounded transition-all cursor-pointer ${
+                          stepsCurrent === idx 
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {idx === 3 ? 'ALL' : `STEP ${idx + 1}`}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1">（0-indexed：0代表阶段一，1代表阶段二，3代表全部完结）</p>
+                </div>
+
+                {/* 2. Direction */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">布局排布方向 (Direction Layout)</label>
+                  <div className="flex gap-2">
+                    {[
+                      { id: 'horizontal', label: '横横向极简跨度 (Horizontal)' },
+                      { id: 'vertical', label: '纵纵向表单细节 (Vertical)' },
+                    ].map((dir) => (
+                      <button
+                        key={dir.id}
+                        onClick={() => setStepsDirection(dir.id as any)}
+                        className={`flex-1 py-1.5 px-2 text-left text-[11px] border rounded transition-all cursor-pointer ${
+                          stepsDirection === dir.id
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {dir.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Sizes */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">组件形态尺寸规格 (Steps Size)</label>
+                  <div className="flex gap-1.5">
+                    {(['sm', 'md', 'lg'] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setStepsSize(s)}
+                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
+                          stepsSize === s ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {s.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Toggles */}
+                <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">展示详细描述文字 (Show Description)</span>
+                      <span className="text-[10px] text-slate-400">是否渲染步骤正文下方的辅助引导字段</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={stepsShowDesc}
+                      onChange={(e) => setStepsShowDesc(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">矢量图标载入 (Load Custom Icons)</span>
+                      <span className="text-[10px] text-slate-400">切换自定义 Lucide 图标与单纯数字序号</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={stepsHasIcons}
+                      onChange={(e) => setStepsHasIcons(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer animate-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">允许点击任意跳转 (Clickable Nodes)</span>
+                      <span className="text-[10px] text-slate-400 font-normal leading-normal">开启后点击步骤圆环、文字即可任意自由切换</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={stepsClickable}
+                      onChange={(e) => setStepsClickable(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600">模拟步骤冲突错误 (status: 'error')</span>
+                      <span className="text-[10px] text-rose-500 font-medium leading-normal">显式置顶第二阶段发生清算错误，变红示警</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={stepsHasError}
+                      onChange={(e) => setStepsHasError(e.target.checked)}
+                      className="w-4 h-4 text-rose-600 rounded cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
             )}

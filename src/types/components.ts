@@ -25,17 +25,25 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   id?: string;
 }
 
-// 3. 【Dropdown】下拉单选器契约
+// 3. 【Dropdown】下拉单/复选器契约
+export interface DropdownOption {
+  label: string;
+  value: string;
+  description?: string;
+}
+
 export interface DropdownProps {
   label?: string;
   description?: string;
-  options: Array<{
-    label: string;
-    value: string;
-    description?: string;
-  }>;
-  value: string;
-  onChange: (value: string) => void;
+  options: DropdownOption[];
+  value: string | string[];
+  onChange: (value: any) => void;
+  placeholder?: string;
+  error?: string;
+  disabled?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  enableSearch?: boolean;
+  multiple?: boolean;
   id?: string;
 }
 
@@ -77,4 +85,62 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
   hoverVariant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'none';
   spinning?: boolean;
 }
+
+// 7. 【Breadcrumb】智能面包屑契约
+export interface BreadcrumbItem {
+  label: React.ReactNode;
+  href?: string;
+  icon?: React.ReactNode;
+  [key: string]: any;
+}
+
+export interface BreadcrumbProps {
+  items: BreadcrumbItem[];
+  separator?: React.ReactNode;
+  maxItems?: number;
+  itemsBeforeCollapse?: number;
+  itemsAfterCollapse?: number;
+  onItemClick?: (item: BreadcrumbItem, index: number, event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+// 8. 【Pagination】高标高保真分页原语契约
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'classic' | 'modern' | 'minimal';
+  disabled?: boolean;
+  showFirstLast?: boolean; // 是否展示最前/最后页的快捷双箭头跳转按键
+  showPageSizeChanger?: boolean; // 是否展示快速更换每页条数的轻型下拉器
+  pageSize?: number;
+  onPageSizeChange?: (size: number) => void;
+  pageSizeOptions?: number[];
+  className?: string;
+}
+
+// 9. 【Steps】高标高保真物理自适应步骤条契约
+export interface StepItem {
+  title: string;
+  description?: string;
+  icon?: string; // 支持可选的 Lucide 图标名称，例如 'User', 'CreditCard', 'Check'
+  disabled?: boolean;
+  status?: 'wait' | 'process' | 'finish' | 'error'; // 显式状态重写，如果不传则通过当前索引智能计算
+}
+
+export interface StepsProps {
+  current: number; // 当前进度的步骤索引 (0-indexed: 0 代表第一步)
+  items: StepItem[];
+  direction?: 'horizontal' | 'vertical'; // 步骤条方向：横向布局 / 纵向布局
+  size?: 'sm' | 'md' | 'lg'; // 步骤条尺寸规格
+  clickable?: boolean; // 点击步骤节点是否可直接进行跳迁回调
+  onStepChange?: (index: number) => void; // 页签步骤受控切换动作
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+
+
 

@@ -15,6 +15,7 @@
 import React, { useState } from 'react';
 import { useDesignTokens } from '../components/base/DesignTokensContext';
 import { CustomPageTemplate } from './CustomPageTemplate';
+import { BidBuilderView } from './BidBuilderView';
 import { LayoutGrid, Sparkles, Pin } from 'lucide-react';
 
 interface RegisteredView {
@@ -31,13 +32,19 @@ interface RegisteredView {
 // =========================================================================
 const VIEWS_REGISTRY: RegisteredView[] = [
   {
+    id: 'bid-builder',
+    name: '招标文件智能大纲与正文生成器',
+    desc: '依据用户两份截图百分百还原的高度仿生工作空间，自带树状大纲整理、智能章节重写、CAD施工图内嵌、字数点数消费微交互',
+    badge: '截图提炼',
+    component: BidBuilderView,
+  },
+  {
     id: 'default-template',
     name: '租户虚拟网络控制台',
     desc: '系统内置的 12 列栅格响应式控制台模板，完美适配 4 套风骨主题',
     badge: '官方模板',
     component: CustomPageTemplate,
   },
-  // 💡 [AI 快速扩充通道]: 新页面直接物理建好后在此行下方进行 Named Import 并在此处追加入口
 ];
 
 export const ViewsStudioContainer: React.FC = () => {

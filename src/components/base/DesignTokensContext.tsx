@@ -19,7 +19,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DesignTokens, ThemePreset } from '../../types/tokens';
-import { SWISS_MODERN, ALL_PRESETS } from '../../constants/presets';
+import { INTELLIGENT_WORKSPACE, ALL_PRESETS } from '../../constants/presets';
 
 /**
  * 📝 上下文类型契约：向外公开哪些管理接口
@@ -41,8 +41,8 @@ const DesignTokensContext = createContext<DesignTokensContextType | undefined>(u
  */
 export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // 1. 定义状态量：保存当前的主题标签与具体的令牌配置
-  const [activePreset, setActivePreset] = useState<ThemePreset>('swiss_modern');
-  const [tokens, setTokens] = useState<DesignTokens>({ ...SWISS_MODERN });
+  const [activePreset, setActivePreset] = useState<ThemePreset>('intelligent_workspace');
+  const [tokens, setTokens] = useState<DesignTokens>({ ...INTELLIGENT_WORKSPACE });
 
   // 一键切换方案 (深拷贝确保没有任何历史残留和交叉污染)
   const setPreset = (preset: ThemePreset) => {
@@ -99,11 +99,28 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
   --color-bg-card: ${tokens.colors.bgCard};
   --color-bg-input: ${tokens.colors.bgInput};
   --color-text-primary: ${tokens.colors.textPrimary};
+  --color-text-secondary: ${tokens.colors.textSecondary};
   --color-text-muted: ${tokens.colors.textMuted};
+  --color-text-inverse: ${tokens.colors.textInverse};
   --color-border: ${tokens.colors.border};
   --color-border-focus: ${tokens.colors.borderFocus};
+  --color-bg-hover: ${tokens.colors.bgHover};
+  --color-bg-active: ${tokens.colors.bgActive};
+  --color-bg-disabled: ${tokens.colors.bgDisabled};
+  --color-text-disabled: ${tokens.colors.textDisabled};
+  --color-border-disabled: ${tokens.colors.borderDisabled};
+  --color-icon-primary: ${tokens.colors.iconPrimary};
+  --color-icon-secondary: ${tokens.colors.iconSecondary};
+  --color-icon-brand: ${tokens.colors.iconBrand};
+  --color-focus-ring: ${tokens.colors.focusRing};
   --color-success: ${tokens.colors.success};
+  --color-success-bg: ${tokens.colors.successBg};
   --color-error: ${tokens.colors.error};
+  --color-error-bg: ${tokens.colors.errorBg};
+  --color-warning: ${tokens.colors.warning};
+  --color-warning-bg: ${tokens.colors.warningBg};
+  --color-info: ${tokens.colors.info};
+  --color-info-bg: ${tokens.colors.infoBg};
 
   /* ✍️ 排版字型令牌组 (Typography) */
   --font-family-heading: ${tokens.typography.headingFont === 'serif' ? '"Playfair Display", Georgia, serif' : tokens.typography.headingFont === 'mono' ? '"JetBrains Mono", Courier, monospace' : '"Inter", sans-serif'};
@@ -173,11 +190,28 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
         --color-bg-card: ${tokens.colors.bgCard};
         --color-bg-input: ${tokens.colors.bgInput};
         --color-text-primary: ${tokens.colors.textPrimary};
+        --color-text-secondary: ${tokens.colors.textSecondary};
         --color-text-muted: ${tokens.colors.textMuted};
+        --color-text-inverse: ${tokens.colors.textInverse};
         --color-border: ${tokens.colors.border};
         --color-border-focus: ${tokens.colors.borderFocus};
+        --color-bg-hover: ${tokens.colors.bgHover};
+        --color-bg-active: ${tokens.colors.bgActive};
+        --color-bg-disabled: ${tokens.colors.bgDisabled};
+        --color-text-disabled: ${tokens.colors.textDisabled};
+        --color-border-disabled: ${tokens.colors.borderDisabled};
+        --color-icon-primary: ${tokens.colors.iconPrimary};
+        --color-icon-secondary: ${tokens.colors.iconSecondary};
+        --color-icon-brand: ${tokens.colors.iconBrand};
+        --color-focus-ring: ${tokens.colors.focusRing};
         --color-success: ${tokens.colors.success};
+        --color-success-bg: ${tokens.colors.successBg};
         --color-error: ${tokens.colors.error};
+        --color-error-bg: ${tokens.colors.errorBg};
+        --color-warning: ${tokens.colors.warning};
+        --color-warning-bg: ${tokens.colors.warningBg};
+        --color-info: ${tokens.colors.info};
+        --color-info-bg: ${tokens.colors.infoBg};
 
         --font-family-heading: ${tokens.typography.headingFont === 'serif' ? '"Playfair Display", Georgia, serif' : tokens.typography.headingFont === 'mono' ? '"JetBrains Mono", Courier, monospace' : '"Inter", sans-serif'};
         --font-family-body: ${tokens.typography.bodyFont === 'mono' ? '"JetBrains Mono", Courier, monospace' : '"Inter", sans-serif'};

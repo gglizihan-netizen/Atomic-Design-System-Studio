@@ -109,9 +109,9 @@ export const Button: React.FC<ButtonProps> = ({
     if (disabled || isLoading) {
       return {
         ...base,
-        backgroundColor: tokens.typography.headingFont === 'mono' ? '#1F2937' : '#F1F5F9',
-        borderColor: tokens.typography.headingFont === 'mono' ? '#374151' : '#E2E8F0',
-        color: tokens.typography.headingFont === 'mono' ? '#6B7280' : '#94A3B8',
+        backgroundColor: tokens.colors.bgDisabled,
+        borderColor: tokens.colors.borderDisabled,
+        color: tokens.colors.textDisabled,
         cursor: 'not-allowed',
         boxShadow: 'none',
       };
@@ -124,8 +124,7 @@ export const Button: React.FC<ButtonProps> = ({
           ...base,
           backgroundColor: tokens.colors.brand,
           borderColor: tokens.colors.brand,
-          // 如果是黑色系极客风，文字用黑色底片对比，如果是普通风，用利落白色文本
-          color: isMonoTheme ? '#090D16' : '#FFFFFF',
+          color: tokens.colors.textInverse, // 使用反向高对比文本色
           boxShadow: tokens.shadows.sm,
         };
       case 'secondary':
@@ -133,7 +132,7 @@ export const Button: React.FC<ButtonProps> = ({
           ...base,
           backgroundColor: tokens.colors.bgInput,
           borderColor: tokens.colors.border,
-          color: tokens.colors.textPrimary,
+          color: tokens.colors.textSecondary, // 使用精心定制的二级正文文本色
         };
       case 'outline':
         return {
@@ -154,7 +153,7 @@ export const Button: React.FC<ButtonProps> = ({
           ...base,
           backgroundColor: tokens.colors.error,
           borderColor: tokens.colors.error,
-          color: '#FFFFFF',
+          color: tokens.colors.textInverse, // 红色底片也采用高对比反色字符
           boxShadow: tokens.shadows.sm,
         };
       default:
@@ -180,7 +179,7 @@ export const Button: React.FC<ButtonProps> = ({
         break;
       case 'secondary':
         interactiveStyles = {
-          backgroundColor: tokens.colors.border,     // 二级背景轻微变灰
+          backgroundColor: tokens.colors.bgHover,     // 通用中性悬停背景
         };
         break;
       case 'outline':
@@ -213,6 +212,11 @@ export const Button: React.FC<ButtonProps> = ({
           ...interactiveStyles,
           backgroundColor: tokens.colors.brandDark, // 按下色加深
           borderColor: tokens.colors.brandDark,
+        };
+        break;
+      case 'secondary':
+        interactiveStyles = {
+          backgroundColor: tokens.colors.bgActive,    // 通用中性激活背景
         };
         break;
       case 'outline':
