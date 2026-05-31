@@ -1115,8 +1115,8 @@ export class AtomixDemoComponent {
             borderColor: tokens.colors.border,
           }}
         >
-          <div className="space-y-4 animate-fade-in text-xs font-normal font-sans leading-normal" style={{ color: tokens.colors.textSecondary }}>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono block select-none mb-1" style={{ color: tokens.colors.textMuted }}>
+          <div className="space-y-6 animate-fade-in text-sm font-normal font-sans leading-normal" style={{ color: tokens.colors.textSecondary }}>
+            <span className="text-base font-medium font-sans mb-3 block" style={{ color: tokens.colors.textMuted }}>
               基本属性 (Base props)
             </span>
 
@@ -1124,7 +1124,7 @@ export class AtomixDemoComponent {
               {activeTab === 'button' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>按钮变体 (Variant)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>按钮变体 (Variant)</label>
                     <div className="grid grid-cols-2 gap-1.5">
                       {(['primary', 'secondary', 'outline', 'text', 'danger'] as const).map((v) => (
                         <Button
@@ -1142,7 +1142,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold" style={{ color: tokens.colors.textSecondary }}>按钮尺寸 (Size)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>按钮尺寸 (Size)</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border"
                       style={{
@@ -1194,7 +1194,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5 animate-fade-in text-xs font-normal">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>前置/后置图标 placement</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>前置/后置图标 placement</label>
                     <Dropdown
                       options={[
                         { label: '无内置图标', value: 'none' },
@@ -1208,7 +1208,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>按钮文案</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>按钮文案</label>
                     <Input
                       value={btnText}
                       onChange={(e) => setBtnText(e.target.value)}
@@ -1222,7 +1222,7 @@ export class AtomixDemoComponent {
               {activeTab === 'input' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5 font-sans">
-                    <label className="block font-semibold" style={{ color: tokens.colors.textSecondary }}>输入尺寸大小</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>输入尺寸大小</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none"
                       style={{
@@ -1251,7 +1251,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>标签文案 (Label)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>标签文案 (Label)</label>
                     <Input
                       value={inputLabel}
                       onChange={(e) => setInputLabel(e.target.value)}
@@ -1260,7 +1260,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>占位文字 (Placeholder)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>占位文字 (Placeholder)</label>
                     <Input
                       value={inputPlaceholder}
                       onChange={(e) => setInputPlaceholder(e.target.value)}
@@ -1269,7 +1269,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>底部说明文字 (Helper Desc)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>底部说明文字 (Helper Desc)</label>
                     <Input
                       value={inputDesc}
                       onChange={(e) => setInputDesc(e.target.value)}
@@ -1278,7 +1278,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>错误提示消息 (Error Props)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>错误提示消息 (Error Props)</label>
                     <Input
                       placeholder="留空即取消安全警示状态"
                       value={inputError}
@@ -1290,7 +1290,7 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>前置 Mail 图标</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>前置 Mail 图标</span>
                       <input
                         type="checkbox"
                         checked={inputIconLeft}
@@ -1300,7 +1300,7 @@ export class AtomixDemoComponent {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>只读禁用状态</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>只读禁用状态</span>
                       <input
                         type="checkbox"
                         checked={inputDisabled}
@@ -1317,7 +1317,7 @@ export class AtomixDemoComponent {
               {activeTab === 'dropdown' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5 font-sans">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>选择器尺寸大小</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>选择器尺寸大小</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
                       style={{
@@ -1346,7 +1346,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>标签文案 (Label)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>标签文案 (Label)</label>
                     <Input
                       value={dropLabel}
                       onChange={(e) => setDropLabel(e.target.value)}
@@ -1355,7 +1355,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>底置描述 (Desc)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>底置描述 (Desc)</label>
                     <Input
                       value={dropDesc}
                       onChange={(e) => setDropDesc(e.target.value)}
@@ -1365,7 +1365,7 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>多选 checkbox 药丸</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>多选 checkbox 药丸</span>
                       <input
                         type="checkbox"
                         checked={dropMultiple}
@@ -1375,7 +1375,7 @@ export class AtomixDemoComponent {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>词串前向检索</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>词串前向检索</span>
                       <input
                         type="checkbox"
                         checked={dropSearch}
@@ -1385,7 +1385,7 @@ export class AtomixDemoComponent {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>呈现选项子解释</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>呈现选项子解释</span>
                       <input
                         type="checkbox"
                         checked={dropShowDesc}
@@ -1395,7 +1395,7 @@ export class AtomixDemoComponent {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>锁定禁用状态</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>锁定禁用状态</span>
                       <input
                         type="checkbox"
                         checked={dropDisabled}
@@ -1407,7 +1407,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>强制警告提示</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>强制警告提示</label>
                     <Input
                       placeholder="留空即常态"
                       value={dropError}
@@ -1423,7 +1423,7 @@ export class AtomixDemoComponent {
               {activeTab === 'modal' && (
                 <div className="space-y-4 font-sans text-xs">
                   <div className="space-y-1.5 animate-fade-in text-xs font-normal">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>弹窗尺寸级别 (Size)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>弹窗尺寸级别 (Size)</label>
                     <Dropdown
                       options={[
                         { label: '380px (SM)', value: 'sm' },
@@ -1438,7 +1438,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>弹窗标题文案</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>弹窗标题文案</label>
                     <Input
                       value={modalTitle}
                       onChange={(e) => setModalTitle(e.target.value)}
@@ -1448,7 +1448,7 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>显示底部操作列</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>显示底部操作列</span>
                       <input
                         type="checkbox"
                         checked={modalHasFooter}
@@ -1458,7 +1458,7 @@ export class AtomixDemoComponent {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>信息通知提示风格 (i)</span>
+                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>信息通知提示风格 (i)</span>
                       <input
                         type="checkbox"
                         checked={modalIsAlertStyle}
@@ -1481,7 +1481,7 @@ export class AtomixDemoComponent {
               {activeTab === 'navbar' && (
                 <div className="space-y-4 font-sans text-xs">
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>品牌/标志文案（Logo Brand）</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>品牌/标志文案（Logo Brand）</label>
                     <Input
                       value={navBrandName}
                       onChange={(e) => setNavBrandName(e.target.value)}
@@ -1489,7 +1489,7 @@ export class AtomixDemoComponent {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>动态激活链接选定</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>动态激活链接选定</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
                       style={{
@@ -1523,7 +1523,7 @@ export class AtomixDemoComponent {
               {activeTab === 'icon' && (
                 <div className="space-y-4 font-sans text-xs">
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>矢量图徽图标 (name)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>矢量图徽图标 (name)</label>
                     <div
                       className="grid grid-cols-4 gap-1 p-1 rounded-xl border"
                       style={{
@@ -1551,7 +1551,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>尺寸计算类型 (Size Type)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>尺寸计算类型 (Size Type)</label>
                     <div
                       className="grid grid-cols-2 gap-1 p-1 rounded-xl border select-none"
                       style={{
@@ -1590,7 +1590,7 @@ export class AtomixDemoComponent {
 
                   {iconSizeType === 'preset' ? (
                     <div className="space-y-1.5">
-                      <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>预设梯度选择 (Size)</label>
+                      <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>预设梯度选择 (Size)</label>
                       <div
                         className="grid grid-cols-5 p-1 border rounded-xl"
                         style={{
@@ -1619,7 +1619,7 @@ export class AtomixDemoComponent {
                   ) : (
                     <div className="space-y-1.5">
                       <div className="flex justify-between font-mono text-xs">
-                        <label className="font-semibold" style={{ color: tokens.colors.textSecondary }}>精准像素大小</label>
+                        <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>精准像素大小</label>
                         <span className="font-bold" style={{ color: tokens.colors.brand }}>{iconCustomSize}px</span>
                       </div>
                       <input
@@ -1638,7 +1638,7 @@ export class AtomixDemoComponent {
                   )}
 
                   <div className="space-y-1.5 animate-fade-in">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>配色方案 (Variant)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>配色方案 (Variant)</label>
                     <Dropdown
                       options={[
                         { label: '中性暗灰 (Default)', value: 'default' },
@@ -1680,7 +1680,7 @@ export class AtomixDemoComponent {
                     }}
                   >
                     <div className="flex justify-between font-mono text-xs">
-                      <label className="font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>最长展层限制 (Max Items)</label>
+                      <label className="block text-sm font-medium mb-1.5 mb-1" style={{ color: tokens.colors.textPrimary }}>最长展层限制 (Max Items)</label>
                       <span className="font-bold" style={{ color: tokens.colors.brand }}>{breadMaxItems} 级</span>
                     </div>
                     <input
@@ -1698,7 +1698,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5 animate-fade-in">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>间隔符样式 (Separator)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>间隔符样式 (Separator)</label>
                     <Dropdown
                       options={[
                         { label: '默认令牌间隔 (Default dot)', value: 'default' },
@@ -1719,7 +1719,7 @@ export class AtomixDemoComponent {
               {activeTab === 'pagination' && (
                 <div className="space-y-4 font-sans text-xs">
                   <div className="space-y-1.5 animate-fade-in">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>分页器形态结构</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>分页器形态结构</label>
                     <Dropdown
                       options={[
                         { label: '传统盒子框 (Classic bordered)', value: 'classic' },
@@ -1733,7 +1733,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>分页器大小</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>分页器大小</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
                       style={{
@@ -1830,7 +1830,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>整体部署朝向 (Direction)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>整体部署朝向 (Direction)</label>
                     <div
                       className="grid grid-cols-2 gap-1 p-1 rounded-xl border text-center select-none font-bold"
                       style={{
@@ -1868,7 +1868,7 @@ export class AtomixDemoComponent {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>物理尺寸 (Size)</label>
+                    <label className="block text-sm font-medium mb-1.5"style={{ color: tokens.colors.textPrimary }}>物理尺寸 (Size)</label>
                     <div
                       className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
                       style={{
@@ -1945,7 +1945,7 @@ export class AtomixDemoComponent {
 
           {/* Style parameters category */}
           <div className="space-y-2 select-none">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono block" style={{ color: tokens.colors.textMuted }}>
+            <span className="text-base font-medium font-sans mb-3 block" style={{ color: tokens.colors.textMuted }}>
               样式与对齐规格 (Style Specs)
             </span>
             <div className="space-y-2 font-mono text-[9.5px]" style={{ color: tokens.colors.textSecondary }}>

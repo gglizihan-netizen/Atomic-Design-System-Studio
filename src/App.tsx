@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { DesignTokensProvider, useDesignTokens } from './components/base/DesignTokensContext';
 import { DesignTokenPanel } from './components/DesignTokenPanel';
+import { Dropdown } from './components/atoms/Dropdown';
 import { ShowcasePanel } from './components/ShowcasePanel';
 import { FrameworkDocs } from './components/FrameworkDocs';
 import ViewsStudioContainer from './views/index';
@@ -164,6 +165,7 @@ function StudioLayout() {
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'playground' | 'tokens' | 'views' | 'docs'>('playground');
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [workspaceCollapsed, setWorkspaceCollapsed] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isFooterHovered, setIsFooterHovered] = useState(false);
  
@@ -247,7 +249,7 @@ function StudioLayout() {
   };
 
   return (
-    <div className="min-h-screen flex transition-colors duration-300" style={{ color: tokens.colors.textPrimary }}>
+    <div className="h-screen overflow-hidden flex transition-colors duration-300" style={{ color: tokens.colors.textPrimary }}>
       {/* 1. Left Sidebar (Unified Navigation) */}
       <aside
         className="border-r flex flex-col justify-between shrink-0 select-none transition-all duration-300"
@@ -281,19 +283,36 @@ function StudioLayout() {
           </div>
 
           {/* Sidebar Body Scroll container */}
-          <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-hidden flex flex-col py-4 px-3 space-y-6">
             {/* WORKSPACE group */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 shrink-0">
               {!sidebarCollapsed && (
-                <div className="px-3 py-1 flex items-center justify-between select-none">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
-                    Workspace
-                  </span>
-                  <ChevronDown className="w-3 h-3" style={{ color: tokens.colors.textMuted }} />
-                </div>
+                <div 
+  className="px-3 py-1 flex items-center justify-between select-none cursor-pointer hover:opacity-80 transition-opacity"
+  onClick={() => setWorkspaceCollapsed(!workspaceCollapsed)}
+>
+  <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
+    Workspace
+  </span>
+  <ChevronDown 
+    className="w-3 h-3 transition-transform" 
+    style={{ 
+      color: tokens.colors.textMuted,
+      transform: workspaceCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
+    }} 
+  />
+</div>
               )}
-              <div className="space-y-0.5">
-                {workspaceTabs.map((tab) => {
+              <AnimatePresence>
+                {!workspaceCollapsed && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-0.5">
+                      {workspaceTabs.map((tab) => {
                   const isSelected = activeWorkspaceTab === tab.id;
                   return (
                     <WorkspaceTabButton
@@ -304,15 +323,30 @@ function StudioLayout() {
                       sidebarCollapsed={sidebarCollapsed}
                       tokens={tokens}
                     />
-                  );
-                })}
-              </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* COMPONENTS group (Flat list underneath Workspace, satisfying the prompt) */}
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1 flex flex-col min-h-0">
+              {/* Theme Dropdown at the top of components */}
               {!sidebarCollapsed && (
-                <div className="px-3 py-1 flex items-center justify-between select-none">
+                <div className="px-3 pt-1 pb-2 shrink-0">
+  <Dropdown
+    value={activePreset}
+    onChange={(val: any) => setPreset(val)}
+    options={presetsList.map(p => ({ label: `${p.label} - ${p.code}`, value: p.id }))}
+    size="sm"
+  />
+</div>
+              )}
+
+              {!sidebarCollapsed && (
+                <div className="px-3 py-1 flex items-center justify-between select-none shrink-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
                     Components
                   </span>
@@ -327,8 +361,9 @@ function StudioLayout() {
 
               {/* Component Search Input (only shown when not collapsed) */}
               {!sidebarCollapsed && (
-                <div className="px-1 py-0.5">
-                  <div className="relative">
+                <div className="px-3 py-1 shrink-0">
+                  <div className="relative flex items-center h-8">
+                    <Search className="w-3.5 h-3.5 absolute left-3" style={{ color: tokens.colors.textMuted }} />
                     <input
                       type="text"
                       placeholder="搜索核心组件 & 令牌..."
@@ -336,18 +371,17 @@ function StudioLayout() {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onFocus={() => setIsSearchFocused(true)}
                       onBlur={() => setIsSearchFocused(false)}
-                      className="w-full text-[11px] pl-7.5 pr-3 py-1.8 border rounded-lg transition-all focus:outline-none"
+                      className="w-full h-full text-[11px] pl-8 pr-6 border rounded-lg transition-all focus:outline-none placeholder:text-[11px]"
                       style={{
                         backgroundColor: tokens.colors.bgInput,
                         borderColor: isSearchFocused ? tokens.colors.brand : tokens.colors.border,
                         color: tokens.colors.textPrimary,
                       }}
                     />
-                    <Search className="w-3.5 h-3.5 absolute left-2.2 top-2.5" style={{ color: tokens.colors.textMuted }} />
                     {searchQuery && (
                       <button
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-2 top-1.5 w-4 h-4 rounded-full flex items-center justify-center font-mono text-[9px] cursor-pointer"
+                        className="absolute right-2 w-4 h-4 rounded-full flex items-center justify-center font-mono text-[9px] cursor-pointer"
                         style={{ backgroundColor: tokens.colors.bgHover, color: tokens.colors.textMuted }}
                       >
                         ×
@@ -358,7 +392,7 @@ function StudioLayout() {
               )}
 
               {/* Flat list of components */}
-              <div className="space-y-0.5 max-h-[220px] overflow-y-auto custom-scrollbar">
+              <div className="space-y-0.5 flex-1 overflow-y-auto px-1 mt-1 custom-scrollbar">
                 {filteredComponents.map((item) => {
                   const isSelected = activeWorkspaceTab === 'playground' && activeTab === item.id;
                   return (
@@ -374,32 +408,6 @@ function StudioLayout() {
                 })}
               </div>
             </div>
-
-            {/* Quick Themes preset (One-key change, integrated inside directory bar satisfying design prompt value) */}
-            {!sidebarCollapsed && (
-              <div className="space-y-2 border-t pt-4" style={{ borderColor: tokens.colors.border }}>
-                <div className="px-3 py-1 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 animate-pulse" style={{ color: tokens.colors.brand }} />
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
-                    一键换肤 (Themes)
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5 px-1">
-                  {presetsList.map((preset) => {
-                    const isSelected = activePreset === preset.id;
-                    return (
-                      <ThemePresetButton
-                        key={preset.id}
-                        preset={preset}
-                        isSelected={isSelected}
-                        onClick={() => setPreset(preset.id)}
-                        tokens={tokens}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
