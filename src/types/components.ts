@@ -58,3 +58,23 @@ export interface NavbarProps {
   actions?: React.ReactNode;
   id?: string;
 }
+
+// 6. 【Icon】图标组件契约
+export type IconName =
+  | 'plus' | 'pencil' | 'trash' | 'search' | 'refresh' | 'check' | 'x'
+  | 'chevron-down' | 'chevron-right' | 'chevron-left'
+  | 'settings' | 'help' | 'loader'
+  | 'upload' | 'download'
+  | 'more-horizontal' | 'more-vertical' | 'drag'
+  | 'checkbox-checked' | 'checkbox-unchecked'
+  | 'radio-checked' | 'radio-unchecked'
+  | 'ai' | 'success' | 'warning' | 'error' | 'info';
+
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
+  name: IconName;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'custom';
+  hoverVariant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'none';
+  spinning?: boolean;
+}
+

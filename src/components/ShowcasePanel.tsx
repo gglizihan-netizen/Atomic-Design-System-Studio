@@ -5,6 +5,8 @@ import { Input } from './atoms/Input';
 import { Dropdown } from './atoms/Dropdown';
 import { Modal } from './atoms/Modal';
 import { Navbar } from './atoms/Navbar';
+import { Icon } from './atoms/Icon';
+import { IconName } from '../types/components';
 import {
   Code,
   Sliders,
@@ -24,8 +26,17 @@ import {
 
 export const ShowcasePanel: React.FC = () => {
   const { tokens } = useDesignTokens();
-  const [activeTab, setActiveTab] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar'>('button');
+  const [activeTab, setActiveTab] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon'>('button');
   const [copied, setCopied] = useState(false);
+
+  // 6. Icon Demo states
+  const [iconName, setIconName] = useState<IconName>('ai');
+  const [iconSize, setIconSize] = useState<'xs' | 'sm' | 'md' | 'lg' | 'xl'>('xl');
+  const [iconVariant, setIconVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'custom'>('default');
+  const [iconHoverVariant, setIconHoverVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'none'>('none');
+  const [iconSpinning, setIconSpinning] = useState(false);
+  const [iconCustomSize, setIconCustomSize] = useState<number>(36);
+  const [iconSizeType, setIconSizeType] = useState<'preset' | 'custom'>('preset');
 
   // States for interactive prop controller configuration
   // 1. Button Props states
@@ -87,6 +98,7 @@ export const ShowcasePanel: React.FC = () => {
     { id: 'dropdown' as const, label: '下拉选择 (Dropdown / Select)' },
     { id: 'modal' as const, label: '模态视窗 (Modal Overlay)' },
     { id: 'navbar' as const, label: '导航系统 (Navbar Navigation)' },
+    { id: 'icon' as const, label: '智能图标 (Icon & Feedback)' },
   ];
 
   // Dynamically build sample code based on props
@@ -207,6 +219,17 @@ export default function AppLayout() {
       rightActions={
         <Button size="sm" variant="outline">控制台登录</Button>
       }
+    />
+  );
+}`;
+      case 'icon':
+        return `import { Icon } from './components/atoms/Icon';
+
+export default function MyPage() {
+  return (
+    <Icon
+      name="${iconName}"
+      size={${iconSizeType === 'custom' ? iconCustomSize : `'${iconSize}'`}}${iconVariant !== 'default' ? `\n      variant="${iconVariant}"` : ''}${iconHoverVariant !== 'none' ? `\n      hoverVariant="${iconHoverVariant}" font-mono` : ''}${iconSpinning ? '\n      spinning' : ''}
     />
   );
 }`;
@@ -415,6 +438,39 @@ export default function AppLayout() {
                   </p>
                 </div>
               )}
+
+              {activeTab === 'icon' && (
+                <div className="w-full text-center animate-fade-in flex flex-col items-center">
+                  <div 
+                    className="p-10 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-100/80 flex items-center justify-center min-w-[140px] min-h-[140px] group transition-all duration-300 hover:shadow-md hover:bg-white"
+                    style={{ borderRadius: tokens.borders.radiusLg }}
+                  >
+                    <Icon
+                      name={iconName}
+                      size={iconSizeType === 'custom' ? iconCustomSize : iconSize}
+                      variant={iconVariant}
+                      hoverVariant={iconHoverVariant}
+                      spinning={iconSpinning}
+                    />
+                  </div>
+                  
+                  <div className="mt-5 space-y-1.5 max-w-sm">
+                    <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5 justify-center">
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-mono">
+                        &lt;Icon name="{iconName}" /&gt;
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-normal leading-normal">
+                      尺寸范围：<span className="font-mono text-indigo-600 font-semibold">{iconSizeType === 'custom' ? `${iconCustomSize}px (自定义像素)` : iconSize.toUpperCase()}</span> | 
+                      动画形态：<span className="font-mono text-indigo-600 font-semibold">{iconSpinning || iconName === 'loader' ? '循环纺锤旋转' : '常规静态'}</span>
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-normal leading-normal select-none">
+                      💡 <strong>悬停微体验：</strong>请将鼠标移入/悬停在上方图标上，感受高保真颜色平滑过渡。
+                      {iconName === 'trash' && <span className="text-red-500 block font-medium mt-1"> (防误解高保真：删除图标默认绑定红色 Hover 状态!)</span>}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -492,6 +548,22 @@ export default function AppLayout() {
                   <p className="pt-1.5 border-t border-slate-100">
                     <strong>原子设计复用：</strong>导航栏组件的右侧按钮操作群
                     (rightActions)，在组合时将完美的将 <code>Button</code> 作为原子进行注入，形成干净、清晰、一贯性的组件树嵌套。
+                  </p>
+                </>
+              )}
+              {activeTab === 'icon' && (
+                <>
+                  <p>
+                    <strong>色彩分流与视觉层级保护：</strong>
+                    绝大部分常规操作、配置和导航图标在未选中时，保持温和的<b>中性浅灰</b>（<code>tokens.colors.textMuted</code>/<code>#94A3B8</code>），以此避免对界面内容和结构构成多余的喧宾夺主，保持画面的极简和空气感！
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>固化语义色安全阀：</strong>
+                    常用的成功、警醒、错误在渲染时默认绑定行业通行的<b>红/绿/黄固化语义色</b>，不支持随便变异，保证开发无论在哪里使用这些系统状态时其安全调性完美统一。
+                  </p>
+                  <p className="pt-1.5 border-t border-slate-100">
+                    <strong>悬吊微反馈 (Trash hover to red)：</strong>
+                    删除 (trash/delete) 图标自带悬浮安全暗示——不管初始呈现多么暗淡，在鼠标贴合的一瞬间将转变为<b>警告朱红</b>，暗示危险毁灭动作。
                   </p>
                 </>
               )}
@@ -825,6 +897,239 @@ export default function AppLayout() {
                     value={navBrandName}
                     onChange={(e) => setNavBrandName(e.target.value)}
                     className="w-full text-xs border rounded p-2"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'icon' && (
+              <div className="space-y-4">
+                {/* 1. 图标库矩阵选择 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-2">
+                    选择测试图标 (Click to select)
+                  </label>
+                  <div className="space-y-3.5 bg-slate-50/50 p-3 rounded-lg border border-slate-100/60 max-h-56 overflow-y-auto scrollbar-thin">
+                    {/* A. 基础操作类 */}
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono">Operations 基础操作</span>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {(['plus', 'pencil', 'trash', 'search', 'refresh', 'check', 'x'] as const).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => setIconName(name)}
+                            title={name}
+                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
+                              iconName === name
+                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
+                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
+                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* B. 导航方向类 */}
+                    <div className="mt-2.5">
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">Navigation 导航方向</span>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {(['chevron-down', 'chevron-right', 'chevron-left'] as const).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => setIconName(name)}
+                            title={name}
+                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
+                              iconName === name
+                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
+                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
+                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* C. 系统配置类 */}
+                    <div className="mt-2.5">
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">System 系统辅助</span>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {(['settings', 'help', 'loader'] as const).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => setIconName(name)}
+                            title={name}
+                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
+                              iconName === name
+                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
+                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
+                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* D. 常用输入选项类 */}
+                    <div className="mt-2.5">
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">Forms 选项与常态</span>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {(['upload', 'download', 'more-horizontal', 'more-vertical', 'drag', 'checkbox-checked', 'checkbox-unchecked', 'radio-checked', 'radio-unchecked'] as const).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => setIconName(name)}
+                            title={name}
+                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
+                              iconName === name
+                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
+                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
+                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* E. 智能反馈类 */}
+                    <div className="mt-2.5">
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono">AI & Feedbacks 智能与反馈</span>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {(['ai', 'success', 'warning', 'error', 'info'] as const).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => setIconName(name)}
+                            title={name}
+                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
+                              iconName === name
+                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
+                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <Icon name={name} size="sm" />
+                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. 尺寸控制 */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-slate-600">图标物理大小 (Size Mode)</label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setIconSizeType('preset')}
+                        className={`px-1.5 py-0.5 text-[10px] border rounded ${
+                          iconSizeType === 'preset' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
+                        }`}
+                      >
+                        标准预设
+                      </button>
+                      <button
+                        onClick={() => setIconSizeType('custom')}
+                        className={`px-1.5 py-0.5 text-[10px] border rounded ${
+                          iconSizeType === 'custom' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
+                        }`}
+                      >
+                        绝对像素
+                      </button>
+                    </div>
+                  </div>
+
+                  {iconSizeType === 'preset' ? (
+                    <div className="flex gap-1.5">
+                      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setIconSize(s)}
+                          className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
+                            iconSize === s && iconSizeType === 'preset' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {s.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+                        <span>12px</span>
+                        <span className="text-indigo-600 font-semibold">{iconCustomSize}px</span>
+                        <span>64px</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="12"
+                        max="64"
+                        value={iconCustomSize}
+                        onChange={(e) => setIconCustomSize(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Variant 变体选择 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">正常状态颜色 (Variant)</label>
+                  <select
+                    value={iconVariant}
+                    onChange={(e) => setIconVariant(e.target.value as any)}
+                    className="w-full text-xs border rounded p-2"
+                  >
+                    <option value="default">Default (遵循设计规范：淡雅不夺目暖灰色)</option>
+                    <option value="primary">Primary (高光品牌主色)</option>
+                    <option value="success">Success (语义成功：专属翡翠绿色)</option>
+                    <option value="warning">Warning (语义警告：暖金琥珀色)</option>
+                    <option value="danger">Danger (语义危险/错误：火红警戒色)</option>
+                    <option value="info">Info (信息指南：通透蓝色)</option>
+                  </select>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+                    * <b>极客贴士：</b>特定字形（如 success、warning、error 等）在未指定 Variant 时会自动绑定各自定义专属色，确保首要反馈的高视觉识别度。
+                  </p>
+                </div>
+
+                {/* 4. Hover Variant 悬停变体 */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">悬停变化颜色 (Hover State)</label>
+                  <select
+                    value={iconHoverVariant}
+                    onChange={(e) => setIconHoverVariant(e.target.value as any)}
+                    className="w-full text-xs border rounded p-2"
+                  >
+                    <option value="none">None (保持常态色，无变色变化)</option>
+                    <option value="default">Default (微调灰色)</option>
+                    <option value="primary">Primary (渐变品牌色)</option>
+                    <option value="success">Success (复原语义绿)</option>
+                    <option value="warning">Warning (警告琥珀色)</option>
+                    <option value="danger">Danger (警戒深朱红)</option>
+                  </select>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+                    * <b>微交互原则：</b>在触碰图标实体时触发轻微的动效。删除图标（trash）在悬浮时会自动拉升到警戒朱红，警告其后续的毁灭倾向。
+                  </p>
+                </div>
+
+                {/* 5. 动画形态 */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-slate-600">自旋动画 (Continuous Rotation)</span>
+                    <span className="text-[10px] text-slate-400">开启后产生 360° 无端自转效果</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={iconSpinning}
+                    onChange={(e) => setIconSpinning(e.target.checked)}
+                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                 </div>
               </div>

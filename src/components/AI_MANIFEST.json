@@ -224,6 +224,52 @@
         "behaviors.motionCurve (导航高光底影滑动的阻尼响应)",
         "behaviors.motionDurationNormal (切换过渡动画秒)"
       ]
+    },
+    "Icon": {
+      "tag": "span",
+      "category": "Basic Visual Primitive",
+      "description": "系统高保真微动效、语义色智能感应图标组件。内置常用基础操作、导航、系统配置、上传下载、多选单选、拖拽及高科技 AI 炫光呼吸图标。",
+      "props": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "plus", "pencil", "trash", "search", "refresh", "check", "x",
+            "chevron-down", "chevron-right", "chevron-left",
+            "settings", "help", "loader",
+            "upload", "download", "more-horizontal", "more-vertical", "drag",
+            "checkbox-checked", "checkbox-unchecked", "radio-checked", "radio-unchecked",
+            "ai", "success", "warning", "error", "info"
+          ],
+          "required": true,
+          "description": "图标标识。不同标识将映射到相应 Lucide React 高级图符"
+        },
+        "size": {
+          "type": "string | number",
+          "enum": ["xs", "sm", "md", "lg", "xl"],
+          "default": "md",
+          "description": "图标物理尺寸。支持 sm(14px)、md(16px)、lg(20px) 预设或直接传数字大小"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["default", "primary", "success", "warning", "danger", "info", "custom"],
+          "default": "default",
+          "description": "常规视觉状态方案。特定标识（如 success, error）在未传参数时将自动强制继承各自专有语义色；普通控制图标在默认状态下呈现安静不夺目的柔和浅灰色"
+        },
+        "hoverVariant": {
+          "type": "string",
+          "enum": ["default", "primary", "success", "warning", "danger", "info", "none"],
+          "default": "none",
+          "description": "鼠标移动触碰时激发的高保真变色模式。典型的如垃圾桶图标「trash」在鼠标悬浮时默认提供警示红，提示危险行为"
+        },
+        "spinning": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否开启极速连续性自旋动画。当选中「loader」图符时自动激活，其他图标可通过显式传 true 来加载智能自旋"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionDurationFast (切换或悬停状态变色过渡时长的阻尼)"
+      ]
     }
   },
   "usage_instruction_for_llm": "【⚠️ 关键人机协作准则】：当 AI (或任何 Agent) 收到为本项目拼装界面的用户 prompt（例如: “给我生成一个带确认的云节点配置和启动表单”）时，严禁使用 HTML 原生指令、非预装的外部三方 UI 组件等。AI 只能在上面列出的 5 大原子原语库中做挑选！AI 应根据意图组装符合 Layer 5 规范的「JSON Schema协议」，并将该 Schema 输出在文本中或直接传入 ScenarioSandbox 声明式解析运行时。如此能做到极致的一致性！"
