@@ -26,49 +26,34 @@ import {
   ShieldAlert,
   Menu,
   Home,
+  Star,
+  Monitor,
+  Tablet,
+  Laptop as LaptopIcon,
+  Play,
+  RotateCcw,
+  Zap,
+  Book,
+  Terminal,
+  Activity,
+  Award,
+  ChevronDown
 } from 'lucide-react';
 
 export const ShowcasePanel: React.FC = () => {
-  const { tokens } = useDesignTokens();
-  const [activeTab, setActiveTab] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps'>('button');
-  const [copied, setCopied] = useState(false);
+  const { tokens, activePreset, setPreset, activeTab } = useDesignTokens();
+  
+  // Custom states for sub-tabs layout
+  const [activeSubTab, setActiveSubTab] = useState<'preview' | 'docs' | 'api' | 'specs' | 'history'>('preview');
+  const [device, setDevice] = useState<'desktop' | 'laptop' | 'tablet' | 'mobile'>('desktop');
+  const [activeFramework, setActiveFramework] = useState<'react'>('react');
+  const [copiedConfig, setCopiedConfig] = useState(false);
 
-  // 9. Steps Demo states
-  const [stepsCurrent, setStepsCurrent] = useState<number>(1);
-  const [stepsDirection, setStepsDirection] = useState<'horizontal' | 'vertical'>('horizontal');
-  const [stepsSize, setStepsSize] = useState<'sm' | 'md' | 'lg'>('md');
-  const [stepsClickable, setStepsClickable] = useState<boolean>(true);
-  const [stepsShowDesc, setStepsShowDesc] = useState<boolean>(true);
-  const [stepsHasIcons, setStepsHasIcons] = useState<boolean>(true);
-  const [stepsHasError, setStepsHasError] = useState<boolean>(false);
 
-  // 8. Pagination Demo states
-  const [pagCurrentPage, setPagCurrentPage] = useState<number>(3);
-  const [pagTotalPages, setPagTotalPages] = useState<number>(10);
-  const [pagSize, setPagSize] = useState<'sm' | 'md' | 'lg'>('md');
-  const [pagVariant, setPagVariant] = useState<'classic' | 'modern' | 'minimal'>('classic');
-  const [pagDisabled, setPagDisabled] = useState<boolean>(false);
-  const [pagShowFirstLast, setPagShowFirstLast] = useState<boolean>(true);
-  const [pagShowSizeChanger, setPagShowSizeChanger] = useState<boolean>(true);
-  const [pagPageSize, setPagPageSize] = useState<number>(10);
+  // Trigger copy configs
+  const [copiedCodeCode, setCopiedCodeCode] = useState(false);
 
-  // 7. Breadcrumb Demo states
-  const [breadMaxItems, setBreadMaxItems] = useState<number>(4);
-  const [breadItemsBefore, setBreadItemsBefore] = useState<number>(1);
-  const [breadItemsAfter, setBreadItemsAfter] = useState<number>(1);
-  const [breadSeparator, setBreadSeparator] = useState<'default' | 'slash' | 'chevron' | 'hyphen' | 'arrow'>('default');
-  const [breadClickedLog, setBreadClickedLog] = useState<string>('暂无（点击上方可点击节点触发点击事件记录）');
-
-  // 6. Icon Demo states
-  const [iconName, setIconName] = useState<IconName>('ai');
-  const [iconSize, setIconSize] = useState<'xs' | 'sm' | 'md' | 'lg' | 'xl'>('xl');
-  const [iconVariant, setIconVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'custom'>('default');
-  const [iconHoverVariant, setIconHoverVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'none'>('none');
-  const [iconSpinning, setIconSpinning] = useState(false);
-  const [iconCustomSize, setIconCustomSize] = useState<number>(36);
-  const [iconSizeType, setIconSizeType] = useState<'preset' | 'custom'>('preset');
-
-  // States for interactive prop controller configuration
+  // States for interactive prop controllers configuration
   // 1. Button Props states
   const [btnVariant, setBtnVariant] = useState<'primary' | 'secondary' | 'outline' | 'text' | 'danger'>('primary');
   const [btnSize, setBtnSize] = useState<'sm' | 'md' | 'lg'>('md');
@@ -98,15 +83,6 @@ export const ShowcasePanel: React.FC = () => {
   const [dropMultiple, setDropMultiple] = useState(false);
   const [dropShowDesc, setDropShowDesc] = useState(false);
 
-  const handleToggleMultiple = (checked: boolean) => {
-    setDropMultiple(checked);
-    if (checked) {
-      setDropValue(typeof dropValue === 'string' ? [dropValue] : (Array.isArray(dropValue) ? dropValue : ['asia-east1-a']));
-    } else {
-      setDropValue(Array.isArray(dropValue) && dropValue.length > 0 ? dropValue[0] : 'asia-east1-a');
-    }
-  };
-
   // 4. Modal Props states
   const [modalSize, setModalSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('sm');
   const [modalTitle, setModalTitle] = useState('提示');
@@ -117,6 +93,51 @@ export const ShowcasePanel: React.FC = () => {
   // 5. Navbar states
   const [navBrandName, setNavBrandName] = useState('NEXUS LOGISTICS');
   const [navActiveIndex, setNavActiveIndex] = useState(0);
+
+  // 6. Icon Demo states
+  const [iconName, setIconName] = useState<IconName>('ai');
+  const [iconSize, setIconSize] = useState<'xs' | 'sm' | 'md' | 'lg' | 'xl'>('xl');
+  const [iconVariant, setIconVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'custom'>('default');
+  const [iconHoverVariant, setIconHoverVariant] = useState<'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'none'>('none');
+  const [iconSpinning, setIconSpinning] = useState(false);
+  const [iconCustomSize, setIconCustomSize] = useState<number>(36);
+  const [iconSizeType, setIconSizeType] = useState<'preset' | 'custom'>('preset');
+
+  // 7. Breadcrumb Demo states
+  const [breadMaxItems, setBreadMaxItems] = useState<number>(4);
+  const [breadItemsBefore, setBreadItemsBefore] = useState<number>(1);
+  const [breadItemsAfter, setBreadItemsAfter] = useState<number>(1);
+  const [breadSeparator, setBreadSeparator] = useState<'default' | 'slash' | 'chevron' | 'hyphen' | 'arrow'>('default');
+  const [breadClickedLog, setBreadClickedLog] = useState<string>('暂无（点击上方节点触发点击事件记录）');
+
+  // 8. Pagination Demo states
+  const [pagCurrentPage, setPagCurrentPage] = useState<number>(3);
+  const [pagTotalPages, setPagTotalPages] = useState<number>(10);
+  const [pagSize, setPagSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [pagVariant, setPagVariant] = useState<'classic' | 'modern' | 'minimal'>('classic');
+  const [pagDisabled, setPagDisabled] = useState<boolean>(false);
+  const [pagShowFirstLast, setPagShowFirstLast] = useState<boolean>(true);
+  const [pagShowSizeChanger, setPagShowSizeChanger] = useState<boolean>(true);
+  const [pagPageSize, setPagPageSize] = useState<number>(10);
+
+  // 9. Steps Demo states
+  const [stepsCurrent, setStepsCurrent] = useState<number>(1);
+  const [stepsDirection, setStepsDirection] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [stepsSize, setStepsSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [stepsClickable, setStepsClickable] = useState<boolean>(true);
+  const [stepsShowDesc, setStepsShowDesc] = useState<boolean>(true);
+  const [stepsHasIcons, setStepsHasIcons] = useState<boolean>(true);
+  const [stepsHasError, setStepsHasError] = useState<boolean>(false);
+
+  // Toggle multiple sub options helper
+  const handleToggleMultiple = (checked: boolean) => {
+    setDropMultiple(checked);
+    if (checked) {
+      setDropValue(typeof dropValue === 'string' ? [dropValue] : (Array.isArray(dropValue) ? dropValue : ['asia-east1-a']));
+    } else {
+      setDropValue(Array.isArray(dropValue) && dropValue.length > 0 ? dropValue[0] : 'asia-east1-a');
+    }
+  };
 
   const dropOptions = [
     { label: '华东1区 (杭州) - 可用区A', value: 'cn-hangzhou-a', description: '低空载，优质公网链路' },
@@ -133,43 +154,167 @@ export const ShowcasePanel: React.FC = () => {
     alert: <ShieldAlert className="w-4 h-4" />,
   };
 
-  const menuTabs = [
-    { id: 'button' as const, label: '按钮 (Button)' },
-    { id: 'input' as const, label: '输入框 (Input)' },
-    { id: 'dropdown' as const, label: '下拉选择 (Dropdown / Select)' },
-    { id: 'modal' as const, label: '模态视窗 (Modal Overlay)' },
-    { id: 'navbar' as const, label: '导航系统 (Navbar Navigation)' },
-    { id: 'icon' as const, label: '智能图标 (Icon & Feedback)' },
-    { id: 'breadcrumb' as const, label: '智能面包屑 (Breadcrumb)' },
-    { id: 'pagination' as const, label: '自适应分页 (Pagination)' },
-    { id: 'steps' as const, label: '级阶步骤条 (Steps Stepper)' },
-  ];
+  // Reset to default config parameters
+  const handleResetDefaults = () => {
+    if (activeTab === 'button') {
+      setBtnVariant('primary');
+      setBtnSize('md');
+      setBtnDisabled(false);
+      setBtnLoading(false);
+      setBtnIcon('none');
+      setBtnText('立即部署应用');
+    } else if (activeTab === 'input') {
+      setInputSize('md');
+      setInputLabel('企业电子邮箱 (Email)');
+      setInputPlaceholder('example@company.com');
+      setInputDesc('我们会向此邮箱发送实例运行报告');
+      setInputError('');
+      setInputDisabled(false);
+      setInputIconLeft(true);
+      setInputValue('');
+    } else if (activeTab === 'dropdown') {
+      setDropSize('md');
+      setDropLabel('可用区网络配置 (VPC Subnet)');
+      setDropDesc('请选择服务器实例分配的私有子网区域');
+      setDropError('');
+      setDropSearch(true);
+      setDropDisabled(false);
+      setDropValue('asia-east1-a');
+      setDropMultiple(false);
+      setDropShowDesc(false);
+    } else if (activeTab === 'modal') {
+      setModalSize('sm');
+      setModalTitle('提示');
+      setModalIsOpen(false);
+      setModalHasFooter(true);
+      setModalIsAlertStyle(true);
+    } else if (activeTab === 'navbar') {
+      setNavBrandName('NEXUS LOGISTICS');
+      setNavActiveIndex(0);
+    } else if (activeTab === 'icon') {
+      setIconName('ai');
+      setIconSize('xl');
+      setIconVariant('default');
+      setIconHoverVariant('none');
+      setIconSpinning(false);
+      setIconCustomSize(36);
+      setIconSizeType('preset');
+    } else if (activeTab === 'breadcrumb') {
+      setBreadMaxItems(4);
+      setBreadItemsBefore(1);
+      setBreadItemsAfter(1);
+      setBreadSeparator('default');
+      setBreadClickedLog('暂无（点击上方节点触发点击事件记录）');
+    } else if (activeTab === 'pagination') {
+      setPagCurrentPage(3);
+      setPagTotalPages(10);
+      setPagSize('md');
+      setPagVariant('classic');
+      setPagDisabled(false);
+      setPagShowFirstLast(true);
+      setPagShowSizeChanger(true);
+      setPagPageSize(10);
+    } else if (activeTab === 'steps') {
+      setStepsCurrent(1);
+      setStepsDirection('horizontal');
+      setStepsSize('md');
+      setStepsClickable(true);
+      setStepsShowDesc(true);
+      setStepsHasIcons(true);
+      setStepsHasError(false);
+    }
+  };
 
-  // Dynamically build sample code based on props
-  const getCodeSnippet = () => {
-    switch (activeTab) {
-      case 'button':
-        return `import { Button } from './components/atoms/Button';
+  const handleCopyConfigProps = () => {
+    let propConfigStr = '';
+    if (activeTab === 'button') {
+      propConfigStr = `variant: "${btnVariant}", size: "${btnSize}", disabled: ${btnDisabled}, isLoading: ${btnLoading}, iconPlacement: "${btnIcon}", text: "${btnText}"`;
+    } else if (activeTab === 'input') {
+      propConfigStr = `size: "${inputSize}", label: "${inputLabel}", placeholder: "${inputPlaceholder}", disabled: ${inputDisabled}, error: "${inputError}"`;
+    } else if (activeTab === 'dropdown') {
+      propConfigStr = `size: "${dropSize}", search: ${dropSearch}, multiple: ${dropMultiple}, disabled: ${dropDisabled}, error: "${dropError}"`;
+    } else if (activeTab === 'steps') {
+      propConfigStr = `current: ${stepsCurrent}, direction: "${stepsDirection}", size: "${stepsSize}", clickable: ${stepsClickable}`;
+    } else {
+      propConfigStr = `id: "${activeTab}", preset: "${activePreset}"`;
+    }
+    navigator.clipboard.writeText(propConfigStr);
+    setCopiedConfig(true);
+    setTimeout(() => setCopiedConfig(false), 2000);
+  };
+
+  // Generate metadata dynamically for current component tab
+  const getComponentMetadata = () => {
+    const data = {
+      button: {
+        title: 'Button 按钮',
+        desc: '具有高柔和动能物理反弹触感的点击交互单元。完美绑定品牌主色及圆角令牌，在微型加载、状态切换、多变体及安全触发场景中提供可靠支持。',
+      },
+      icon: {
+        title: 'Icon 智能图标',
+        desc: '支持响应式着色与自适应悬浮变体的矢量指令原子。可完美嵌入其它容器级组件，原生支持纺锤形平滑无极循环物理旋转。',
+      },
+      input: {
+        title: 'Input 输入框',
+        desc: '标准高保真表单信息录入基底，支持前置行内修饰图标。其聚焦高光扩边 (Focus Ring) 及不正常告警态细节完美遵从行为令牌的延迟定义。',
+      },
+      dropdown: {
+        title: 'Dropdown 下拉选择 (Select)',
+        desc: '集成本地多维度前向字符级搜索的智能筛选器。支持多元素 checkboxes 组合，选中项自适应转换为气泡标签药丸，并提供二级细节文本。',
+      },
+      modal: {
+        title: 'Modal 页面弹窗 (Overlay)',
+        desc: '层级高达 50 的关键行为强聚焦交互遮罩窗口。在进入和呼出时，由 React 级 motion 弹力物理学数学曲线操纵淡入微弹淡出，避免生硬割裂。',
+      },
+      navbar: {
+        title: 'Navbar 导航系统',
+        desc: '横向 12 列栅格对齐的标准响应式应用系统顶栏。支持集成动态滑动聚焦浮条，保持极高文字可访问性。',
+      },
+      breadcrumb: {
+        title: 'Breadcrumb 面包屑',
+        desc: '提供整洁物理路径记忆的多级树状关系指示条。集成大深度自适应省略号节点，点击省略号节点可以实现完美的原处横向平滑全展。',
+      },
+      pagination: {
+        title: 'Pagination 自适应分页器',
+        desc: '结构清晰的多模态数据跳步分布器。提供传统盒装、优雅圆底、现代简约无框三种视觉风格，在多状态交互中自动变换动作尺度。',
+      },
+      steps: {
+        title: 'Steps 步骤条 (Stepper)',
+        desc: '引导用户按照既定流程安全推进的进度步骤条。完美支持横向流程网格或竖向垂直技术细节流程的双向无损切换。',
+      },
+    };
+    return data[activeTab] || { title: 'Atom Component', desc: 'React high fidelity sandbox element.' };
+  };
+
+  const activeMeta = getComponentMetadata();
+
+  // Multi-Framework and syntax tailored code snippet
+  const getFrameworkCodeSnippet = (fw: 'react' | 'vue' | 'angular') => {
+    if (fw === 'react') {
+      switch (activeTab) {
+        case 'button':
+          return `import { Button } from 'atomix-ui';
 import { ArrowRight } from 'lucide-react';
 
-export default function MyPage() {
+export default function App() {
   return (
     <Button
       variant="${btnVariant}"
       size="${btnSize}"${btnDisabled ? '\n      disabled' : ''}${btnLoading ? '\n      isLoading' : ''}${
-          btnIcon === 'left' ? '\n      iconLeft={<ArrowRight className="w-4 h-4" />}' : ''
-        }${btnIcon === 'right' ? '\n      iconRight={<ArrowRight className="w-4 h-4" />}' : ''}
+            btnIcon === 'left' ? '\n      iconLeft={<ArrowRight className="w-4 h-4" />}' : ''
+          }${btnIcon === 'right' ? '\n      iconRight={<ArrowRight className="w-4 h-4" />}' : ''}
     >
       ${btnText}
     </Button>
   );
 }`;
-      case 'input':
-        return `import { Input } from './components/atoms/Input';
+        case 'input':
+          return `import { Input } from 'atomix-ui';
 import { Mail } from 'lucide-react';
+import { useState } from 'react';
 
-export default function MyPage() {
-  const [email, setEmail] = useState('');
+export default function FormField() {
+  const [val, setVal] = useState('${inputValue}');
 
   return (
     <Input
@@ -177,118 +322,97 @@ export default function MyPage() {
       description="${inputDesc}"
       placeholder="${inputPlaceholder}"
       size="${inputSize}"${inputDisabled ? '\n      disabled' : ''}${inputError ? `\n      error="${inputError}"` : ''}${
-          inputIconLeft ? '\n      iconLeft={<Mail className="w-4 h-4" />}' : ''
-        }
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
+            inputIconLeft ? '\n      iconLeft={<Mail className="w-4 h-4" />}' : ''
+          }
+      value={val}
+      onChange={(e) => setVal(e.target.value)}
     />
   );
 }`;
-      case 'dropdown':
-        return `import { Dropdown } from './components/atoms/Dropdown';
+        case 'dropdown':
+          return `import { Dropdown } from 'atomix-ui';
 import { useState } from 'react';
 
-const OPTIONS = [
-  { label: '华东1区 (杭州) - 可用区A', value: 'cn-hangzhou-a', description: '低空载...' },
-  { label: '亚太1区 (新加坡) - A区', value: 'asia-east1-a', description: '高可用...' }
-];
-
-export default function MyPage() {
-  const [value, setValue] = useState(${dropMultiple ? "['asia-east1-a']" : "'asia-east1-a'"});
+export default function SelectGrid() {
+  const [val, setVal] = useState(${dropMultiple ? "['asia-east1-a']" : "'asia-east1-a'"});
+  const options = [
+    { label: '亚太1区 (新加坡)', value: 'asia-east1-a', description: '高可用推荐' }
+  ];
 
   return (
     <Dropdown
       label="${dropLabel}"
       description="${dropDesc}"
-      options={OPTIONS}
-      value={value}
-      onChange={setValue}
-      size="${dropSize}"${dropSearch ? '\n      enableSearch' : ''}${dropDisabled ? '\n      disabled' : ''}${
-          dropError ? `\n      error="${dropError}"` : ''
-        }${dropMultiple ? '\n      multiple' : ''}${dropShowDesc ? '\n      showDescription' : ''}
+      options={options}
+      value={val}
+      onChange={setVal}
+      size="${dropSize}"
+      enableSearch={${dropSearch}}
+      multiple={${dropMultiple}}${dropDisabled ? '\n      disabled' : ''}${
+            dropError ? `\n      error="${dropError}"` : ''
+          }
     />
   );
 }`;
-      case 'modal':
-        return `import { Modal } from './components/atoms/Modal';
-import { Button } from './components/atoms/Button';
+        case 'modal':
+          return `import { Modal, Button } from 'atomix-ui';
+import { useState } from 'react';
 
-export default function MyPage() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function OverlayPage() {
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>打开弹框</Button>
+      <Button onClick={() => setOpen(true)}>展开模态框</Button>
 
       <Modal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={open}
+        onClose={() => setOpen(false)}
         title="${modalTitle}"
-        size="${modalSize}"${
-          modalHasFooter
-            ? `
-        footer={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>取消</Button>
-            <Button variant="danger" onClick={() => setIsOpen(false)}>停用计算组</Button>
-          </div>
-        }`
-            : ''
-        }
+        size="${modalSize}"
+        borderless
       >
-        <p>这将导致与该计算节点关联的所有业务容器中断并永久删除，该过程不可逆。</p>
+        <p>确认将终止分配的系统实例并彻底清理物理卷吗？此过程无可逆性。</p>
       </Modal>
     </>
   );
 }`;
-      case 'navbar':
-        return `import { Navbar } from './components/atoms/Navbar';
-import { Button } from './components/atoms/Button';
+        case 'navbar':
+          return `import { Navbar, Button } from 'atomix-ui';
 
-export default function AppLayout() {
-  const menuItems = [
-    { label: '云控制台', active: true },
-    { label: '边缘存储' },
-    { label: '安全审计' }
-  ];
-
+export default function HeaderLayout() {
   return (
     <Navbar
-      logo={
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600" />
-          <span className="font-bold text-slate-850">${navBrandName}</span>
-        </div>
-      }
-      menuItems={menuItems}
-      rightActions={
-        <Button size="sm" variant="outline">控制台登录</Button>
-      }
+      logo={<span>${navBrandName}</span>}
+      menuItems={[
+        { label: '智能分析', active: true },
+        { label: '系统设置', active: false }
+      ]}
+      rightActions={<Button size="sm">退出控制台</Button>}
     />
   );
 }`;
-      case 'icon':
-        return `import { Icon } from './components/atoms/Icon';
+        case 'icon':
+          return `import { Icon } from 'atomix-ui';
 
-export default function MyPage() {
+export default function IconDemo() {
   return (
     <Icon
       name="${iconName}"
-      size={${iconSizeType === 'custom' ? iconCustomSize : `'${iconSize}'`}}${iconVariant !== 'default' ? `\n      variant="${iconVariant}"` : ''}${iconHoverVariant !== 'none' ? `\n      hoverVariant="${iconHoverVariant}" font-mono` : ''}${iconSpinning ? '\n      spinning' : ''}
+      size=${iconSizeType === 'custom' ? `${iconCustomSize}` : `"${iconSize}"`}
+      variant="${iconVariant}"${iconSpinning ? '\n      spinning' : ''}
     />
   );
 }`;
-      case 'breadcrumb':
-        return `import { Breadcrumb } from './components/atoms/Breadcrumb';
+        case 'breadcrumb':
+          return `import { Breadcrumb } from 'atomix-ui';
 import { Home } from 'lucide-react';
 
-export default function MyPage() {
+export default function NavPath() {
   const items = [
-    { label: '系统根节点', href: '#/', icon: <Home size={14} /> },
-    { label: '安全审计与可用群集', href: '#/clusters' },
-    { label: '边缘计算节点管理', href: '#/edge' },
-    { label: '北京二区虚拟机拓扑组', href: '#/topology' },
-    { label: '当前拓扑图和性能大盘详情' },
+    { label: '主控节点', href: '#/', icon: <Home size={14} /> },
+    { label: '计算群集', href: '#/clusters' },
+    { label: '容器拓扑', href: '#/topology' }
   ];
 
   return (
@@ -296,1539 +420,1595 @@ export default function MyPage() {
       items={items}
       maxItems={${breadMaxItems}}
       itemsBeforeCollapse={${breadItemsBefore}}
-      itemsAfterCollapse={${breadItemsAfter}}${
-        breadSeparator !== 'default' 
-          ? `\n      separator="${
-              breadSeparator === 'slash' ? '/' 
-              : breadSeparator === 'chevron' ? '→' 
-              : breadSeparator === 'hyphen' ? '—' 
-              : '›'
-            }"` 
-          : ''
-      }
-      onItemClick={(item, index) => console.log('Clicked:', item, index)}
+      itemsAfterCollapse={${breadItemsAfter}}
     />
   );
 }`;
-      case 'pagination':
-        return `import { Pagination } from './components/atoms/Pagination';
+        case 'pagination':
+          return `import { Pagination } from 'atomix-ui';
 import { useState } from 'react';
 
-export default function MyPage() {
-  const [currentPage, setCurrentPage] = useState(${pagCurrentPage});
-  const [pageSize, setPageSize] = useState(${pagPageSize});
+export default function DataPages() {
+  const [page, setPage] = useState(${pagCurrentPage});
 
   return (
     <Pagination
-      currentPage={currentPage}
+      currentPage={page}
       totalPages={${pagTotalPages}}
-      onPageChange={setCurrentPage}
+      onPageChange={setPage}
       size="${pagSize}"
-      variant="${pagVariant}"${pagDisabled ? '\n      disabled' : ''}${!pagShowFirstLast ? '\n      showFirstLast={false}' : ''}${pagShowSizeChanger ? `\n      showPageSizeChanger\n      pageSize={pageSize}\n      onPageSizeChange={setPageSize}` : ''}
+      variant="${pagVariant}"
+      pageSize={${pagPageSize}}
+      showFirstLast={${pagShowFirstLast}}
+      showPageSizeChanger={${pagShowSizeChanger}}
     />
   );
 }`;
-      case 'steps':
-        return `import { Steps } from './components/atoms/Steps';
-import { useState } from 'react';
+        case 'steps':
+          return `import { Steps } from 'atomix-ui';
 
-export default function MyPage() {
-  const [current, setCurrent] = useState(${stepsCurrent});
-
-  const steps = [
-    { title: '实名身份验证',${stepsShowDesc ? " description: '核验绑定真实身分姓名与身份证照'," : ""}${stepsHasIcons ? " icon: 'user'" : ""} },
-    { title: '银行卡账户连接',${stepsShowDesc ? " description: '自主添加结算银联并完成协议代扣签约'," : ""}${stepsHasIcons ? " icon: 'creditcard'" : ""}${stepsHasError ? ", status: 'error'" : ""} },
-    { title: '完成最终安全测评',${stepsShowDesc ? " description: '完成问卷安全答卷并自动归档保存'," : ""}${stepsHasIcons ? " icon: 'lock'" : ""} }
+export default function StepsProgress() {
+  const items = [
+    { title: '身分信息认证', description: '完成 OCR 及二要素验证' },
+    { title: '连接清算银行', description: '授权银行结算代扣绑定' }
   ];
 
   return (
     <Steps
-      current={current}
-      items={steps}
+      current={${stepsCurrent}}
+      items={items}
       direction="${stepsDirection}"
-      size="${stepsSize}"${stepsClickable ? '\n      clickable' : ''}
-      onStepChange={setCurrent}
+      size="${stepsSize}"
+      clickable={${stepsClickable}}
     />
   );
+}`;
+        default:
+          return ``;
+      }
+    } else if (fw === 'vue') {
+      return `<!-- Vue 3 Template Standard -->
+<template>
+  <a-components-sandbox>
+    <a-${activeTab} 
+      :preset="activePreset"${activeTab === 'button' ? `\n      variant="${btnVariant}"\n      size="${btnSize}"\n      :loading="${btnLoading}"\n      :disabled="${btnDisabled}"` : ''}${activeTab === 'input' ? `\n      label="${inputLabel}"\n      placeholder="${inputPlaceholder}"\n      :disabled="${inputDisabled}"\n      :error="${inputError}"` : ''}${activeTab === 'steps' ? `\n      :current="${stepsCurrent}"\n      direction="${stepsDirection}"\n      size="${stepsSize}"` : ''}
+    />
+  </a-components-sandbox>
+</template>
+
+<script setup>
+const activePreset = '${activePreset}';
+</script>`;
+    } else {
+      return `<!-- Angular 16+ Component Spec -->
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-component-demo',
+  template: \`
+    <ax-${activeTab} 
+      [preset]="currentPreset"
+      [size]="'${activeTab === 'button' ? btnSize : (activeTab === 'input' ? inputSize : 'md')}'">
+    </ax-${activeTab}>
+  \`
+})
+export class AtomixDemoComponent {
+  currentPreset = '${activePreset}';
 }`;
     }
   };
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(getCodeSnippet());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyCodeSnippet = () => {
+    navigator.clipboard.writeText(getFrameworkCodeSnippet(activeFramework));
+    setCopiedCodeCode(true);
+    setTimeout(() => setCopiedCodeCode(false), 2000);
+  };
+
+  // UI responsive sizes helper values
+  const getDeviceWidthClass = () => {
+    switch (device) {
+      case 'laptop':
+        return 'max-w-[1024px] border-x-[12px] border-y-[6px] border-slate-800 rounded-2xl shadow-xl';
+      case 'tablet':
+        return 'max-w-[768px] border-x-[14px] border-y-[8px] border-slate-800 rounded-xl shadow-xl';
+      case 'mobile':
+        return 'max-w-[375px] border-x-[16px] border-y-[24px] border-slate-800 rounded-3xl shadow-xl';
+      case 'desktop':
+      default:
+        return 'w-full';
+    }
+  };
+
+  // Details for API documentation contract table
+  const getApiContractRows = () => {
+    switch (activeTab) {
+      case 'button':
+        return [
+          { name: 'variant', type: "'primary' | 'secondary' | 'outline' | 'text' | 'danger'", default: "'primary'", desc: '按钮的视觉变体：包含品牌主色填充，中性辅助底色，极简线框，以及红色警示态' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '尺寸梯度，分别绑定高度为 32px / 40px / 48px，其横向内边距自动按 Spacings 令牌比例自适应缩放' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: '强制锁定按钮并屏蔽所有点击以及悬游过渡动作，视觉降级为 bgDisabled 暗沉灰哑状态' },
+          { name: 'isLoading', type: 'boolean', default: 'false', desc: '开启时，按钮自动加塞 loading 转圈菊花，并锁定屏蔽二次物理按下' },
+          { name: 'iconLeft', type: 'React.ReactNode', default: 'undefined', desc: '在文本左方嵌入的自定义矢量图标元素 <span>' },
+          { name: 'iconRight', type: 'React.ReactNode', default: 'undefined', desc: '在文本右方嵌入的自定义矢量图标元素 <span>' },
+        ];
+      case 'input':
+        return [
+          { name: 'label', type: 'string', default: "''", desc: '顶部对齐排布的标准文本标签描述说明' },
+          { name: 'description', type: 'string', default: "''", desc: '底部辅助提示，用于解释输入规则、长度限制、状态描述安全指引等' },
+          { name: 'placeholder', type: 'string', default: "''", desc: '为空时默认浮出的淡灰色说明信息' },
+          { name: 'error', type: 'string', default: "''", desc: '传入非空且有效的信息时，输入框和标题会同步切换到红色警示 error 态，自动高亮并开启微抖动' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '输入高度规格：小高度 32px （密核推荐），标准 40px，大气 48px' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: '是否锁定输入，背景降级，光标重写为禁行状态' },
+        ];
+      case 'dropdown':
+        return [
+          { name: 'label', type: 'string', default: "''", desc: '表单说明标题，提供严谨的可访问导航属性' },
+          { name: 'options', type: 'Array<{label, value, description}>', default: '[]', desc: '数据源选项列表，提供选项名称、回填值以及专属状态描述详情' },
+          { name: 'value', type: 'string | string[]', default: "''", desc: '当前选中的对象值。支持绑定 React local 数组作为多模式选值' },
+          { name: 'enableSearch', type: 'boolean', default: 'true', desc: '是否在最上方开启轻型本地智能关键词过滤栏' },
+          { name: 'multiple', type: 'boolean', default: 'false', desc: '开启多选机制。可一次性多维选取，选定项将自适应转化为可删除的气泡药丸标签' },
+        ];
+      case 'steps':
+        return [
+          { name: 'current', type: 'number', default: '0', desc: '当前正在推进的激活步骤。从 0 开始步进计数' },
+          { name: 'items', type: 'Array<{title, description, icon}>', default: '[]', desc: '步骤数组集合，包含基础各层次标题，及多模态矢量图标键' },
+          { name: 'direction', type: "'horizontal' | 'vertical'", default: "'horizontal'", desc: '排布朝向，经典左右平铺 vs 详情垂直展开，完全支持响应式' },
+          { name: 'clickable', type: 'boolean', default: 'true', desc: '是否允许点击非当前节点来进行快捷跳转推进' },
+        ];
+      default:
+        return [
+          { name: 'preset', type: "ThemePreset", default: "'intelligent_workspace'", desc: '全局设计方案预设标签' },
+          { name: 'className', type: "string", default: "''", desc: '自定义注入的 Tailwind 类，扩展视觉边界' },
+        ];
+    }
   };
 
   return (
-    <div className="flex flex-col gap-6" id="component-showcase-panel">
-      {/* Component Navigation Header Row */}
-      <div className="flex items-center justify-start gap-1 pb-1 overflow-x-auto scrollbar-none border-b border-slate-100">
-        {menuTabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setActiveTab(tab.id);
-            }}
-            className={`py-3 px-5 text-xs font-semibold whitespace-nowrap transition-all border-b-2 shrink-0 ${
-              activeTab === tab.id
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="component-showcase-panel">
+      {/* Left Column (Col span 9) */}
+      <div className="lg:col-span-9 flex flex-col gap-6">
+        {/* 1. Component Title Header Block */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between outline-none pb-4 border-b border-slate-100 gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 token-font-heading">
+              {activeMeta.title}
+            </h1>
+            <span className="text-[10px] font-mono select-none px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full font-bold">
+              v1.2.0 Stable
+            </span>
+          </div>
+          <p className="text-xs text-slate-450 mt-1.5 max-w-3xl leading-relaxed">
+            {activeMeta.desc}
+          </p>
+        </div>
+
+
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Interactive Playground Sandbox: Live Preview and controllers */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          {/* Main Visual Arena */}
-          <div className="p-8 border border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center min-h-[300px] relative bg-slate-50/20 shadow-xs">
-            <span className="absolute top-3 left-3 text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex items-center gap-1">
-              <Eye className="w-3 h-3" /> Live Sandbox Canvas
-            </span>
+      {/* 2. Secondary Tabs Row */}
+      <div className="flex border-b border-slate-100 select-none pb-px overflow-x-auto scrollbar-none">
+        {([
+          { id: 'preview', label: '预览效果', en: 'Preview' },
+          { id: 'docs', label: '设计规范', en: 'Specs & Docs' },
+          { id: 'api', label: 'API 契约', en: 'API Interface' },
+          { id: 'specs', label: '物理参数', en: 'Metrics' },
+          { id: 'history', label: '版本更迭', en: 'Changelogs' }
+        ] as const).map((sub) => {
+          const isSel = activeSubTab === sub.id;
+          return (
+            <button
+              key={sub.id}
+              onClick={() => setActiveSubTab(sub.id)}
+              className={`cursor-pointer px-4.5 py-2.5 text-xs font-bold border-b-2 leading-none shrink-0 transition-all ${
+                isSel
+                  ? 'border-indigo-600 text-indigo-700'
+                  : 'border-transparent text-slate-505 hover:text-slate-800 hover:border-slate-200'
+              }`}
+            >
+              <span className="block">{sub.label}</span>
+              <span className="block text-[8.5px] font-mono uppercase tracking-widest font-normal text-slate-400 mt-1">{sub.en}</span>
+            </button>
+          );
+        })}
+      </div>
 
-            {/* Render selected component with active controls */}
-            <div className="w-full max-w-md flex flex-col items-center justify-center py-6">
-              {activeTab === 'button' && (
-                <div className="animate-fade-in text-center">
-                  <Button
-                    variant={btnVariant}
-                    size={btnSize}
-                    disabled={btnDisabled}
-                    isLoading={btnLoading}
-                    iconLeft={btnIcon === 'left' ? helperIcons.arrow : undefined}
-                    iconRight={btnIcon === 'right' ? helperIcons.arrow : undefined}
-                  >
-                    {btnText}
-                  </Button>
-                  <p className="text-[10px] text-slate-400 mt-4 font-mono select-none">
-                    * 体验微动画：点击或鼠标划过，观察 Hover & Active 颜色的平滑过渡动画
-                  </p>
-                </div>
-              )}
+      {/* 3. Main Bento Grid Workspace Content */}
+          {activeSubTab === 'preview' && (
+            <>
+              {/* Emulator Canvas Section with Viewport switcher toolbar */}
+              <div
+                className="border rounded-2xl overflow-hidden flex flex-col transition-all duration-300"
+                style={{
+                  backgroundColor: tokens.colors.bgCard,
+                  borderColor: tokens.colors.border,
+                }}
+              >
+                {/* Canvas emulation header toolbar */}
+                <div
+                  className="px-4 py-2.5 border-b flex items-center justify-between select-none transition-all duration-300"
+                  style={{
+                    backgroundColor: tokens.colors.bgInput,
+                    borderColor: tokens.colors.border,
+                  }}
+                >
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold flex items-center gap-1.5" style={{ color: tokens.colors.textMuted }}>
+                    <Eye className="w-3.5 h-3.5 shrink-0" style={{ color: tokens.colors.brand }} />
+                    <span>Live Preview Sandbox Canvas</span>
+                  </span>
 
-              {activeTab === 'input' && (
-                <div className="w-full animate-fade-in">
-                  <Input
-                    label={inputLabel}
-                    description={inputDesc}
-                    placeholder={inputPlaceholder}
-                    error={inputError}
-                    size={inputSize}
-                    disabled={inputDisabled}
-                    iconLeft={inputIconLeft ? helperIcons.mail : undefined}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                  />
-                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
-                    * 属性联动：点击聚焦，输入框边框高亮颜色与全圆角将配合当前最外层 Token 自适应
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'dropdown' && (
-                <div className="w-full animate-fade-in min-h-[140px]">
-                  <Dropdown
-                    label={dropLabel}
-                    description={dropDesc}
-                    options={dropOptions}
-                    value={dropValue}
-                    onChange={setDropValue}
-                    size={dropSize}
-                    error={dropError}
-                    enableSearch={dropSearch}
-                    disabled={dropDisabled}
-                    multiple={dropMultiple}
-                    showDescription={dropShowDesc}
-                  />
-                  <p className="text-[10px] text-slate-400 mt-6 text-center font-mono select-none">
-                    * 属性联动：展开后提供搜索过滤。当前支持<strong>单选</strong>与<strong>多选（带 checkbox 并支持可移除 tag 药丸）</strong>两种变体模式自适应
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'modal' && (
-                <div className="w-full animate-fade-in text-center flex flex-col items-center">
-                  <Button variant="primary" onClick={() => setModalIsOpen(true)}>
-                    运行触发和呼出模态框 (Trigger Overlay)
-                  </Button>
-
-                  <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modalTitle}
-                    size={modalSize}
-                    borderless={true}
-                    footer={
-                      modalHasFooter ? (
-                        modalIsAlertStyle ? (
-                          <div className="flex gap-2 justify-end w-full">
-                            <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
-                              取消
-                            </Button>
-                            <Button variant="primary" size="sm" onClick={() => setModalIsOpen(false)}>
-                              确定
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex gap-2 justify-end w-full">
-                            <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
-                              暂返回修改
-                            </Button>
-                            <Button variant="danger" size="sm" onClick={() => setModalIsOpen(false)}>
-                              确定并终止实例
-                            </Button>
-                          </div>
-                        )
-                      ) : undefined
-                    }
-                  >
-                    {modalIsAlertStyle ? (
-                      <div className="flex items-start gap-4 py-1.5 text-left">
-                        {/* 蓝色实像圆章 "i" 图标 */}
-                        <div 
-                          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white font-serif font-bold text-sm select-none"
-                          style={{ backgroundColor: tokens.colors.brand }}
+                  {/* Device selectors */}
+                  <div className="flex items-center gap-1.5">
+                    {([
+                      { id: 'desktop', title: 'Desktop (1440px)', icon: <Monitor className="w-3.5 h-3.5" /> },
+                      { id: 'laptop', title: 'Laptop (1024px)', icon: <LaptopIcon className="w-3.5 h-3.5" /> },
+                      { id: 'tablet', title: 'Tablet (768px)', icon: <Tablet className="w-3.5 h-3.5" /> },
+                      { id: 'mobile', title: 'Mobile (375px)', icon: <Smartphone className="w-3.5 h-3.5" /> }
+                    ] as const).map((dev) => {
+                      const isSelDev = device === dev.id;
+                      return (
+                        <Button
+                          key={dev.id}
+                          onClick={() => setDevice(dev.id)}
+                          title={dev.title}
+                          size="sm"
+                          variant={isSelDev ? 'primary' : 'secondary'}
+                          className="w-8 h-8 p-0! flex items-center justify-center rounded-xl"
                         >
-                          i
-                        </div>
-                        <div className="text-sm font-normal pt-0.5 leading-relaxed" style={{ color: tokens.colors.textPrimary }}>
-                          请先完成首份技术标书编制，首份编制完成后解锁再写一份
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-3 font-normal text-slate-600 text-left">
-                        <p className="text-sm">
-                          此操作为云集群高危级别操作，关闭该运行实例将会断开 <strong>Algonet-2</strong>{' '}
-                          分布式节点。包含 <strong>2.4TB</strong> 网络缓存也会永久清理。
+                          {dev.icon}
+                        </Button>
+                      );
+                    })}
+                    <div className="h-4 w-px mx-1" style={{ backgroundColor: tokens.colors.border }} />
+                    <Dropdown
+                      options={[
+                        { label: '1440px (Desktop)', value: 'desktop' },
+                        { label: '1024px (Laptop)', value: 'laptop' },
+                        { label: '768px (iPad Air)', value: 'tablet' },
+                        { label: '375px (iPhone Mobile)', value: 'mobile' },
+                      ]}
+                      value={device}
+                      onChange={setDevice}
+                      size="sm"
+                      className="w-36 font-mono text-[10px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Simulated center viewport box */}
+                <div
+                  className="p-8 flex flex-col items-center justify-center min-h-[320px] transition-all relative overflow-x-auto"
+                  style={{
+                    backgroundColor: tokens.colors.bgActive,
+                  }}
+                >
+                  <div
+                    className={`w-full transition-all duration-300 border border-dashed p-10 flex items-center justify-center ${getDeviceWidthClass()}`}
+                    style={{
+                      backgroundColor: tokens.colors.bgCard,
+                      borderColor: tokens.colors.border,
+                    }}
+                  >
+                    {/* Component render map */}
+                    {activeTab === 'button' && (
+                      <div className="text-center w-full max-w-sm">
+                        <Button
+                          variant={btnVariant}
+                          size={btnSize}
+                          disabled={btnDisabled}
+                          isLoading={btnLoading}
+                          iconLeft={btnIcon === 'left' ? helperIcons.arrow : undefined}
+                          iconRight={btnIcon === 'right' ? helperIcons.arrow : undefined}
+                        >
+                          {btnText}
+                        </Button>
+                        <p className="text-[10px] text-slate-400 mt-4 text-center font-mono leading-none select-none">
+                          * Click, Hover or Press checking physics micro transition values
                         </p>
-                        <div className="p-3 bg-red-50 text-red-700 rounded-lg flex items-start gap-2 border border-red-100">
-                          <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                          <div className="text-xs">
-                            <strong>警告提示：</strong>
-                            本操作不可回滚。数据卷将同时被注销，无法重新还原。
-                          </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'input' && (
+                      <div className="w-full max-w-sm">
+                        <Input
+                          label={inputLabel}
+                          description={inputDesc}
+                          placeholder={inputPlaceholder}
+                          error={inputError}
+                          size={inputSize}
+                          disabled={inputDisabled}
+                          iconLeft={inputIconLeft ? helperIcons.mail : undefined}
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                        />
+                        <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none leading-none">
+                          * High contract border ring dynamically wraps inputs during active focus state
+                        </p>
+                      </div>
+                    )}
+
+                    {activeTab === 'dropdown' && (
+                      <div className="w-full max-w-xs min-h-[140px]">
+                        <Dropdown
+                          label={dropLabel}
+                          description={dropDesc}
+                          options={dropOptions}
+                          value={dropValue}
+                          onChange={setDropValue}
+                          size={dropSize}
+                          error={dropError}
+                          enableSearch={dropSearch}
+                          disabled={dropDisabled}
+                          multiple={dropMultiple}
+                          showDescription={dropShowDesc}
+                        />
+                        <p className="text-[10px] text-slate-400 mt-6 text-center font-mono select-none leading-none">
+                          * Expand testing forward search filter matches and active dynamic checks
+                        </p>
+                      </div>
+                    )}
+
+                    {activeTab === 'modal' && (
+                      <div className="text-center flex flex-col items-center">
+                        <Button variant="primary" onClick={() => setModalIsOpen(true)}>
+                          部署模态触发 (Call Modal Screen)
+                        </Button>
+
+                        <Modal
+                          isOpen={modalIsOpen}
+                          onClose={() => setModalIsOpen(false)}
+                          title={modalTitle}
+                          size={modalSize}
+                          borderless={true}
+                          footer={
+                            modalHasFooter ? (
+                              modalIsAlertStyle ? (
+                                <div className="flex gap-2 justify-end w-full">
+                                  <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
+                                    取消
+                                  </Button>
+                                  <Button variant="primary" size="sm" onClick={() => setModalIsOpen(false)}>
+                                    确定
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex gap-2 justify-end w-full">
+                                  <Button variant="outline" size="sm" onClick={() => setModalIsOpen(false)}>
+                                    暂返回
+                                  </Button>
+                                  <Button variant="danger" size="sm" onClick={() => setModalIsOpen(false)}>
+                                    确定并删除卷
+                                  </Button>
+                                </div>
+                              )
+                            ) : undefined
+                          }
+                        >
+                          {modalIsAlertStyle ? (
+                            <div className="flex items-start gap-4 py-2 text-left">
+                              <div
+                                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white font-serif font-black text-xs select-none"
+                                style={{ backgroundColor: tokens.colors.brand }}
+                              >
+                                i
+                              </div>
+                              <div className="text-xs font-medium pt-0.5 leading-relaxed" style={{ color: tokens.colors.textPrimary }}>
+                                重要提示：北京可用集群网络标书项目已启动，本节点将于 48 小时后正式交接，其余项目暂缓部署。
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-3 font-normal text-slate-650 text-left">
+                              <p className="text-xs">
+                                警告：关闭此物理计算服务器将断开主管道 <strong>Algonet-2</strong>{' '}
+                                联络总线。包含 <strong>2.4TB</strong> 网络静态缓存也会永久蒸发，数据无可逆性。
+                              </p>
+                              <div className="p-2.5 bg-red-50 text-red-700 rounded-lg flex items-start gap-2 border border-red-100/50">
+                                <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 animate-bounce" />
+                                <div className="text-[10px] leading-normal font-semibold">
+                                  <strong>高危警告：</strong>
+                                  本操作不可逆。数据存储卷无法还原。
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </Modal>
+
+                        <p className="text-[10px] text-slate-400 mt-4 text-center font-mono leading-none select-none">
+                          * Smooth spring animations and fade backdrops during active focus changes
+                        </p>
+                      </div>
+                    )}
+
+                    {activeTab === 'navbar' && (
+                      <div className="w-full border border-slate-100 rounded-lg overflow-hidden shadow-xs relative">
+                        <Navbar
+                          logo={
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-7 h-7 flex items-center justify-center font-serif font-bold text-white rounded text-xs select-none"
+                                style={{ backgroundColor: tokens.colors.brand }}
+                              >
+                                Ω
+                              </div>
+                              <span className="text-[11px] font-bold tracking-tight token-font-heading text-slate-800">
+                                {navBrandName}
+                              </span>
+                            </div>
+                          }
+                          menuItems={[
+                            { label: '智能大纲', active: navActiveIndex === 0, onClick: () => setNavActiveIndex(0) },
+                            { label: '安全组审计', active: navActiveIndex === 1, onClick: () => setNavActiveIndex(1) },
+                            { label: '容器拓扑线', active: navActiveIndex === 2, onClick: () => setNavActiveIndex(2) },
+                          ]}
+                          rightActions={
+                            <Button size="sm" variant="outline">
+                              退出控制台
+                            </Button>
+                          }
+                          sticky={false}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'icon' && (
+                      <div className="text-center flex flex-col items-center justify-center">
+                        <div
+                          className="p-10 border border-slate-100/80 shadow-xs flex items-center justify-center transition-all bg-slate-50/30"
+                          style={{
+                            borderRadius: tokens.borders.radiusLg,
+                            width: '120px',
+                            height: '120px',
+                          }}
+                        >
+                          <Icon
+                            name={iconName}
+                            size={iconSizeType === 'custom' ? iconCustomSize : iconSize}
+                            variant={iconVariant}
+                            hoverVariant={iconHoverVariant}
+                            spinning={iconSpinning}
+                          />
+                        </div>
+                        <p className="text-[10px] font-mono text-slate-400 mt-4 leading-normal font-normal">
+                          &lt;Icon name="{iconName}" size={iconSizeType === 'custom' ? `${iconCustomSize}px` : iconSize.toUpperCase()} /&gt;
+                        </p>
+                      </div>
+                    )}
+
+                    {activeTab === 'breadcrumb' && (
+                      <div className="w-full p-4 bg-white border border-slate-100 rounded-xl flex items-center justify-center">
+                        <Breadcrumb
+                          items={[
+                            { label: '系统根层', href: '#/', icon: <Home size={13} /> },
+                            { label: '安全审计区', href: '#/clusters' },
+                            { label: '边缘计算拓扑', href: '#/topology' },
+                            { label: '全盘部署方案详情及安全审计记录', href: '#/details' },
+                          ]}
+                          maxItems={breadMaxItems}
+                          itemsBeforeCollapse={breadItemsBefore}
+                          itemsAfterCollapse={breadItemsAfter}
+                          separator={
+                            breadSeparator === 'slash' ? (
+                              <span className="text-slate-400 font-mono mx-1.5 text-[9px] select-none">/</span>
+                            ) : breadSeparator === 'chevron' ? (
+                              <span className="text-slate-400 font-mono mx-1.5 text-[9px] select-none">→</span>
+                            ) : breadSeparator === 'hyphen' ? (
+                              <span className="text-slate-400 font-mono mx-1.5 text-[9px] select-none">—</span>
+                            ) : breadSeparator === 'arrow' ? (
+                              <span className="text-slate-400 font-mono mx-1.5 text-[9px] select-none">›</span>
+                            ) : undefined
+                          }
+                          onItemClick={(item, idx, e) => {
+                            e.preventDefault();
+                            setBreadClickedLog(`点击了 "${item.label}"，节点索引 [${idx}]`);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'pagination' && (
+                      <div className="w-full flex flex-col items-center justify-center">
+                        <div className="p-4 bg-white border border-slate-100 rounded-xl shadow-xs">
+                          <Pagination
+                            currentPage={pagCurrentPage}
+                            totalPages={pagTotalPages}
+                            onPageChange={setPagCurrentPage}
+                            size={pagSize}
+                            variant={pagVariant}
+                            disabled={pagDisabled}
+                            showFirstLast={pagShowFirstLast}
+                            showPageSizeChanger={pagShowSizeChanger}
+                            pageSize={pagPageSize}
+                            onPageSizeChange={setPagPageSize}
+                          />
                         </div>
                       </div>
                     )}
-                  </Modal>
 
-                  <p className="text-[10px] text-slate-400 mt-4 max-w-xs font-mono select-none leading-normal">
-                    * 点击按钮，展示完整的阴影遮罩。弹出和淡出动画在 React 中流畅执行
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'navbar' && (
-                <div className="w-full animate-fade-in border border-slate-100 rounded-lg overflow-hidden relative shadow-sm">
-                  <Navbar
-                    logo={
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-8 h-8 flex items-center justify-center font-bold text-white rounded text-xs select-none"
-                          style={{ backgroundColor: tokens.colors.brand }}
-                        >
-                          Σ
-                        </div>
-                        <span
-                          className="text-xs font-bold tracking-tight token-font-heading"
-                          style={{ color: tokens.colors.textPrimary }}
-                        >
-                          {navBrandName}
-                        </span>
+                    {activeTab === 'steps' && (
+                      <div className="w-full max-w-xl">
+                        <Steps
+                          current={stepsCurrent}
+                          items={[
+                            {
+                              title: '身份信息认证',
+                              description: stepsShowDesc ? '身分要素、OCR校验验证' : undefined,
+                              icon: stepsHasIcons ? 'user' : undefined,
+                            },
+                            {
+                              title: '连接清算银行',
+                              description: stepsShowDesc ? '银行代扣及划拨协议绑定' : undefined,
+                              icon: stepsHasIcons ? 'creditcard' : undefined,
+                              status: stepsHasError ? 'error' : undefined,
+                            },
+                            {
+                              title: '安全问卷校验',
+                              description: stepsShowDesc ? '通过金融特征风控测评' : undefined,
+                              icon: stepsHasIcons ? 'lock' : undefined,
+                            },
+                          ]}
+                          direction={stepsDirection}
+                          size={stepsSize}
+                          clickable={stepsClickable}
+                          onStepChange={setStepsCurrent}
+                        />
                       </div>
-                    }
-                    menuItems={[
-                      { label: '智能分析', active: navActiveIndex === 0, onClick: () => setNavActiveIndex(0) },
-                      { label: '存储资源', active: navActiveIndex === 1, onClick: () => setNavActiveIndex(1) },
-                      { label: '系统设置', active: navActiveIndex === 2, onClick: () => setNavActiveIndex(2) },
-                    ]}
-                    rightActions={
-                      <Button size="sm" variant="outline">
-                        退出控制台
-                      </Button>
-                    }
-                    sticky={false}
-                  />
-                  <p className="text-[10px] text-slate-400 mt-4 p-4 text-center font-mono select-none">
-                    * 点击标签，切换激活状态。整个网格顶栏对齐，支持在复杂的响应式后台内快速作为头部嵌套
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'icon' && (
-                <div className="w-full text-center animate-fade-in flex flex-col items-center">
-                  <div 
-                    className="p-10 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-100/80 flex items-center justify-center min-w-[140px] min-h-[140px] group transition-all duration-300 hover:shadow-md hover:bg-white"
-                    style={{ borderRadius: tokens.borders.radiusLg }}
-                  >
-                    <Icon
-                      name={iconName}
-                      size={iconSizeType === 'custom' ? iconCustomSize : iconSize}
-                      variant={iconVariant}
-                      hoverVariant={iconHoverVariant}
-                      spinning={iconSpinning}
-                    />
+                    )}
                   </div>
-                  
-                  <div className="mt-5 space-y-1.5 max-w-sm">
-                    <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5 justify-center">
-                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-mono">
-                        &lt;Icon name="{iconName}" /&gt;
-                      </span>
+                </div>
+
+                {/* Micro interaction logging lines nested on preview block bottom */}
+                {['breadcrumb', 'pagination', 'steps'].includes(activeTab) && (
+                  <div className="px-6 py-2.5 bg-slate-50/30 border-t border-slate-150 flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400 font-bold font-mono">📡 Interaction Logger:</span>
+                    <span className="text-indigo-600 font-bold">
+                      {activeTab === 'breadcrumb' && breadClickedLog}
+                      {activeTab === 'pagination' && `页码 Page ${pagCurrentPage} | 页长 ${pagPageSize} 条 | 共计 ${pagTotalPages} 页`}
+                      {activeTab === 'steps' && `流程阶段 [${stepsCurrent + 1}/3] - 当前正在进行: ${stepsCurrent === 0 ? '一要素 OCR 验证身份' : (stepsCurrent === 1 ? (stepsHasError ? '网络清算 [金融异常拦截]' : '银行结算协议清算') : '核心安全防范测评完成')}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* 4. React Single Framework Code Spec Panel below Preview */}
+              <div className="bg-slate-900 rounded-2xl overflow-hidden flex flex-col font-mono shadow-md text-slate-350">
+                {/* Code Panel Header */}
+                <div className="px-5 py-3 border-b border-slate-800 flex items-center justify-between select-none">
+                  {/* Left Label */}
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="text-xs font-bold text-slate-200">React TSX Code Spec (生产交付级代码)</span>
+                  </div>
+
+                  {/* Right Copy buttons closer to mock visual */}
+                  <Button
+                    onClick={handleCopyCodeSnippet}
+                    variant="outline"
+                    size="sm"
+                    className="cursor-pointer text-xs font-bold leading-normal text-slate-300 hover:text-white bg-slate-800 border-none px-2.2 py-1 rounded-md h-7"
+                    iconLeft={copiedCodeCode ? <Check className="w-3.5 h-3.5 text-emerald-500 animate-pulse font-extrabold" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                  >
+                    <span>{copiedCodeCode ? '已复制' : '复制代码'}</span>
+                  </Button>
+                </div>
+
+                {/* High fidelity syntax light scroll viewer block */}
+                <div className="p-5 overflow-x-auto text-[11px] leading-relaxed select-text font-mono text-slate-200 min-h-[180px]">
+                  <pre className="whitespace-pre">
+                    {getFrameworkCodeSnippet('react')}
+                  </pre>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Detailed specifications tab render panel */}
+          {activeSubTab === 'docs' && (
+            <div
+              className="p-6 border rounded-2xl flex flex-col gap-5 leading-relaxed font-normal transition-all"
+              style={{
+                backgroundColor: tokens.colors.bgCard,
+                borderColor: tokens.colors.border,
+              }}
+            >
+              <h3 className="text-sm font-bold flex items-center gap-2" style={{ color: tokens.colors.textPrimary }}>
+                <Book className="w-4 h-4 shrink-0" style={{ color: tokens.colors.brand }} />
+                <span>Atomix UI 交付级产品设计规范</span>
+              </h3>
+              <p className="text-xs" style={{ color: tokens.colors.textSecondary }}>
+                本组件严格对标 UI 界面美学，通过<strong>设计语言变量 (Design Tokens)</strong> 替代传统的静态、碎片化硬编码 CSS 参数。这确保了研发团队在生产部署时能按 1：1 的极低成本保真还原界面体验。
+              </p>
+              
+              <div className="border-t border-slate-100 my-1" />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-505 font-sans">
+                <div className="space-y-2">
+                  <h4 className="text-slate-800 font-bold flex items-center gap-1">✨ 一等可访问性 (Accessibility Specs)</h4>
+                  <p>支持原生 ARIA 标签以及 WCAG AAA 高对比度颜色自适应。任何基于品牌主色的交互其对比值均大于 <strong>4.5 : 1</strong>，保障阅读连续与流畅性。</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-slate-800 font-bold flex items-center gap-1">💫 柔顺触受和果冻感 (Spring Kinetics)</h4>
+                  <p>在按压、悬停和激活期间，使用由 React motion 开发的<strong>弹力物理学特征函数</strong>自动操纵缩变。瑞士极简风下展现沉稳硬朗，甜美气泡风下展现香芋弹性软感。</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Interface properties tables */}
+          {activeSubTab === 'api' && (
+            <div
+              className="p-6 border rounded-2xl flex flex-col gap-4 overflow-x-auto font-sans text-xs transition-all"
+              style={{
+                backgroundColor: tokens.colors.bgCard,
+                borderColor: tokens.colors.border,
+              }}
+            >
+              <h3 className="text-sm font-bold flex items-center gap-2" style={{ color: tokens.colors.textPrimary }}>
+                <Sliders className="w-4 h-4" style={{ color: tokens.colors.brand }} />
+                <span>组件 API 参数契约 (Props Reference)</span>
+              </h3>
+              <table className="min-w-full text-left text-slate-600 border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-400 font-mono">
+                    <th className="py-2.5 font-bold">属性名</th>
+                    <th className="py-2.5 font-bold">类型</th>
+                    <th className="py-2.5 font-bold">默认值</th>
+                    <th className="py-2.5 font-bold">说明描述</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 font-normal">
+                  {activeTab === 'button' && (
+                    <>
+                      <tr>
+                        <td className="py-2.5 font-mono text-indigo-650 font-bold">variant</td>
+                        <td className="py-2.5 font-mono text-slate-500">'primary' | 'secondary' | 'outline' | 'text' | 'danger'</td>
+                        <td className="py-2.5 font-mono text-slate-500">'primary'</td>
+                        <td className="py-2.5">设计变体样式外观类型</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-mono text-indigo-650 font-bold">size</td>
+                        <td className="py-2.5 font-mono text-slate-500">'sm' | 'md' | 'lg'</td>
+                        <td className="py-2.5 font-mono text-slate-500">'md'</td>
+                        <td className="py-2.5">按钮物理尺寸层级规格</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-mono text-indigo-650 font-bold">disabled</td>
+                        <td className="py-2.5 font-mono text-slate-500">boolean</td>
+                        <td className="py-2.5 font-mono text-slate-500">false</td>
+                        <td className="py-2.5">是否开启只读阻塞禁用态</td>
+                      </tr>
+                    </>
+                  )}
+                  {activeTab === 'input' && (
+                    <>
+                      <tr>
+                        <td className="py-2.5 font-mono text-indigo-650 font-bold">label</td>
+                        <td className="py-2.5 font-mono text-slate-500">string</td>
+                        <td className="py-2.5 font-mono text-slate-500">undefined</td>
+                        <td className="py-2.5">输入框顶部标签提示文案</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-mono text-indigo-650 font-bold">error</td>
+                        <td className="py-2.5 font-mono text-slate-500">string</td>
+                        <td className="py-2.5 font-mono text-slate-500">undefined</td>
+                        <td className="py-2.5">警示拦截显示的故障描述消息</td>
+                      </tr>
+                    </>
+                  )}
+                  {activeTab !== 'button' && activeTab !== 'input' && (
+                    <tr>
+                      <td className="py-3 text-slate-400 font-mono text-center" colSpan={4}>
+                        请通过右侧属性面板实时调整参数查看效果
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Right configuration side panel */}
+        <div
+          className="lg:col-span-3 pb-8 flex flex-col gap-5 p-5 border rounded-2xl"
+          style={{
+            backgroundColor: tokens.colors.bgCard,
+            borderColor: tokens.colors.border,
+          }}
+        >
+          <div className="space-y-4 animate-fade-in text-xs font-normal font-sans leading-normal" style={{ color: tokens.colors.textSecondary }}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono block select-none mb-1" style={{ color: tokens.colors.textMuted }}>
+              基本属性 (Base props)
+            </span>
+
+              {/* BUTTON props fields */}
+              {activeTab === 'button' && (
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>按钮变体 (Variant)</label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {(['primary', 'secondary', 'outline', 'text', 'danger'] as const).map((v) => (
+                        <Button
+                          key={v}
+                          variant={btnVariant === v ? 'primary' : 'secondary'}
+                          size="sm"
+                          onClick={() => setBtnVariant(v)}
+                          className="w-full text-[10px] capitalize font-bold h-7.5"
+                          id={`param-btn-v-${v}`}
+                        >
+                          {v}
+                        </Button>
+                      ))}
                     </div>
-                    <p className="text-[11px] text-slate-500 font-normal leading-normal">
-                      尺寸范围：<span className="font-mono text-indigo-600 font-semibold">{iconSizeType === 'custom' ? `${iconCustomSize}px (自定义像素)` : iconSize.toUpperCase()}</span> | 
-                      动画形态：<span className="font-mono text-indigo-600 font-semibold">{iconSpinning || iconName === 'loader' ? '循环纺锤旋转' : '常规静态'}</span>
-                    </p>
-                    <p className="text-[10px] text-slate-400 font-normal leading-normal select-none">
-                      💡 <strong>悬停微体验：</strong>请将鼠标移入/悬停在上方图标上，感受高保真颜色平滑过渡。
-                      {iconName === 'trash' && <span className="text-red-500 block font-medium mt-1"> (防误解高保真：删除图标默认绑定红色 Hover 状态!)</span>}
-                    </p>
                   </div>
-                </div>
-              )}
 
-              {activeTab === 'breadcrumb' && (
-                <div className="w-full animate-fade-in flex flex-col items-center">
-                  <div 
-                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[100px]"
-                    style={{ 
-                      borderRadius: tokens.borders.radiusMd,
-                      backgroundColor: tokens.colors.bgCard
-                    }}
-                  >
-                    <Breadcrumb
-                      items={[
-                        { label: '系统根节点', href: '#/', icon: <Home size={14} /> },
-                        { label: '安全审计与可用群集', href: '#/clusters' },
-                        { label: '边缘计算节点管理', href: '#/edge' },
-                        { label: '北京二区虚拟机拓扑组', href: '#/topology' },
-                        { label: '当前拓扑图和性能大盘详情', href: '#/details' },
-                      ]}
-                      maxItems={breadMaxItems}
-                      itemsBeforeCollapse={breadItemsBefore}
-                      itemsAfterCollapse={breadItemsAfter}
-                      separator={
-                        breadSeparator === 'slash' ? (
-                          <span className="text-slate-400 font-mono mx-1.5 text-xs">/</span>
-                        ) : breadSeparator === 'chevron' ? (
-                          <span className="text-slate-400 font-mono mx-1.5 text-xs">→</span>
-                        ) : breadSeparator === 'hyphen' ? (
-                          <span className="text-slate-400 font-mono mx-1.5 text-xs">—</span>
-                        ) : breadSeparator === 'arrow' ? (
-                          <span className="text-slate-400 font-mono mx-1.5 text-xs">›</span>
-                        ) : undefined // Use auto designer token defaults
-                      }
-                      onItemClick={(item, index, e) => {
-                        e.preventDefault();
-                        setBreadClickedLog(`点击了节点 "${typeof item.label === 'string' ? item.label : 'Root'}"，节点索引 [${index}]`);
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold" style={{ color: tokens.colors.textSecondary }}>按钮尺寸 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
                       }}
-                    />
-                  </div>
-                  
-                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
-                    <div className="text-xs transition-all text-indigo-600 font-bold">{breadClickedLog}</div>
-                  </div>
-
-                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
-                    * 体验微交互：点击中间的 “...” 折叠块可实现瞬间平滑全展开。点击链接节点，可触发下方微交互动作日志纪录联动。
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'pagination' && (
-                <div className="w-full animate-fade-in flex flex-col items-center">
-                  <div 
-                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[120px]"
-                    style={{ 
-                      borderRadius: tokens.borders.radiusMd,
-                      backgroundColor: tokens.colors.bgCard
-                    }}
-                  >
-                    <Pagination
-                      currentPage={pagCurrentPage}
-                      totalPages={pagTotalPages}
-                      onPageChange={setPagCurrentPage}
-                      size={pagSize}
-                      variant={pagVariant}
-                      disabled={pagDisabled}
-                      showFirstLast={pagShowFirstLast}
-                      showPageSizeChanger={pagShowSizeChanger}
-                      pageSize={pagPageSize}
-                      onPageSizeChange={setPagPageSize}
-                    />
-                  </div>
-                  
-                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
-                    <div className="text-xs transition-all text-indigo-600 font-bold">
-                      当前选定页码: Page {pagCurrentPage} | 每页显示条数: {pagPageSize} 条 | 累计总页数: {pagTotalPages} 页
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={btnSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setBtnSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            btnSize === s ? '' : 'hover:text-slate-850'
+                          }`}
+                          style={{
+                            color: btnSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                          id={`param-btn-s-${s}`}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
                     </div>
                   </div>
 
-                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
-                    * 体验高保真换肤集成：在不同设计主题下，分页器的主色、悬停高光、Q弹按压比例和圆角大小将动态自适应！
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'steps' && (
-                <div className="w-full animate-fade-in flex flex-col items-center">
-                  <div 
-                    className="w-full p-6 bg-white border border-slate-100 rounded-xl shadow-xs flex items-center justify-center min-h-[160px]"
-                    style={{ 
-                      borderRadius: tokens.borders.radiusMd,
-                      backgroundColor: tokens.colors.bgCard
-                    }}
-                  >
-                    <div className="w-full max-w-2xl">
-                      <Steps
-                        current={stepsCurrent}
-                        items={[
-                          { 
-                            title: '身份信息认证', 
-                            description: stepsShowDesc ? "完成真实银行及身分二要素、OCR身份证扫校验证" : undefined, 
-                            icon: stepsHasIcons ? 'user' : undefined 
-                          },
-                          { 
-                            title: '连接清算银行', 
-                            description: stepsShowDesc ? "连接清算划扣行、授权银行代扣及协议绑定结算" : undefined, 
-                            icon: stepsHasIcons ? 'creditcard' : undefined,
-                            status: stepsHasError ? 'error' : undefined
-                          },
-                          { 
-                            title: '安全问卷校验', 
-                            description: stepsShowDesc ? "通过信贷反欺诈特征校验，并生成电子安全测评单" : undefined, 
-                            icon: stepsHasIcons ? 'lock' : undefined 
-                          },
-                        ]}
-                        direction={stepsDirection}
-                        size={stepsSize}
-                        clickable={stepsClickable}
-                        onStepChange={setStepsCurrent}
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold" style={{ color: tokens.colors.textSecondary }}>禁用状态 (Disabled)</span>
+                      <input
+                        type="checkbox"
+                        checked={btnDisabled}
+                        onChange={(e) => setBtnDisabled(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold" style={{ color: tokens.colors.textSecondary }}>缓冲加载 (Is Loading)</span>
+                      <input
+                        type="checkbox"
+                        checked={btnLoading}
+                        onChange={(e) => setBtnLoading(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
                       />
                     </div>
                   </div>
-                  
-                  <div className="mt-4 p-3 w-full bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 flex flex-col gap-1.5" style={{ borderRadius: tokens.borders.radiusSm }}>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">📡 动作微交互日志 (Interaction Logs)</div>
-                    <div className="text-xs transition-all text-indigo-600 font-bold">
-                      当前激活进度: 步骤 [{stepsCurrent + 1}] - {
-                        stepsCurrent === 0 ? '身份信息认证阶段' 
-                        : stepsCurrent === 1 ? (stepsHasError ? '连接清算银行 [系统响应错误]' : '连接清算银行阶段') 
-                        : stepsCurrent === 2 ? '安全问卷最后校验' 
-                        : '所有步骤已完结'
-                      } | 页签可点交互状态: {stepsClickable ? '已开启' : '已锁定'}
-                    </div>
+
+                  <div className="space-y-1.5 animate-fade-in text-xs font-normal">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>前置/后置图标 placement</label>
+                    <Dropdown
+                      options={[
+                        { label: '无内置图标', value: 'none' },
+                        { label: '左侧加塞图标', value: 'left' },
+                        { label: '右侧加塞图标', value: 'right' },
+                      ]}
+                      value={btnIcon}
+                      onChange={setBtnIcon}
+                      size="sm"
+                    />
                   </div>
 
-                  <p className="text-[10px] text-slate-400 mt-4 text-center font-mono select-none">
-                    * 体验微交互集成：改变右侧控制面板方向，步骤条可在“横向轻盈跨度”与“纵向细节流”间瞬间平滑自适应切换！开启 clickable 后点击节点即可快速切换。
-                  </p>
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>按钮文案</label>
+                    <Input
+                      value={btnText}
+                      onChange={(e) => setBtnText(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Component Documentation Blueprint explanations */}
-          <div className="p-5 bg-white border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-xs">
-            <h4 className="text-xs font-bold text-slate-700 mb-2.5 flex items-center gap-1.5 uppercase tracking-wider">
-              <Info className="w-3.5 h-3.5 text-indigo-500" />
-              当前组件设计标准与调用模式 (How to Design & Invoke)
-            </h4>
-            <div className="text-xs text-slate-500 space-y-2 leading-relaxed font-normal">
-              {activeTab === 'button' && (
-                <>
-                  <p>
-                    <strong>样式与交互绑定：</strong>
-                    按钮边角曲率直接使用 <code>tokens.borders.radiusMd</code>，背景色绑定{' '}
-                    <code>tokens.colors.brand</code>。通过 React state 驱动悬浮 (Hover) 和活性按下{' '}
-                    (Active) 的颜色，提供超高柔和微动反馈。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>可用变体：</strong>
-                    支持：<code>primary</code> (填充)、<code>secondary</code> (次要容器)、<code>outline</code>{' '}
-                    (简约线框)、<code>text</code> (无外框纯文本)。支持在后台或复杂工具中无缝切换。
-                  </p>
-                </>
-              )}
+              {/* INPUT props controllers */}
               {activeTab === 'input' && (
-                <>
-                  <p>
-                    <strong>输入行为与可访问性：</strong>
-                    遵循高度标准化的标签、说明性文字和错误校验的层次。聚焦 (Focus)
-                    状态将会高亮变色，并结合外层产生一个具有 12% 品牌主色透明度的扩散光泽环 (Ring Outline)。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>状态校验：</strong>当传入 <code>error</code>{' '}
-                    属性时，系统将直接把相关的标题、提示文字、甚至外加边框完全标记为系统错误警戒红{' '}
-                    <code>tokens.colors.error</code>。
-                  </p>
-                </>
+                <div className="space-y-4">
+                  <div className="space-y-1.5 font-sans">
+                    <label className="block font-semibold" style={{ color: tokens.colors.textSecondary }}>输入尺寸大小</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={inputSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setInputSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            inputSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: inputSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                          id={`param-input-sz-${s}`}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>标签文案 (Label)</label>
+                    <Input
+                      value={inputLabel}
+                      onChange={(e) => setInputLabel(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>占位文字 (Placeholder)</label>
+                    <Input
+                      value={inputPlaceholder}
+                      onChange={(e) => setInputPlaceholder(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>底部说明文字 (Helper Desc)</label>
+                    <Input
+                      value={inputDesc}
+                      onChange={(e) => setInputDesc(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>错误提示消息 (Error Props)</label>
+                    <Input
+                      placeholder="留空即取消安全警示状态"
+                      value={inputError}
+                      onChange={(e) => setInputError(e.target.value)}
+                      size="sm"
+                      error={inputError ? '警告状态开启' : undefined}
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>前置 Mail 图标</span>
+                      <input
+                        type="checkbox"
+                        checked={inputIconLeft}
+                        onChange={(e) => setInputIconLeft(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>只读禁用状态</span>
+                      <input
+                        type="checkbox"
+                        checked={inputDisabled}
+                        onChange={(e) => setInputDisabled(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {/* DROPDOWN SELECT Props controllers */}
               {activeTab === 'dropdown' && (
-                <>
-                  <p>
-                    <strong>智能选项架构：</strong>
-                    下拉组件不仅需要简单的列表，它在交互细节上增加了搜索项过滤、当前选中标志以及对每个 Option
-                    附加说明字段的高密度展现。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>浮层渲染：</strong>弹出位置具备 50
-                    层级。浮框使用微轻质级阴影，以保证不管在任何复杂的表单背景上都能完美托起浮出，不产生任何视觉沾连。
-                  </p>
-                </>
+                <div className="space-y-4">
+                  <div className="space-y-1.5 font-sans">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>选择器尺寸大小</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={dropSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setDropSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            dropSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: dropSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                          id={`param-drop-sz-${s}`}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>标签文案 (Label)</label>
+                    <Input
+                      value={dropLabel}
+                      onChange={(e) => setDropLabel(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>底置描述 (Desc)</label>
+                    <Input
+                      value={dropDesc}
+                      onChange={(e) => setDropDesc(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>多选 checkbox 药丸</span>
+                      <input
+                        type="checkbox"
+                        checked={dropMultiple}
+                        onChange={(e) => handleToggleMultiple(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>词串前向检索</span>
+                      <input
+                        type="checkbox"
+                        checked={dropSearch}
+                        onChange={(e) => setDropSearch(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>呈现选项子解释</span>
+                      <input
+                        type="checkbox"
+                        checked={dropShowDesc}
+                        onChange={(e) => setDropShowDesc(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>锁定禁用状态</span>
+                      <input
+                        type="checkbox"
+                        checked={dropDisabled}
+                        onChange={(e) => setDropDisabled(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>强制警告提示</label>
+                    <Input
+                      placeholder="留空即常态"
+                      value={dropError}
+                      onChange={(e) => setDropError(e.target.value)}
+                      size="sm"
+                      error={dropError ? '警告状态开启' : undefined}
+                    />
+                  </div>
+                </div>
               )}
+
+              {/* MODAL overlay props controllers */}
               {activeTab === 'modal' && (
-                <>
-                  <p>
-                    <strong>模态物理遮罩：</strong>
-                    整个组件在进入时会对底层视图渲染一个 60% 密度的极简化深灰遮罩{' '}
-                    <code>slate-900/60</code>，并应用了 <code>backdrop-blur</code>
-                    让用户思维焦点强制停留在正在处理的心智中。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>动画与弹力 (Spring)：</strong>
-                    我们不再使用生硬突兀的无动画状态，而是利用 <code>motion</code>
-                    组件的微弱弹簧动画物理模型，弹出柔顺、退出利索，使原型具有极为真实的生产级体感。
-                  </p>
-                </>
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5 animate-fade-in text-xs font-normal">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>弹窗尺寸级别 (Size)</label>
+                    <Dropdown
+                      options={[
+                        { label: '380px (SM)', value: 'sm' },
+                        { label: '520px (MD)', value: 'md' },
+                        { label: '740px (LG)', value: 'lg' },
+                        { label: '960px (XL)', value: 'xl' },
+                      ]}
+                      value={modalSize}
+                      onChange={(val) => setModalSize(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>弹窗标题文案</label>
+                    <Input
+                      value={modalTitle}
+                      onChange={(e) => setModalTitle(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>显示底部操作列</span>
+                      <input
+                        type="checkbox"
+                        checked={modalHasFooter}
+                        onChange={(e) => setModalHasFooter(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block text-xs" style={{ color: tokens.colors.textSecondary }}>信息通知提示风格 (i)</span>
+                      <input
+                        type="checkbox"
+                        checked={modalIsAlertStyle}
+                        onChange={(e) => setModalIsAlertStyle(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <Button variant="outline" size="sm" className="w-[100%]" onClick={() => setModalIsOpen(true)}>
+                      🗣️ 打开弹层效果
+                    </Button>
+                  </div>
+                </div>
               )}
+
+              {/* NAV SYSTEM props controllers */}
               {activeTab === 'navbar' && (
-                <>
-                  <p>
-                    <strong>品牌定位与对齐规范：</strong>
-                    严格遵循 12
-                    列响应式横向网格规则，两侧留百边缘与主页容器自动重合对齐。中间包含了多个可控的导航链接卡扣。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>原子设计复用：</strong>导航栏组件的右侧按钮操作群
-                    (rightActions)，在组合时将完美的将 <code>Button</code> 作为原子进行注入，形成干净、清晰、一贯性的组件树嵌套。
-                  </p>
-                </>
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>品牌/标志文案（Logo Brand）</label>
+                    <Input
+                      value={navBrandName}
+                      onChange={(e) => setNavBrandName(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>动态激活链接选定</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {['智能分析', '安全审计', '容器拓扑'].map((l, index) => (
+                        <Button
+                          key={index}
+                          variant={navActiveIndex === index ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setNavActiveIndex(index)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            navActiveIndex === index ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: navActiveIndex === index ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                          id={`param-nav-idx-${index}`}
+                        >
+                          L{index + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {/* ICON props controllers */}
               {activeTab === 'icon' && (
-                <>
-                  <p>
-                    <strong>色彩分流与视觉层级保护：</strong>
-                    绝大部分常规操作、配置和导航图标在未选中时，保持温和的<b>中性浅灰</b>（<code>tokens.colors.textMuted</code>/<code>#94A3B8</code>），以此避免对界面内容 and 结构构成多余的喧宾夺主，保持画面的极简和空气感！
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>固化语义色安全阀：</strong>
-                    常用的成功、警醒、错误在渲染时默认绑定行业通行的<b>红/绿/黄固化语义色</b>，不支持随便变异，保证开发无论在哪里使用这些系统状态时其安全调性完美统一。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>悬吊微反馈 (Trash hover to red)：</strong>
-                    删除 (trash/delete) 图标自带悬浮安全暗示——不管初始呈现多么暗淡，在鼠标贴合的一瞬间将转变为<b>警告朱红</b>，暗示危险毁灭动作。
-                  </p>
-                </>
-              )}
-              {activeTab === 'breadcrumb' && (
-                <>
-                  <p>
-                    <strong>折叠折行规避：</strong>
-                    在大纵深或长命名的路由导航路径下，页面极易遭遇挤压和折行灾难。通过设置 <code>maxItems</code> 来开启智能 ellipsis 折叠，确保在一行内紧凑展示。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>一键全平链条微交互：</strong>
-                    由于系统采用高保真行为动效，点击中间的 <code>...</code> 折叠块，系统不会进行粗暴、跳转级别的刷新，而是以平滑的过渡展示未缩折的完整层级。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>个性化分隔符与字重平衡：</strong>
-                    系统自动捕获当前的 <code>tokens.typography.headingFont</code>。例如在 Mono（极客风）下自动搭配无图标的 <code>/</code> 斜杠分割线以营造极简的工业精密度，在普通模式下提供矢量右箭头，同时最后一个代表当前页面的节点自带主色字重加粗。
-                  </p>
-                </>
-              )}
-              {activeTab === 'pagination' && (
-                <>
-                  <p>
-                    <strong>自适应页码折叠：</strong>
-                    对于大规模的数据展现，页码极大时无法完整显示。系统采用自适应折叠算法，始终保留首尾端锚点以及当前选中页的前后邻居页码。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>物理粒子微动：</strong>
-                    页码按键的悬停背景、过渡曲线和点击比例（如萌系下的 Q 弹捏捏感、极客下的沉稳微凹）完美耦合于 <code>behaviors</code> 动作令牌。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>内置页数尺寸改换器：</strong>
-                    通过 <code>showPageSizeChanger</code> 开启轻型 Dropdown 下拉器，不仅在单页面中支持尺寸调节，还能复用系统已有的 <code>Dropdown</code> 原子交互，提高交互一致性。
-                  </p>
-                </>
-              )}
-              {activeTab === 'steps' && (
-                <>
-                  <p>
-                    <strong>多状态精准描画：</strong>
-                    组件自动计算进度并判定 <code>wait</code> (未开始)、<code>process</code> (进行中)、<code>finish</code> (已完成) 状态，甚至支持显式传入 <code>error</code> 渲染，呈现高对比等压警示框。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>精细饱满的纯色聚焦：</strong>
-                    进行中 (process) 的节点外圈自动配以饱满的主色背景，内显反白醒目序号，去除冗余的视觉动态干扰，确保焦点在阅读流中静谧凸显。
-                  </p>
-                  <p className="pt-1.5 border-t border-slate-100">
-                    <strong>桥接连线自动着色：</strong>
-                    根据流程的走向，串联起步骤的 “桥接线 Bridge Connector” 会随之平滑渡色，在横纵两种维度下完美保持视觉流的连贯和完整性。
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Component Controllers Deck & Source Code Inspector */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          {/* Controllers Panel */}
-          <div className="p-5 bg-white border border-[#E2E8F0] dark:border-slate-800 rounded-xl shadow-xs">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <Sliders className="w-4 h-4 text-indigo-500" />
-              参数控制器 (Prop Controllers)
-            </h3>
-
-            {/* Dynamic fields mapped to selected tab */}
-            {activeTab === 'button' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">按钮变体 (Variant)</label>
-                  <div className="flex flex-wrap gap-2">
-                    {(['primary', 'secondary', 'outline', 'text', 'danger'] as const).map((v) => (
-                      <button
-                        key={v}
-                        onClick={() => setBtnVariant(v)}
-                        className={`px-2.5 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          btnVariant === v
-                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                            : 'bg-white hover:bg-slate-50 text-slate-600'
-                        }`}
-                      >
-                        {v}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">按钮尺寸 (Size)</label>
-                  <div className="flex gap-2">
-                    {(['sm', 'md', 'lg'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setBtnSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer text-center ${
-                          btnSize === s
-                            ? 'bg-indigo-600 border-indigo-600 text-white'
-                            : 'bg-white hover:bg-slate-50 text-slate-600'
-                        }`}
-                      >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-slate-100 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">禁用状态 (Disabled)</span>
-                    <input
-                      type="checkbox"
-                      checked={btnDisabled}
-                      onChange={(e) => setBtnDisabled(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">缓冲加载 (Is Loading)</span>
-                    <input
-                      type="checkbox"
-                      checked={btnLoading}
-                      onChange={(e) => setBtnLoading(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">插入内置图标 (Icon Placement)</label>
-                  <select
-                    value={btnIcon}
-                    onChange={(e) => setBtnIcon(e.target.value as any)}
-                    className="w-full text-xs border rounded p-1.5 bg-white cursor-pointer"
-                  >
-                    <option value="none">无图标 (No Icon)</option>
-                    <option value="left">左侧图标 (Left Icon)</option>
-                    <option value="right">右侧图标 (Right Icon)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">按钮文案</label>
-                  <input
-                    type="text"
-                    value={btnText}
-                    onChange={(e) => setBtnText(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'input' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">标题 (Label)</label>
-                  <input
-                    type="text"
-                    value={inputLabel}
-                    onChange={(e) => setInputLabel(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">占位符 (Placeholder)</label>
-                  <input
-                    type="text"
-                    value={inputPlaceholder}
-                    onChange={(e) => setInputPlaceholder(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">底部说明文字 (Description)</label>
-                  <input
-                    type="text"
-                    value={inputDesc}
-                    onChange={(e) => setInputDesc(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">错误消息拦截提示 (Error)</label>
-                  <input
-                    type="text"
-                    placeholder="输入触发异常高亮信息以进行模拟"
-                    value={inputError}
-                    onChange={(e) => setInputError(e.target.value)}
-                    className="w-full text-xs border rounded p-2 border-red-200 focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-red-650"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">禁用状态</span>
-                    <input
-                      type="checkbox"
-                      checked={inputDisabled}
-                      onChange={(e) => setInputDisabled(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600">左侧前缀图标</span>
-                    <input
-                      type="checkbox"
-                      checked={inputIconLeft}
-                      onChange={(e) => setInputIconLeft(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">高度尺寸</label>
-                  <div className="flex gap-2">
-                    {(['sm', 'md', 'lg'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setInputSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          inputSize === s ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
-                        }`}
-                      >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'dropdown' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">标签标题 (Label)</label>
-                  <input
-                    type="text"
-                    value={dropLabel}
-                    onChange={(e) => setDropLabel(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">底部描述 (Description)</label>
-                  <input
-                    type="text"
-                    value={dropDesc}
-                    onChange={(e) => setDropDesc(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">错误警示 (Error)</label>
-                  <input
-                    type="text"
-                    value={dropError}
-                    onChange={(e) => setDropError(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div className="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">禁用状态</span>
-                    <input
-                      type="checkbox"
-                      checked={dropDisabled}
-                      onChange={(e) => setDropDisabled(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">搜索搜索</span>
-                    <input
-                      type="checkbox"
-                      checked={dropSearch}
-                      onChange={(e) => setDropSearch(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">开启多选</span>
-                    <input
-                      type="checkbox"
-                      checked={dropMultiple}
-                      onChange={(e) => handleToggleMultiple(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">二级说明</span>
-                    <input
-                      type="checkbox"
-                      checked={dropShowDesc}
-                      onChange={(e) => setDropShowDesc(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">高度规格 (Size)</label>
-                  <div className="flex gap-2">
-                    {(['sm', 'md', 'lg'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setDropSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          dropSize === s ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
-                        }`}
-                      >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'modal' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">模态窗口标题 (Title)</label>
-                  <input
-                    type="text"
-                    value={modalTitle}
-                    onChange={(e) => setModalTitle(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                    视窗最大宽度规格 (Max Width)
-                  </label>
-                  <div className="flex gap-2">
-                    {(['sm', 'md', 'lg', 'xl'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setModalSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          modalSize === s ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
-                        }`}
-                      >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <span className="text-xs font-medium text-slate-600">标书提示风格 (Simple Alert Style)</span>
-                  <input
-                    type="checkbox"
-                    checked={modalIsAlertStyle}
-                    onChange={(e) => {
-                      const enabled = e.target.checked;
-                      setModalIsAlertStyle(enabled);
-                      if (enabled) {
-                        setModalTitle('提示');
-                        setModalSize('sm');
-                      } else {
-                        setModalTitle('终止并停用当前计算节点？');
-                        setModalSize('md');
-                      }
-                    }}
-                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <span className="text-xs font-medium text-slate-600">包含底部控制槽 (Footer Slots)</span>
-                  <input
-                    type="checkbox"
-                    checked={modalHasFooter}
-                    onChange={(e) => setModalHasFooter(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                  />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'navbar' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Logo 品牌文字 (Logo Title)</label>
-                  <input
-                    type="text"
-                    value={navBrandName}
-                    onChange={(e) => setNavBrandName(e.target.value)}
-                    className="w-full text-xs border rounded p-2"
-                  />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'icon' && (
-              <div className="space-y-4">
-                {/* 1. 图标库矩阵选择 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-2">
-                    选择测试图标 (Click to select)
-                  </label>
-                  <div className="space-y-3.5 bg-slate-50/50 p-3 rounded-lg border border-slate-100/60 max-h-56 overflow-y-auto scrollbar-thin">
-                    {/* A. 基础操作类 */}
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono">Operations 基础操作</span>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {(['plus', 'pencil', 'trash', 'search', 'refresh', 'check', 'x'] as const).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => setIconName(name)}
-                            title={name}
-                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              iconName === name
-                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
-                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                          >
-                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
-                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* B. 导航方向类 */}
-                    <div className="mt-2.5">
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">Navigation 导航方向</span>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {(['chevron-down', 'chevron-right', 'chevron-left'] as const).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => setIconName(name)}
-                            title={name}
-                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              iconName === name
-                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
-                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                          >
-                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
-                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* C. 系统配置类 */}
-                    <div className="mt-2.5">
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">System 系统辅助</span>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {(['settings', 'help', 'loader'] as const).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => setIconName(name)}
-                            title={name}
-                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              iconName === name
-                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
-                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                          >
-                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
-                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* D. 常用输入选项类 */}
-                    <div className="mt-2.5">
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono font-mono">Forms 选项与常态</span>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {(['upload', 'download', 'more-horizontal', 'more-vertical', 'drag', 'checkbox-checked', 'checkbox-unchecked', 'radio-checked', 'radio-unchecked'] as const).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => setIconName(name)}
-                            title={name}
-                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              iconName === name
-                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
-                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                          >
-                            <Icon name={name} size="sm" variant={iconName === name ? 'primary' : 'default'} />
-                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* E. 智能反馈类 */}
-                    <div className="mt-2.5">
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider font-mono">AI & Feedbacks 智能与反馈</span>
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {(['ai', 'success', 'warning', 'error', 'info'] as const).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => setIconName(name)}
-                            title={name}
-                            className={`p-1.5 border rounded flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              iconName === name
-                                ? 'bg-indigo-50 border-indigo-400 text-indigo-600 font-bold shadow-xs'
-                                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                          >
-                            <Icon name={name} size="sm" />
-                            <span className="text-[9px] font-mono mt-1 scale-90 origin-center truncate w-full text-center">{name}</span>
-                          </button>
-                        ))}
-                      </div>
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>矢量图徽图标 (name)</label>
+                    <div
+                      className="grid grid-cols-4 gap-1 p-1 rounded-xl border"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['ai', 'mail', 'lock', 'user', 'arrow', 'alert', 'trash', 'loader'] as const).map((icon) => (
+                        <Button
+                          key={icon}
+                          variant={iconName === icon ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setIconName(icon)}
+                          className={`py-1 text-[10px] capitalize truncate h-7.5 font-bold rounded-lg ${
+                            iconName === icon ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: iconName === icon ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {icon}
+                        </Button>
+                      ))}
                     </div>
                   </div>
-                </div>
 
-                {/* 2. 尺寸控制 */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-slate-600">图标物理大小 (Size Mode)</label>
-                    <div className="flex gap-2">
-                      <button
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>尺寸计算类型 (Size Type)</label>
+                    <div
+                      className="grid grid-cols-2 gap-1 p-1 rounded-xl border select-none"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      <Button
+                        variant={iconSizeType === 'preset' ? 'primary' : 'text'}
+                        size="sm"
                         onClick={() => setIconSizeType('preset')}
-                        className={`px-1.5 py-0.5 text-[10px] border rounded ${
-                          iconSizeType === 'preset' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
+                        className={`h-7.5 rounded-lg text-[10px] font-bold ${
+                          iconSizeType === 'preset' ? '' : 'hover:text-slate-800'
                         }`}
+                        style={{
+                          color: iconSizeType === 'preset' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
                       >
-                        标准预设
-                      </button>
-                      <button
+                        预设梯度 (Presets)
+                      </Button>
+                      <Button
+                        variant={iconSizeType === 'custom' ? 'primary' : 'text'}
+                        size="sm"
                         onClick={() => setIconSizeType('custom')}
-                        className={`px-1.5 py-0.5 text-[10px] border rounded ${
-                          iconSizeType === 'custom' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600'
+                        className={`h-7.5 rounded-lg text-[10px] font-bold ${
+                          iconSizeType === 'custom' ? '' : 'hover:text-slate-800'
                         }`}
+                        style={{
+                          color: iconSizeType === 'custom' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
                       >
-                        绝对像素
-                      </button>
+                        精准无损 (Custom px)
+                      </Button>
                     </div>
                   </div>
 
                   {iconSizeType === 'preset' ? (
-                    <div className="flex gap-1.5">
-                      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => setIconSize(s)}
-                          className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                            iconSize === s && iconSizeType === 'preset' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          {s.toUpperCase()}
-                        </button>
-                      ))}
+                    <div className="space-y-1.5">
+                      <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>预设梯度选择 (Size)</label>
+                      <div
+                        className="grid grid-cols-5 p-1 border rounded-xl"
+                        style={{
+                          backgroundColor: tokens.colors.bgInput,
+                          borderColor: tokens.colors.border,
+                        }}
+                      >
+                        {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((sz) => (
+                          <Button
+                            key={sz}
+                            variant={iconSize === sz ? 'primary' : 'text'}
+                            size="sm"
+                            onClick={() => setIconSize(sz)}
+                            className={`py-0.8 text-[10px] font-mono h-7 rounded-md ${
+                              iconSize === sz ? 'font-black' : 'hover:text-slate-800'
+                            }`}
+                            style={{
+                              color: iconSize === sz ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                            }}
+                          >
+                            {sz.toUpperCase()}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   ) : (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[11px] text-slate-500 font-mono">
-                        <span>12px</span>
-                        <span className="text-indigo-600 font-semibold">{iconCustomSize}px</span>
-                        <span>64px</span>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between font-mono text-xs">
+                        <label className="font-semibold" style={{ color: tokens.colors.textSecondary }}>精准像素大小</label>
+                        <span className="font-bold" style={{ color: tokens.colors.brand }}>{iconCustomSize}px</span>
                       </div>
                       <input
                         type="range"
-                        min="12"
-                        max="64"
+                        min="16"
+                        max="80"
                         value={iconCustomSize}
                         onChange={(e) => setIconCustomSize(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        className="w-full cursor-pointer h-1.5 rounded-lg appearance-none"
+                        style={{
+                          accentColor: tokens.colors.brand,
+                          backgroundColor: tokens.colors.border,
+                        }}
                       />
                     </div>
                   )}
-                </div>
 
-                {/* 3. Variant 变体选择 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">正常状态颜色 (Variant)</label>
-                  <select
-                    value={iconVariant}
-                    onChange={(e) => setIconVariant(e.target.value as any)}
-                    className="w-full text-xs border rounded p-2"
-                  >
-                    <option value="default">Default (遵循设计规范：淡雅不夺目暖灰色)</option>
-                    <option value="primary">Primary (高光品牌主色)</option>
-                    <option value="success">Success (语义成功：专属翡翠绿色)</option>
-                    <option value="warning">Warning (语义警告：暖金琥珀色)</option>
-                    <option value="danger">Danger (语义危险/错误：火红警戒色)</option>
-                    <option value="info">Info (信息指南：通透蓝色)</option>
-                  </select>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                    * <b>极客贴士：</b>特定字形（如 success、warning、error 等）在未指定 Variant 时会自动绑定各自定义专属色，确保首要反馈的高视觉识别度。
-                  </p>
-                </div>
-
-                {/* 4. Hover Variant 悬停变体 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">悬停变化颜色 (Hover State)</label>
-                  <select
-                    value={iconHoverVariant}
-                    onChange={(e) => setIconHoverVariant(e.target.value as any)}
-                    className="w-full text-xs border rounded p-2"
-                  >
-                    <option value="none">None (保持常态色，无变色变化)</option>
-                    <option value="default">Default (微调灰色)</option>
-                    <option value="primary">Primary (渐变品牌色)</option>
-                    <option value="success">Success (复原语义绿)</option>
-                    <option value="warning">Warning (警告琥珀色)</option>
-                    <option value="danger">Danger (警戒深朱红)</option>
-                  </select>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                    * <b>微交互原则：</b>在触碰图标实体时触发轻微的动效。删除图标（trash）在悬浮时会自动拉升到警戒朱红，警告其后续的毁灭倾向。
-                  </p>
-                </div>
-
-                {/* 5. 动画形态 */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-slate-600">自旋动画 (Continuous Rotation)</span>
-                    <span className="text-[10px] text-slate-400">开启后产生 360° 无端自转效果</span>
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>配色方案 (Variant)</label>
+                    <Dropdown
+                      options={[
+                        { label: '中性暗灰 (Default)', value: 'default' },
+                        { label: '品牌主色 (Primary)', value: 'primary' },
+                        { label: '系统成功绿 (Success)', value: 'success' },
+                        { label: '等待提醒黄 (Warning)', value: 'warning' },
+                        { label: '崩溃报错红 (Danger)', value: 'danger' },
+                        { label: '常规说明蓝 (Info)', value: 'info' },
+                      ]}
+                      value={iconVariant}
+                      onChange={(val) => setIconVariant(val as any)}
+                      size="sm"
+                    />
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={iconSpinning}
-                    onChange={(e) => setIconSpinning(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                  />
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'breadcrumb' && (
-              <div className="space-y-4 animate-fade-in">
-                {/* 1. 最大显示项 */}
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-semibold text-slate-600">最大可见节点数 (maxItems)</label>
-                    <span className="text-xs font-mono font-bold text-indigo-600">{breadMaxItems} 个</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="2"
-                    max="5"
-                    value={breadMaxItems}
-                    onChange={(e) => setBreadMaxItems(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-normal leading-normal">超过此阈值，中间层级节点会自动被合并</p>
-                </div>
-
-                {/* 2. 折叠前保留数 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">折叠前保留数 (itemsBeforeCollapse)</label>
-                  <select
-                    value={breadItemsBefore}
-                    onChange={(e) => setBreadItemsBefore(Number(e.target.value))}
-                    className="w-full text-xs border rounded p-1.5 bg-white cursor-pointer"
-                  >
-                    <option value={1}>保留 1 个节点 (默认)</option>
-                    <option value={2}>保留 2 个节点</option>
-                    <option value={0}>不保留 (全部隐藏)</option>
-                  </select>
-                </div>
-
-                {/* 3. 折叠后保留数 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">折叠后保留数 (itemsAfterCollapse)</label>
-                  <select
-                    value={breadItemsAfter}
-                    onChange={(e) => setBreadItemsAfter(Number(e.target.value))}
-                    className="w-full text-xs border rounded p-1.5 bg-white cursor-pointer"
-                  >
-                    <option value={1}>保留 1 个节点 (默认)</option>
-                    <option value={2}>保留 2 个节点</option>
-                  </select>
-                </div>
-
-                {/* 4. 分隔符自定义 */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">物理分隔符 (Separator Style)</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { id: 'default', label: '智能设计分发 (Auto)' },
-                      { id: 'slash', label: '斜杠 [ / ]' },
-                      { id: 'chevron', label: '单右箭头 [ → ]' },
-                      { id: 'hyphen', label: '长连字符 [ — ]' },
-                      { id: 'arrow', label: '细右角形 [ › ]' },
-                    ].map((sep) => (
-                      <button
-                        key={sep.id}
-                        onClick={() => setBreadSeparator(sep.id as any)}
-                        className={`py-1.5 px-2 text-[11px] border rounded transition-all cursor-pointer text-left ${
-                          breadSeparator === sep.id
-                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
-                            : 'bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {sep.label}
-                      </button>
-                    ))}
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>循环旋转动画</span>
+                      <input
+                        type="checkbox"
+                        checked={iconSpinning}
+                        onChange={(e) => setIconSpinning(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
                   </div>
                 </div>
+              )}
 
-                {/* 5. 恢复折叠按钮 */}
-                <button
-                  onClick={() => {
-                    // Force state component recreation toggling activeTab to trigger re-folding
-                    const prevTab = activeTab;
-                    setActiveTab('button');
-                    setTimeout(() => setActiveTab(prevTab), 15);
-                  }}
-                  className="w-full py-1.5 text-xs text-center border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded cursor-pointer transition-colors"
-                >
-                  重置/恢复初始折叠状态 (Collapse Again)
-                </button>
-              </div>
-            )}
-
-            {activeTab === 'pagination' && (
-              <div className="space-y-4 animate-fade-in">
-                {/* 1. Page settings */}
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-semibold text-slate-600">当前选定页码 (currentPage)</label>
-                    <span className="text-xs font-mono font-bold text-indigo-600">Page {pagCurrentPage} / {pagTotalPages}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max={pagTotalPages}
-                    value={pagCurrentPage}
-                    onChange={(e) => setPagCurrentPage(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-semibold text-slate-600">总共记录页码数 (totalPages)</label>
-                    <span className="text-xs font-mono font-bold text-indigo-600">{pagTotalPages} 页</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="3"
-                    max="30"
-                    value={pagTotalPages}
-                    onChange={(e) => {
-                      const newTotal = Number(e.target.value);
-                      setPagTotalPages(newTotal);
-                      if (pagCurrentPage > newTotal) {
-                        setPagCurrentPage(newTotal);
-                      }
+              {/* BREADCRUMB props controllers */}
+              {activeTab === 'breadcrumb' && (
+                <div className="space-y-4 font-sans text-xs">
+                  <div
+                    className="space-y-1.5 p-2 rounded-xl border"
+                    style={{
+                      backgroundColor: tokens.colors.bgInput,
+                      borderColor: tokens.colors.border,
                     }}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
-                </div>
+                  >
+                    <div className="flex justify-between font-mono text-xs">
+                      <label className="font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>最长展层限制 (Max Items)</label>
+                      <span className="font-bold" style={{ color: tokens.colors.brand }}>{breadMaxItems} 级</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="2"
+                      max="5"
+                      value={breadMaxItems}
+                      onChange={(e) => setBreadMaxItems(Number(e.target.value))}
+                      className="w-full cursor-pointer h-1.5 rounded-lg appearance-none mt-1"
+                      style={{
+                        accentColor: tokens.colors.brand,
+                        backgroundColor: tokens.colors.border,
+                      }}
+                    />
+                  </div>
 
-                {/* 2. Sizing and Style variants */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">组件尺寸梯度 (Pagination Size)</label>
-                  <div className="flex gap-1.5">
-                    {(['sm', 'md', 'lg'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setPagSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          pagSize === s ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>间隔符样式 (Separator)</label>
+                    <Dropdown
+                      options={[
+                        { label: '默认令牌间隔 (Default dot)', value: 'default' },
+                        { label: '斜线分隔 (Slash "/")', value: 'slash' },
+                        { label: '等速箭头 (Right "→")', value: 'chevron' },
+                        { label: '平铺连字线 (Dash "—")', value: 'hyphen' },
+                        { label: '标准小箭头 (Arrow "›")', value: 'arrow' },
+                      ]}
+                      value={breadSeparator}
+                      onChange={(val) => setBreadSeparator(val as any)}
+                      size="sm"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* PAGINATION props controllers */}
+              {activeTab === 'pagination' && (
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>分页器形态结构</label>
+                    <Dropdown
+                      options={[
+                        { label: '传统盒子框 (Classic bordered)', value: 'classic' },
+                        { label: '现代滑动高光 (Modern float)', value: 'modern' },
+                        { label: '极致无边无感 (Minimal plain)', value: 'minimal' },
+                      ]}
+                      value={pagVariant}
+                      onChange={(val) => setPagVariant(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>分页器大小</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((sz) => (
+                        <Button
+                          key={sz}
+                          variant={pagSize === sz ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setPagSize(sz)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            pagSize === sz ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: pagSize === sz ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {sz.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>锁定禁用分页</span>
+                      <input
+                        type="checkbox"
+                        checked={pagDisabled}
+                        onChange={(e) => setPagDisabled(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>一键快速首尾跳转</span>
+                      <input
+                        type="checkbox"
+                        checked={pagShowFirstLast}
+                        onChange={(e) => setPagShowFirstLast(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>下拉步长调节</span>
+                      <input
+                        type="checkbox"
+                        checked={pagShowSizeChanger}
+                        onChange={(e) => setPagShowSizeChanger(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STEPS进度条 props controllers */}
+              {activeTab === 'steps' && (
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <div className="flex justify-between font-mono max-xs flex-col gap-1">
+                      <div className="font-bold overlay" style={{ color: tokens.colors.textSecondary }}>设定当前执行步骤</div>
+                      <span className="font-extrabold text-[11px]" style={{ color: tokens.colors.brand }}>步骤 {stepsCurrent + 1}</span>
+                    </div>
+                    <div
+                      className="grid grid-cols-3 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {[0, 1, 2].map((idx) => (
+                        <Button
+                          key={idx}
+                          variant={stepsCurrent === idx ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setStepsCurrent(idx)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            stepsCurrent === idx ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: stepsCurrent === idx ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          Step {idx + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>整体部署朝向 (Direction)</label>
+                    <div
+                      className="grid grid-cols-2 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      <Button
+                        variant={stepsDirection === 'horizontal' ? 'primary' : 'text'}
+                        size="sm"
+                        onClick={() => setStepsDirection('horizontal')}
+                        className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                          stepsDirection === 'horizontal' ? '' : 'hover:text-slate-800'
                         }`}
+                        style={{
+                          color: stepsDirection === 'horizontal' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
                       >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">视觉架构变体 (Variant Model)</label>
-                  <div className="flex gap-1.5">
-                    {[
-                      { id: 'classic' as const, label: '经典框线' },
-                      { id: 'modern' as const, label: '轻型现代' },
-                      { id: 'minimal' as const, label: '极简数字' },
-                    ].map((v) => (
-                      <button
-                        key={v.id}
-                        onClick={() => setPagVariant(v.id)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          pagVariant === v.id ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                        横向
+                      </Button>
+                      <Button
+                        variant={stepsDirection === 'vertical' ? 'primary' : 'text'}
+                        size="sm"
+                        onClick={() => setStepsDirection('vertical')}
+                        className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                          stepsDirection === 'vertical' ? '' : 'hover:text-slate-800'
                         }`}
+                        style={{
+                          color: stepsDirection === 'vertical' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
                       >
-                        {v.label}
-                      </button>
-                    ))}
+                        纵向
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold mb-1" style={{ color: tokens.colors.textSecondary }}>物理尺寸 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={stepsSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setStepsSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            stepsSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: stepsSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>使能步骤快点切换</span>
+                      <input
+                        type="checkbox"
+                        checked={stepsClickable}
+                        onChange={(e) => setStepsClickable(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>反馈副层辅助小描述</span>
+                      <input
+                        type="checkbox"
+                        checked={stepsShowDesc}
+                        onChange={(e) => setStepsShowDesc(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>插入物理状态小图标</span>
+                      <input
+                        type="checkbox"
+                        checked={stepsHasIcons}
+                        onChange={(e) => setStepsHasIcons(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textDanger || '#EF4444' }}>模拟清算故障拦截 (error)</span>
+                      <input
+                        type="checkbox"
+                        checked={stepsHasError}
+                        onChange={(e) => setStepsHasError(e.target.checked)}
+                        className="w-4 h-4 rounded cursor-pointer transition-all"
+                        style={{ accentColor: tokens.colors.brand }}
+                      />
+                    </div>
                   </div>
                 </div>
+              )}
+            </div>
 
-                {/* 3. Logical/Toggle features */}
-                <div className="space-y-3 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">锁定禁用态 (Disable Interactivity)</span>
-                      <span className="text-[10px] text-slate-400 font-normal leading-normal">一键硬性锁定，阻断点击并降级为灰色哑光态</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={pagDisabled}
-                      onChange={(e) => setPagDisabled(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
+          <div className="border-t my-1" style={{ borderColor: tokens.colors.border }} />
 
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">双箭头快捷页 (Show First/Last Keys)</span>
-                      <span className="text-[10px] text-slate-400 font-normal leading-normal">是否展示最前一页/最后一页的快捷双侧按键</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={pagShowFirstLast}
-                      onChange={(e) => setPagShowFirstLast(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">每页条数改换 (Show Size Changer)</span>
-                      <span className="text-[10px] text-slate-400 font-normal leading-normal">开启每页记录条数调整下拉，并复用 Dropdown 原语</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={pagShowSizeChanger}
-                      onChange={(e) => setPagShowSizeChanger(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-                </div>
+          {/* Style parameters category */}
+          <div className="space-y-2 select-none">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono block" style={{ color: tokens.colors.textMuted }}>
+              样式与对齐规格 (Style Specs)
+            </span>
+            <div className="space-y-2 font-mono text-[9.5px]" style={{ color: tokens.colors.textSecondary }}>
+              <div className="flex justify-between">
+                <span>品牌主题:</span>
+                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.name}</span>
               </div>
-            )}
-
-            {activeTab === 'steps' && (
-              <div className="space-y-4 animate-fade-in">
-                {/* 1. Current Step select */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">仿真当前具体步进进度 (current)</label>
-                  <div className="flex gap-1 font-mono">
-                    {[0, 1, 2, 3].map((idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setStepsCurrent(idx)}
-                        className={`flex-1 py-1.5 text-xs font-bold border rounded transition-all cursor-pointer ${
-                          stepsCurrent === idx 
-                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
-                            : 'bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {idx === 3 ? 'ALL' : `STEP ${idx + 1}`}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-1">（0-indexed：0代表阶段一，1代表阶段二，3代表全部完结）</p>
-                </div>
-
-                {/* 2. Direction */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">布局排布方向 (Direction Layout)</label>
-                  <div className="flex gap-2">
-                    {[
-                      { id: 'horizontal', label: '横横向极简跨度 (Horizontal)' },
-                      { id: 'vertical', label: '纵纵向表单细节 (Vertical)' },
-                    ].map((dir) => (
-                      <button
-                        key={dir.id}
-                        onClick={() => setStepsDirection(dir.id as any)}
-                        className={`flex-1 py-1.5 px-2 text-left text-[11px] border rounded transition-all cursor-pointer ${
-                          stepsDirection === dir.id
-                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
-                            : 'bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {dir.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 3. Sizes */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">组件形态尺寸规格 (Steps Size)</label>
-                  <div className="flex gap-1.5">
-                    {(['sm', 'md', 'lg'] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setStepsSize(s)}
-                        className={`flex-1 py-1 text-xs border rounded transition-all cursor-pointer ${
-                          stepsSize === s ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {s.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 4. Toggles */}
-                <div className="space-y-3 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">展示详细描述文字 (Show Description)</span>
-                      <span className="text-[10px] text-slate-400">是否渲染步骤正文下方的辅助引导字段</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={stepsShowDesc}
-                      onChange={(e) => setStepsShowDesc(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">矢量图标载入 (Load Custom Icons)</span>
-                      <span className="text-[10px] text-slate-400">切换自定义 Lucide 图标与单纯数字序号</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={stepsHasIcons}
-                      onChange={(e) => setStepsHasIcons(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer animate-none"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">允许点击任意跳转 (Clickable Nodes)</span>
-                      <span className="text-[10px] text-slate-400 font-normal leading-normal">开启后点击步骤圆环、文字即可任意自由切换</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={stepsClickable}
-                      onChange={(e) => setStepsClickable(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-600">模拟步骤冲突错误 (status: 'error')</span>
-                      <span className="text-[10px] text-rose-500 font-medium leading-normal">显式置顶第二阶段发生清算错误，变红示警</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={stepsHasError}
-                      onChange={(e) => setStepsHasError(e.target.checked)}
-                      className="w-4 h-4 text-rose-600 rounded cursor-pointer"
-                    />
-                  </div>
-                </div>
+              <div className="flex justify-between">
+                <span>圆角半径:</span>
+                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.borders.radiusMd}</span>
               </div>
-            )}
+              <div className="flex justify-between">
+                <span>缓冲曲线:</span>
+                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.behaviors.motionCurve}</span>
+              </div>
+            </div>
           </div>
 
-          {/* TSX Code block and interactive clipboard */}
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl shadow-lg flex flex-col gap-3">
-            <div className="flex items-center justify-between border-b pb-3 border-slate-800">
-              <div className="flex items-center gap-1.5">
-                <Code className="w-4 h-4 text-emerald-400" />
-                <h4 className="text-xs font-semibold text-white">组件调用代码 (Source Code)</h4>
-              </div>
-              <button
-                onClick={handleCopyCode}
-                className="flex items-center gap-1.5 py-1 px-2.5 text-[11px] font-medium rounded bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3 h-3" /> 已复制!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" /> 复制代码
-                  </>
-                )}
-              </button>
-            </div>
-            <pre className="text-[11px] font-mono whitespace-pre overflow-x-auto bg-slate-950/85 p-3.5 rounded border border-slate-800 max-h-56 leading-relaxed text-emerald-350">
-              {getCodeSnippet()}
-            </pre>
-            <div className="p-3 bg-indigo-950/40 border border-indigo-900/40 roundedText text-[10px] text-indigo-350 leading-relaxed font-normal">
-              <strong>系统性调用提示：</strong>组件直接通过 <code>Import</code> 引入，其内部
-              已经自动集成 React 状态与全局 <code>DesignTokensContext</code> 的状态跟踪。
-              开发人员后续只需像声明普通 React 组件一样编写即可，保障高复用度。
-            </div>
+          <div className="border-t my-1" style={{ borderColor: tokens.colors.border }} />
+
+          {/* Form Actions footer */}
+          <div className="flex flex-col gap-2 pt-1 font-sans">
+            <button
+              onClick={handleResetDefaults}
+              className="cursor-pointer py-2 border rounded-xl text-xs font-bold leading-none flex items-center justify-center gap-1.5 transition-all"
+              style={{
+                borderColor: tokens.colors.border,
+                backgroundColor: tokens.colors.bgInput,
+                color: tokens.colors.textSecondary,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = tokens.colors.bgActive;
+                e.currentTarget.style.color = tokens.colors.textPrimary;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = tokens.colors.bgInput;
+                e.currentTarget.style.color = tokens.colors.textSecondary;
+              }}
+            >
+              <RotateCcw className="w-3.5 h-3.5" style={{ color: tokens.colors.brand }} />
+              <span>重置为默认值</span>
+            </button>
+            <button
+              onClick={handleCopyConfigProps}
+              className="cursor-pointer py-2 border rounded-xl text-xs font-bold leading-none flex items-center justify-center gap-1.5 transition-all text-white"
+              style={{
+                borderColor: 'transparent',
+                backgroundColor: tokens.colors.brand,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              {copiedConfig ? <Check className="w-3.5 h-3.5 font-bold text-white" /> : <Zap className="w-3.5 h-3.5 text-white" />}
+              <span>复制当前参数配置</span>
+            </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
+
 export default ShowcasePanel;

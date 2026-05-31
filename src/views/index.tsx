@@ -55,83 +55,67 @@ export const ViewsStudioContainer: React.FC = () => {
   const ActiveComponent = activeView ? activeView.component : CustomPageTemplate;
 
   return (
-    <div className="space-y-6">
-      {/* 12列栅格之 - 顶部子页面调度看板面 */}
+    <div className="space-y-4">
+      {/* Slim Tab Switcher Ribbon - Maximizing Content Viewport Space */}
       <div 
-        className="p-5 transition-all duration-300"
+        className="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs"
         style={{
           backgroundColor: tokens.colors.bgCard,
-          borderRadius: tokens.borders.radiusLg,
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: tokens.colors.border,
+          borderRadius: tokens.borders.radiusMd,
+          border: `1px solid ${tokens.colors.border}`,
         }}
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5" style={{ color: tokens.colors.brand }} />
-              <h3 className="text-sm font-bold" style={{ color: tokens.colors.textPrimary }}>
-                业务页面沙盒仓 · 多场景多保真联动面板
-              </h3>
-            </div>
-            <p className="text-xs" style={{ color: tokens.colors.textMuted }}>
-              无需复杂配置，只需在主控仓 <code className="px-1 py-0.5 bg-slate-100 rounded text-[10.5px]">/src/views/index.tsx</code> 中追加导入，AI 页面即可自动挂载。
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-1 bg-slate-100/60 p-1 rounded-lg">
-            <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider font-mono">
-              Views Loaded:
-            </span>
-            <span 
-              className="text-xs font-bold px-1.5 py-0.5 rounded font-mono"
-              style={{
-                color: tokens.colors.brand,
-                backgroundColor: `${tokens.colors.brand}12`,
-              }}
-            >
-              {VIEWS_REGISTRY.length}
+        <div className="flex items-center gap-2">
+          <LayoutGrid className="w-4.5 h-4.5" style={{ color: tokens.colors.brand }} />
+          <div>
+            <h3 className="text-xs font-extrabold leading-none" style={{ color: tokens.colors.textPrimary }}>
+              业务隔离高保真沙盒 (Views Studio)
+            </h3>
+            <span className="text-[9px] text-slate-450 mt-0.5 block font-mono">
+              Views Attached: {VIEWS_REGISTRY.length}
             </span>
           </div>
         </div>
 
-        {/* 页面子 Tab 灵动切换条 */}
-        <div className="mt-4 flex flex-wrap gap-2 pt-4 border-t border-slate-100/40">
+        {/* Low-profile Segment Switcher Caps */}
+        <div
+          className="flex flex-wrap gap-1.5 p-0.5 rounded-lg border"
+          style={{
+            backgroundColor: tokens.colors.bgInput,
+            borderColor: tokens.colors.border,
+          }}
+        >
           {VIEWS_REGISTRY.map((view) => {
             const isSelected = activeViewId === view.id;
             return (
               <button
                 key={view.id}
                 onClick={() => setActiveViewId(view.id)}
-                className="group relative px-4 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+                className="px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer rounded-md flex items-center gap-2"
                 style={{
-                  borderRadius: tokens.borders.radiusMd,
-                  backgroundColor: isSelected ? tokens.colors.brand : `${tokens.colors.brand}05`,
-                  color: isSelected ? '#ffffff' : tokens.colors.textPrimary,
-                  border: isSelected ? `1px solid ${tokens.colors.brand}` : `1px solid ${tokens.colors.border}`,
+                  backgroundColor: isSelected ? tokens.colors.brand : 'transparent',
+                  color: isSelected ? tokens.colors.textInverse : tokens.colors.textPrimary,
                 }}
               >
                 {view.badge && (
                   <span 
-                    className="text-[9px] uppercase tracking-wider px-1.5 py-0.2 rounded-sm scale-90"
+                    className="text-[9px] tracking-wider px-1.5 py-0.2 rounded-sm scale-90"
                     style={{
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : `${tokens.colors.brand}15`,
-                      color: isSelected ? '#ffffff' : tokens.colors.brand,
+                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : `${tokens.colors.brand}12`,
+                      color: isSelected ? tokens.colors.textInverse : tokens.colors.brand,
                     }}
                   >
                     {view.badge}
                   </span>
                 )}
                 <span>{view.name}</span>
-                {isSelected && <Pin className="w-3 h-3 text-white/80 animate-bounce" />}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 激活运行的具体业务面物理展现 */}
+      {/* Active running page container */}
       <div 
         className="transition-all duration-300"
         style={{

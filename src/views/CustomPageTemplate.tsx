@@ -61,7 +61,7 @@ export const CustomPageTemplate: React.FC = () => {
       }}
     >
       {/* 栏目头部：无生硬直边界，留白均匀 */}
-      <div className="flex items-start justify-between border-b pb-4 mb-6 border-slate-100/60">
+      <div className="flex items-start justify-between border-b pb-4 mb-6" style={{ borderColor: tokens.colors.border }}>
         <div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: tokens.colors.brand }} />
@@ -70,7 +70,7 @@ export const CustomPageTemplate: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs mt-1" style={{ color: tokens.colors.textMuted }}>
-            此视图存放在 <code className="px-1.5 py-0.5 bg-slate-50 border rounded text-[11px]">/src/views/</code> 独立隔离区中，专为保证后续业务代码与底层原子组件库解耦。
+            此视图存放在 <code className="px-1.5 py-0.5 border rounded text-[11px]" style={{ backgroundColor: tokens.colors.bgInput, borderColor: tokens.colors.border, color: tokens.colors.textSecondary }}>/src/views/</code> 独立隔离区中，专为保证后续业务代码与底层原子组件库解耦。
           </p>
         </div>
         <span 
@@ -148,7 +148,13 @@ export const CustomPageTemplate: React.FC = () => {
         </div>
 
         {/* 右侧环境信息面板与自锁监控 (5列) */}
-        <div className="md:col-span-5 flex flex-col justify-between p-5 rounded-xl border border-dashed border-slate-200 bg-slate-50/50">
+        <div
+          className="md:col-span-5 flex flex-col justify-between p-5 rounded-xl border border-dashed"
+          style={{
+            borderColor: tokens.colors.border,
+            backgroundColor: tokens.colors.bgInput,
+          }}
+        >
           <div className="space-y-4">
             <h3 className="text-xs font-bold flex items-center gap-1.5" style={{ color: tokens.colors.textPrimary }}>
               <Terminal className="w-4 h-4 text-slate-400" />
@@ -156,15 +162,15 @@ export const CustomPageTemplate: React.FC = () => {
             </h3>
             
             <div className="space-y-2 text-[11px] font-mono">
-              <div className="flex justify-between border-b pb-1 border-slate-100">
+              <div className="flex justify-between border-b pb-1" style={{ borderColor: tokens.colors.border }}>
                 <span className="text-slate-400">当前激活风骨:</span>
                 <span className="font-semibold text-slate-700">{tokens.name}</span>
               </div>
-              <div className="flex justify-between border-b pb-1 border-slate-100">
+              <div className="flex justify-between border-b pb-1" style={{ borderColor: tokens.colors.border }}>
                 <span className="text-slate-400">品牌主色:</span>
                 <span className="font-semibold" style={{ color: tokens.colors.brand }}>{tokens.colors.brand}</span>
               </div>
-              <div className="flex justify-between border-b pb-1 border-slate-100">
+              <div className="flex justify-between border-b pb-1" style={{ borderColor: tokens.colors.border }}>
                 <span className="text-slate-400">按钮压下缩放:</span>
                 <span className="text-slate-700">{tokens.behaviors.buttonPressScale}</span>
               </div>
@@ -174,15 +180,22 @@ export const CustomPageTemplate: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-white/70 rounded-lg flex gap-2 items-start text-[11px] text-slate-500 shadow-2xs leading-relaxed">
+            <div
+              className="p-3 rounded-lg flex gap-2 items-start text-[11px] shadow-2xs leading-relaxed border"
+              style={{
+                backgroundColor: tokens.colors.bgCard,
+                borderColor: tokens.colors.border,
+                color: tokens.colors.textSecondary,
+              }}
+            >
               <Info className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
               <span>
-                <strong>自动校正心率：</strong>当前页面在繁复的操作和动效转换中，没有编写任何内联固定参数，完完全全忠实地与底层设计资产同步收缩扩展并实现编译闭环。
+                <strong>自动校正心率：</strong>当前页面在繁复的操作 and 动效转换中，没有编写任何内联固定参数，完完全全忠实地与底层设计资产同步收缩扩展并实现编译闭环。
               </span>
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-200/50">
+          <div className="mt-6 pt-4 border-t" style={{ borderColor: tokens.colors.border }}>
             <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">
               SANDBOX METRICS
             </span>

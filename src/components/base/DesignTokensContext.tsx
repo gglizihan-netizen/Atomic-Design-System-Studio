@@ -30,7 +30,9 @@ interface DesignTokensContextType {
   setPreset: (preset: ThemePreset) => void; // 用于“一键换肤/一键切换行为模式”的函数
   updateToken: (category: string, key: string, value: string | number | boolean) => void; // 允许在面板或 AI 在线对单个令牌进行微调
   resetToPreset: (preset: ThemePreset) => void; // 重置内存令牌到该主题的官方预设
-  getCssVariablesMap: () => string; // 将当前的令牌动态生成标准 CSS 变量文本，便于开发一键复制带走
+  getCssVariablesMap: () => string; // 将当前的令牌动态生成 standard CSS 变量文本，便于开发一键复制带走
+  activeTab: 'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps';
+  setActiveTab: (tab: 'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps') => void;
 }
 
 // 创建本系统的核心指令传输通道 (React Context)
@@ -43,6 +45,11 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // 1. 定义状态量：保存当前的主题标签与具体的令牌配置
   const [activePreset, setActivePreset] = useState<ThemePreset>('intelligent_workspace');
   const [tokens, setTokens] = useState<DesignTokens>({ ...INTELLIGENT_WORKSPACE });
+  const [activeTab, setActiveTabState] = useState<'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps'>('button');
+
+  const setActiveTab = (tab: 'button' | 'input' | 'dropdown' | 'modal' | 'navbar' | 'icon' | 'breadcrumb' | 'pagination' | 'steps') => {
+    setActiveTabState(tab);
+  };
 
   // 一键切换方案 (深拷贝确保没有任何历史残留和交叉污染)
   const setPreset = (preset: ThemePreset) => {
@@ -283,6 +290,8 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
         updateToken,
         resetToPreset,
         getCssVariablesMap,
+        activeTab,
+        setActiveTab,
       }}
     >
       <div 
