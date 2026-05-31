@@ -67,6 +67,12 @@ export const INTELLIGENT_WORKSPACE: DesignTokens = {
     sizeLg: '1.05rem',       // 17px 小标题/卡片主要大标题
     sizeXl: '1.20rem',       // 19.2px 分区标题
     size2xl: '1.60rem',      // 25.6px 生成大章标题
+    lineHeightTight: '1.25',
+    lineHeightNormal: '1.5',
+    fontWeightLight: '300',
+    fontWeightNormal: '400',
+    fontWeightMedium: '500',
+    fontWeightBold: '700',
   },
   borders: {
     radiusNone: '0px',
@@ -153,6 +159,12 @@ export const SWISS_MODERN: DesignTokens = {
     sizeLg: '1.125rem',      // 18px 小标题/卡片标题
     sizeXl: '1.25rem',       // 20px 板块标题
     size2xl: '1.75rem',      // 28px 页面大标题
+    lineHeightTight: '1.2',
+    lineHeightNormal: '1.45',
+    fontWeightLight: '300',
+    fontWeightNormal: '400',
+    fontWeightMedium: '500',
+    fontWeightBold: '600',
   },
   borders: {
     radiusNone: '0px',
@@ -241,6 +253,12 @@ export const EDITORIAL_WARM: DesignTokens = {
     sizeLg: '1.20rem',       // 小标题
     sizeXl: '1.35rem',       // 板块标题
     size2xl: '2.00rem',      // 气势磅礴的书目章节体大标题
+    lineHeightTight: '1.3',
+    lineHeightNormal: '1.6',
+    fontWeightLight: '300',
+    fontWeightNormal: '400',
+    fontWeightMedium: '500',
+    fontWeightBold: '700',
   },
   borders: {
     radiusNone: '0px',
@@ -327,6 +345,12 @@ export const SWEET_ROUNDED: DesignTokens = {
     sizeLg: '1.15rem',
     sizeXl: '1.30rem',
     size2xl: '1.85rem',
+    lineHeightTight: '1.25',
+    lineHeightNormal: '1.55',
+    fontWeightLight: '300',
+    fontWeightNormal: '400',
+    fontWeightMedium: '600',
+    fontWeightBold: '800',
   },
   borders: {
     radiusNone: '0px',

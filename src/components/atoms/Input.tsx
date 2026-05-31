@@ -143,7 +143,7 @@ export const Input: React.FC<InputProps> = ({
         <label
           style={{
             fontSize: tokens.typography.sizeSm,
-            fontWeight: '500',
+            fontWeight: tokens.typography.fontWeightMedium || '500',
             color: error ? tokens.colors.error : tokens.colors.textPrimary,
             letterSpacing: '0.01em',
             alignSelf: 'flex-start',
@@ -202,7 +202,7 @@ export const Input: React.FC<InputProps> = ({
             fontSize: '0.785rem',
             color: tokens.colors.error,
             marginTop: '2px',
-            fontWeight: '500',
+            fontWeight: tokens.typography.fontWeightMedium || '500',
           }}
         >
           {error}

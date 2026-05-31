@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2">
                 {/* 默认精致的圆形 Omega 原子图标 */}
                 <div
-                  className="w-8 h-8 flex items-center justify-center font-bold text-white shadow-sm"
+                  className="w-8 h-8 flex items-center justify-center token-weight-bold text-white shadow-sm"
                   style={{
                     backgroundColor: tokens.colors.brand,
                     borderRadius: tokens.borders.radiusSm, // 圆角大小随主题自适应
@@ -78,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   Ω
                 </div>
                 <span
-                  className="text-md font-bold tracking-tight token-font-heading"
+                  className="text-md token-weight-bold tracking-tight token-font-heading"
                   style={{ 
                     color: tokens.colors.textPrimary,
                     fontSize: tokens.typography.sizeLg
@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     borderRadius: tokens.borders.radiusSm,
                     fontSize: tokens.typography.sizeSm,
                     color: isActive ? tokens.colors.brand : tokens.colors.textMuted,
-                    fontWeight: isActive ? '600' : '400',
+                    fontWeight: isActive ? (tokens.typography.fontWeightBold || '600') : (tokens.typography.fontWeightNormal || '400'),
                     // 如果被激活，用10%透明度的品牌色垫住，突出呼吸律动感
                     backgroundColor: isActive ? `${tokens.colors.brand}12` : 'transparent',
                     padding: `${tokens.spacings.xs} ${tokens.spacings.sm}`,

@@ -1109,16 +1109,19 @@ export class AtomixDemoComponent {
 
         {/* Right configuration side panel */}
         <div
-          className="lg:col-span-3 pb-8 flex flex-col gap-5 p-5 border rounded-2xl"
+          id="parameter-config-sidebar"
+          className="lg:col-span-3 pb-8 flex flex-col gap-5 p-5 border rounded-2xl token-font-body token-lh-normal"
           style={{
             backgroundColor: tokens.colors.bgCard,
             borderColor: tokens.colors.border,
           }}
         >
-          <div className="space-y-6 animate-fade-in text-sm font-normal font-sans leading-normal" style={{ color: tokens.colors.textSecondary }}>
-            <span className="text-base font-medium font-sans mb-3 block" style={{ color: tokens.colors.textMuted }}>
-              基本属性 (Base props)
-            </span>
+          <div className="space-y-5 animate-fade-in" style={{ color: tokens.colors.textSecondary }}>
+            <div className="border-b pb-2 mb-3" style={{ borderColor: tokens.colors.border }}>
+              <span className="text-sm token-font-heading token-weight-bold token-lh-tight block uppercase tracking-wider" style={{ color: tokens.colors.textPrimary }}>
+                基本属性 (Base props)
+              </span>
+            </div>
 
               {/* BUTTON props fields */}
               {activeTab === 'button' && (
@@ -1942,24 +1945,26 @@ export class AtomixDemoComponent {
             </div>
 
           <div className="border-t my-1" style={{ borderColor: tokens.colors.border }} />
-
+          
           {/* Style parameters category */}
-          <div className="space-y-2 select-none">
-            <span className="text-base font-medium font-sans mb-3 block" style={{ color: tokens.colors.textMuted }}>
-              样式与对齐规格 (Style Specs)
-            </span>
-            <div className="space-y-2 font-mono text-[9.5px]" style={{ color: tokens.colors.textSecondary }}>
-              <div className="flex justify-between">
-                <span>品牌主题:</span>
-                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.name}</span>
+          <div className="space-y-3 select-none">
+            <div className="border-b pb-2" style={{ borderColor: tokens.colors.border }}>
+              <span className="text-sm token-font-heading token-weight-bold token-lh-tight block uppercase tracking-wider" style={{ color: tokens.colors.textPrimary }}>
+                样式与对齐规格 (Style Specs)
+              </span>
+            </div>
+            <div className="space-y-2.5" style={{ color: tokens.colors.textSecondary }}>
+              <div className="flex justify-between items-center text-xs">
+                <span className="token-weight-normal">品牌主题:</span>
+                <span className="token-weight-medium" style={{ color: tokens.colors.textPrimary }}>{tokens.name}</span>
               </div>
-              <div className="flex justify-between">
-                <span>圆角半径:</span>
-                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.borders.radiusMd}</span>
+              <div className="flex justify-between items-center text-xs">
+                <span className="token-weight-normal">圆角半径:</span>
+                <span className="token-weight-medium" style={{ color: tokens.colors.textPrimary }}>{tokens.borders.radiusMd}</span>
               </div>
-              <div className="flex justify-between">
-                <span>缓冲曲线:</span>
-                <span className="font-bold" style={{ color: tokens.colors.textPrimary }}>{tokens.behaviors.motionCurve}</span>
+              <div className="flex justify-between items-center text-xs">
+                <span className="token-weight-normal">缓冲曲线:</span>
+                <span className="token-weight-medium font-mono" style={{ color: tokens.colors.textPrimary }}>{tokens.behaviors.motionCurve}</span>
               </div>
             </div>
           </div>
@@ -1967,10 +1972,10 @@ export class AtomixDemoComponent {
           <div className="border-t my-1" style={{ borderColor: tokens.colors.border }} />
 
           {/* Form Actions footer */}
-          <div className="flex flex-col gap-2 pt-1 font-sans">
+          <div className="flex flex-col gap-2 pt-1">
             <button
               onClick={handleResetDefaults}
-              className="cursor-pointer py-2 border rounded-xl text-xs font-bold leading-none flex items-center justify-center gap-1.5 transition-all"
+              className="cursor-pointer py-2.5 border rounded-xl text-xs token-weight-medium token-lh-normal flex items-center justify-center gap-1.5 transition-all"
               style={{
                 borderColor: tokens.colors.border,
                 backgroundColor: tokens.colors.bgInput,
@@ -1990,7 +1995,7 @@ export class AtomixDemoComponent {
             </button>
             <button
               onClick={handleCopyConfigProps}
-              className="cursor-pointer py-2 border rounded-xl text-xs font-bold leading-none flex items-center justify-center gap-1.5 transition-all text-white"
+              className="cursor-pointer py-2.5 border rounded-xl text-xs token-weight-medium token-lh-normal flex items-center justify-center gap-1.5 transition-all text-white"
               style={{
                 borderColor: 'transparent',
                 backgroundColor: tokens.colors.brand,

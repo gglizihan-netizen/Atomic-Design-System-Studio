@@ -143,7 +143,7 @@ export const Modal: React.FC<ModalProps> = ({
             >
               {title ? (
                 <h3
-                  className="text-lg font-bold token-font-heading"
+                  className="text-lg token-weight-bold token-font-heading token-lh-tight"
                   style={{ color: tokens.colors.textPrimary }}
                 >
                   {title}
@@ -174,7 +174,7 @@ export const Modal: React.FC<ModalProps> = ({
                   fontSize: tokens.typography.sizeBase, 
                   color: tokens.colors.textPrimary 
                 }} 
-                className="leading-relaxed"
+                className="token-lh-normal"
               >
                 {children}
               </div>

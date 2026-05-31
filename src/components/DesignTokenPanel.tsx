@@ -219,6 +219,60 @@ export const DesignTokenPanel: React.FC = () => {
                 </select>
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center justify-between">
+                  <span>紧凑行高 (Tight Line Height)</span>
+                  <span className="font-mono text-[10px] text-indigo-500">{tokens.typography.lineHeightTight}</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full text-xs border rounded-md px-2 py-1.5"
+                  value={tokens.typography.lineHeightTight}
+                  onChange={(e) => updateToken('typography', 'lineHeightTight', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center justify-between">
+                  <span>标准行高 (Normal Line Height)</span>
+                  <span className="font-mono text-[10px] text-indigo-500">{tokens.typography.lineHeightNormal}</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full text-xs border rounded-md px-2 py-1.5"
+                  value={tokens.typography.lineHeightNormal}
+                  onChange={(e) => updateToken('typography', 'lineHeightNormal', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center justify-between">
+                  <span>中等字重 (Medium Weight)</span>
+                  <span className="font-mono text-[10px] text-indigo-500">{tokens.typography.fontWeightMedium}</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full text-xs border rounded-md px-2 py-1.5"
+                  value={tokens.typography.fontWeightMedium}
+                  onChange={(e) => updateToken('typography', 'fontWeightMedium', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1 flex items-center justify-between">
+                  <span>粗体字重 (Bold Weight)</span>
+                  <span className="font-mono text-[10px] text-indigo-500">{tokens.typography.fontWeightBold}</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full text-xs border rounded-md px-2 py-1.5"
+                  value={tokens.typography.fontWeightBold}
+                  onChange={(e) => updateToken('typography', 'fontWeightBold', e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Spacing & Radii Scale */}

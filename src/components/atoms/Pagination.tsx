@@ -157,7 +157,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         backgroundColor: tokens.colors.brand,
         borderColor: tokens.colors.brand,
         color: tokens.colors.textInverse,
-        fontWeight: 'bold',
+        fontWeight: tokens.typography.fontWeightBold || 'bold',
         transform: isActive ? `scale(${tokens.behaviors.buttonPressScale})` : 'scale(1)',
         boxShadow: tokens.shadows.sm,
       };
@@ -236,7 +236,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         {/* 核心中轴字型显示 */}
         <span 
           style={{ fontSize: currentSize.fontSize }}
-          className="font-medium tracking-tight px-2"
+          className="token-weight-medium tracking-tight px-2"
         >
           {currentPage} / <span style={{ color: tokens.colors.textMuted }}>{totalPages}</span>
         </span>
@@ -313,7 +313,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             return (
               <span
                 key={`${p}-${idx}`}
-                className="inline-flex items-center justify-center font-bold tracking-widest text-slate-400 select-none pb-1"
+                className="inline-flex items-center justify-center token-weight-bold tracking-widest text-slate-400 select-none pb-1"
                 style={{
                   width: currentSize.btnSize,
                   height: currentSize.btnSize,

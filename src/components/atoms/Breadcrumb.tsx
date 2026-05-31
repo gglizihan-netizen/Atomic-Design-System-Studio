@@ -81,13 +81,13 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     if (isLast) {
       return {
         color: tokens.colors.textPrimary,
-        fontWeight: 600 as const,
+        fontWeight: (tokens.typography.fontWeightBold || '600') as any,
         cursor: 'default',
       };
     }
     return {
       color: isLink ? tokens.colors.textSecondary : tokens.colors.textMuted,
-      fontWeight: 400 as const,
+      fontWeight: (tokens.typography.fontWeightNormal || '400') as any,
       cursor: isLink ? 'pointer' : 'default',
     };
   };

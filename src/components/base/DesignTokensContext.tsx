@@ -137,6 +137,12 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
   --text-size-lg: ${tokens.typography.sizeLg};
   --text-size-xl: ${tokens.typography.sizeXl};
   --text-size-2xl: ${tokens.typography.size2xl};
+  --line-height-tight: ${tokens.typography.lineHeightTight};
+  --line-height-normal: ${tokens.typography.lineHeightNormal};
+  --font-weight-light: ${tokens.typography.fontWeightLight};
+  --font-weight-normal: ${tokens.typography.fontWeightNormal};
+  --font-weight-medium: ${tokens.typography.fontWeightMedium};
+  --font-weight-bold: ${tokens.typography.fontWeightBold};
 
   /* 📐 圆角大小令牌组 (Borders) */
   --radius-none: ${tokens.borders.radiusNone};
@@ -227,6 +233,12 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
         --text-size-lg: ${tokens.typography.sizeLg};
         --text-size-xl: ${tokens.typography.sizeXl};
         --text-size-2xl: ${tokens.typography.size2xl};
+        --line-height-tight: ${tokens.typography.lineHeightTight};
+        --line-height-normal: ${tokens.typography.lineHeightNormal};
+        --font-weight-light: ${tokens.typography.fontWeightLight};
+        --font-weight-normal: ${tokens.typography.fontWeightNormal};
+        --font-weight-medium: ${tokens.typography.fontWeightMedium};
+        --font-weight-bold: ${tokens.typography.fontWeightBold};
 
         --radius-none: ${tokens.borders.radiusNone};
         --radius-sm: ${tokens.borders.radiusSm};
@@ -259,6 +271,50 @@ export const DesignTokensProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
       .token-font-body {
         font-family: var(--font-family-body);
+      }
+      .token-lh-tight {
+        line-height: var(--line-height-tight);
+      }
+      .token-lh-normal {
+        line-height: var(--line-height-normal);
+      }
+      .token-weight-light {
+        font-weight: var(--font-weight-light);
+      }
+      .token-weight-normal {
+        font-weight: var(--font-weight-normal);
+      }
+      .token-weight-medium {
+        font-weight: var(--font-weight-medium);
+      }
+      .token-weight-bold {
+        font-weight: var(--font-weight-bold);
+      }
+      
+      /* 参数编辑器专属全局排版强制规范 - 彻底解决字体冲突混乱问题 */
+      #parameter-config-sidebar label {
+        font-family: var(--font-family-body) !important;
+        font-size: 11.5px !important;
+        font-weight: var(--font-weight-medium) !important;
+        line-height: var(--line-height-tight) !important;
+        color: var(--color-text-secondary) !important;
+        margin-bottom: 6px !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+      }
+      #parameter-config-sidebar .font-semibold,
+      #parameter-config-sidebar span.font-bold,
+      #parameter-config-sidebar .font-bold {
+        font-family: var(--font-family-body) !important;
+        font-size: 11.5px !important;
+        font-weight: var(--font-weight-medium) !important;
+        line-height: var(--line-height-normal) !important;
+        color: var(--color-text-secondary) !important;
+      }
+      #parameter-config-sidebar select,
+      #parameter-config-sidebar input[type="text"] {
+        font-family: var(--font-family-body) !important;
+        font-size: 12px !important;
       }
       
       /* 让滚动条也优雅兼容色板 */

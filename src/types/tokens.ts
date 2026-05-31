@@ -69,6 +69,12 @@ export interface TypographySet {
   sizeLg: string;                         // 中大字号 (16px - 18px，主要用于卡片标题、表单项标题)
   sizeXl: string;                         // 大字号 (20px - 22px，应用内二级标题)
   size2xl: string;                        // 特大字号 (24px - 28px，主页面醒目标题)
+  lineHeightTight: string;                // 紧凑行高 (例如: 1.25，适用于标题、长文本大段落等)
+  lineHeightNormal: string;               // 标准行高 (例如: 1.5，适用于标准正文段落)
+  fontWeightLight: string;                // 较细字重 (例如: 300)
+  fontWeightNormal: string;               // 标准字重 (例如: 400)
+  fontWeightMedium: string;               // 中等字重 (例如: 500或600)
+  fontWeightBold: string;                 // 粗体字重 (例如: 700)
 }
 
 /**

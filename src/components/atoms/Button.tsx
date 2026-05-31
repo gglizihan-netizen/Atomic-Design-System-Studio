@@ -94,7 +94,7 @@ export const Button: React.FC<ButtonProps> = ({
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontWeight: '500',
+      fontWeight: tokens.typography.fontWeightMedium || '500',
       borderRadius: tokens.borders.radiusMd, // 读取该预设的微圆角或直角令牌
       // ⚠️ 行为令牌注入：悬停动画转换时间直接从 behaviors token 里抓取，表现完美的动态一致性
       transition: `all ${speedFast} ${bezierCurve}`, 

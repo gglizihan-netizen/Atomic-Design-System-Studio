@@ -168,6 +168,7 @@ function StudioLayout() {
   const [workspaceCollapsed, setWorkspaceCollapsed] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isFooterHovered, setIsFooterHovered] = useState(false);
+  const [showThemeDropdown, setShowThemeDropdown] = useState(false);
  
   const workspaceTabs = [
     {
@@ -333,18 +334,6 @@ function StudioLayout() {
 
             {/* COMPONENTS group (Flat list underneath Workspace, satisfying the prompt) */}
             <div className="space-y-2 flex-1 flex flex-col min-h-0">
-              {/* Theme Dropdown at the top of components */}
-              {!sidebarCollapsed && (
-                <div className="px-3 pt-1 pb-2 shrink-0">
-  <Dropdown
-    value={activePreset}
-    onChange={(val: any) => setPreset(val)}
-    options={presetsList.map(p => ({ label: `${p.label} - ${p.code}`, value: p.id }))}
-    size="sm"
-  />
-</div>
-              )}
-
               {!sidebarCollapsed && (
                 <div className="px-3 py-1 flex items-center justify-between select-none shrink-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
@@ -457,7 +446,88 @@ function StudioLayout() {
           </div>
 
           {/* Quick status information actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Elegant Global Theme Switcher Pill in Header */}
+            <div className="relative">
+              <button
+                onClick={() => setShowThemeDropdown(!showThemeDropdown)}
+                className="h-8 pl-2.5 pr-2 rounded-xl border text-[11px] font-bold flex items-center gap-2 transition-all cursor-pointer hover:opacity-95"
+                style={{
+                  backgroundColor: tokens.colors.bgInput,
+                  borderColor: tokens.colors.border,
+                  color: tokens.colors.textPrimary,
+                }}
+              >
+                <span className="w-2 h-2 rounded-full ring-2 ring-offset-2" style={{ backgroundColor: presetsList.find(p => p.id === activePreset)?.color || tokens.colors.brand, ringColor: 'transparent' }} />
+                <span>{presetsList.find(p => p.id === activePreset)?.label || '加载中'}</span>
+                <span className="opacity-50 font-mono text-[9px] font-medium">({presetsList.find(p => p.id === activePreset)?.code || 'AI'})</span>
+                <ChevronDown className="w-3 h-3 ml-0.5 opacity-60" />
+              </button>
+              
+              {/* Floating popover dropdown menu */}
+              {showThemeDropdown && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40 cursor-default" 
+                    onClick={() => setShowThemeDropdown(false)} 
+                  />
+                  <div
+                    className="absolute right-0 mt-1.5 w-52 rounded-xl border p-1.5 z-50 shadow-md animate-fade-in flex flex-col gap-0.5"
+                    style={{
+                      backgroundColor: tokens.colors.bgCard,
+                      borderColor: tokens.colors.border,
+                    }}
+                  >
+                    <div className="px-2.5 py-1.5 text-[9.5px] uppercase tracking-wider font-extrabold font-mono" style={{ color: tokens.colors.textMuted }}>
+                      切换全局设计主题
+                    </div>
+                    {presetsList.map((preset) => {
+                      const isSelected = activePreset === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          onClick={() => {
+                            setPreset(preset.id);
+                            setShowThemeDropdown(false);
+                          }}
+                          className="w-full text-left p-2 rounded-lg text-xs flex items-center justify-between group cursor-pointer transition-all"
+                          style={{
+                            backgroundColor: isSelected ? tokens.colors.bgActive : 'transparent',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) e.currentTarget.style.backgroundColor = tokens.colors.bgHover;
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span 
+                              className="w-2 h-2 rounded-full" 
+                              style={{ backgroundColor: preset.color }} 
+                            />
+                            <div className="flex flex-col">
+                              <span className="font-bold text-[11px]" style={{ color: tokens.colors.textPrimary }}>
+                                {preset.label}
+                              </span>
+                              <span className="text-[9.5px] font-mono" style={{ color: tokens.colors.textMuted }}>
+                                {preset.code}
+                              </span>
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <span className="text-[10px] font-bold" style={{ color: tokens.colors.brand }}>
+                              ACTIVE
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* Ambient indicator lights */}
             <div
               className="flex items-center gap-1.5 text-[11px] font-mono font-bold px-2 py-0.8 rounded-md border"

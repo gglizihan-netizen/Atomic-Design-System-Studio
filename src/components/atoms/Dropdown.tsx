@@ -245,7 +245,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <span
           style={{
             fontSize: tokens.typography.sizeSm,
-            fontWeight: '500',
+            fontWeight: tokens.typography.fontWeightMedium || '500',
             color: error ? tokens.colors.error : tokens.colors.textPrimary,
           }}
         >
@@ -420,12 +420,14 @@ export const Dropdown: React.FC<DropdownProps> = ({
                           {/* 本选项文案部分 */}
                           <div className="flex-1 min-w-0">
                             <div
-                              className="text-sm font-medium truncate"
+                              className="text-sm truncate"
                               style={{
                                 color: isSelected
                                   ? (tokens.colors.brand || '#1F63D1') 
                                   : tokens.colors.textPrimary,
-                                fontWeight: isSelected ? '550' : '400'
+                                fontWeight: isSelected 
+                                  ? (tokens.typography.fontWeightBold || '600') 
+                                  : (tokens.typography.fontWeightNormal || '400')
                               }}
                             >
                               {option.label}

@@ -275,7 +275,7 @@ export const Steps: React.FC<StepsProps> = ({
                 >
                   {/* 圆节点圈框 */}
                   <div
-                    className="flex items-center justify-center font-bold text-center relative shrink-0"
+                    className="flex items-center justify-center token-weight-bold text-center relative shrink-0"
                     style={{
                       width: `${dim.nodeSize}px`,
                       height: `${dim.nodeSize}px`,
@@ -298,7 +298,7 @@ export const Steps: React.FC<StepsProps> = ({
                   <div className="flex flex-col text-left min-w-0">
                     {/* 步骤标题 */}
                     <span
-                      className="font-semibold tracking-tight leading-snug whitespace-nowrap md:whitespace-normal"
+                      className="token-weight-medium tracking-tight token-lh-tight whitespace-nowrap md:whitespace-normal"
                       style={{
                         fontSize: dim.fontSize,
                         color: isHovered ? tokens.colors.brand : (flag.status === 'process' ? tokens.colors.brand : tokens.colors.textPrimary),
@@ -311,7 +311,7 @@ export const Steps: React.FC<StepsProps> = ({
                     {/* 状态详情辅助文段 */}
                     {item.description && (
                       <span
-                        className="font-normal leading-relaxed text-xs text-slate-400 mt-1 line-clamp-1 md:line-clamp-2"
+                        className="token-weight-normal token-lh-normal text-xs text-slate-400 mt-1 line-clamp-1 md:line-clamp-2"
                         style={{
                           fontSize: dim.descSize,
                           color: flag.descriptionColor,
@@ -376,7 +376,7 @@ export const Steps: React.FC<StepsProps> = ({
 
               {/* Side element for nodes */}
               <div
-                className="flex items-center justify-center font-bold text-center relative shrink-0"
+                className="flex items-center justify-center token-weight-bold text-center relative shrink-0"
                 onMouseEnter={() => isInteractive && setHoveredIdx(idx)}
                 onMouseLeave={() => { setHoveredIdx(null); setPressedIdx(null); }}
                 onMouseDown={() => isInteractive && setPressedIdx(idx)}
@@ -412,7 +412,7 @@ export const Steps: React.FC<StepsProps> = ({
               >
                 {/* 步骤标题 */}
                 <span
-                  className="font-semibold tracking-tight leading-none pt-1"
+                  className="token-weight-medium tracking-tight token-lh-tight pt-1"
                   style={{
                     fontSize: dim.fontSize,
                     color: isHovered ? tokens.colors.brand : (flag.status === 'process' ? tokens.colors.brand : tokens.colors.textPrimary),
@@ -426,7 +426,7 @@ export const Steps: React.FC<StepsProps> = ({
                 {/* 状态详情辅助文段 */}
                 {item.description && (
                   <span
-                    className="font-normal leading-relaxed text-wrap"
+                    className="token-weight-normal token-lh-normal text-wrap"
                     style={{
                       fontSize: dim.descSize,
                       color: flag.descriptionColor,
