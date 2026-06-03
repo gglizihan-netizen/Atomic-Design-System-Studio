@@ -5,11 +5,12 @@
 
 import React, { useState } from 'react';
 import { DesignTokensProvider, useDesignTokens } from './components/base/DesignTokensContext';
+import { ToastProvider } from './components/atoms/Toast';
 import { DesignTokenPanel } from './components/DesignTokenPanel';
 import { Dropdown } from './components/atoms/Dropdown';
 import { ShowcasePanel } from './components/ShowcasePanel';
 import { FrameworkDocs } from './components/FrameworkDocs';
-import ViewsStudioContainer from './views/index';
+import ViewsStudioContainer, { VIEWS_REGISTRY } from './views/index';
 import {
   Sparkles,
   Settings,
@@ -122,6 +123,61 @@ function ComponentListItem({ item, isSelected, onClick, sidebarCollapsed, tokens
   );
 }
 
+function ViewListItem({ item, isSelected, onClick, sidebarCollapsed, tokens }: any) {
+  const [isHovered, setIsHovered] = React.useState(false);
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left py-2 px-3 text-xs rounded-lg transition-all flex items-center justify-between group cursor-pointer border border-transparent"
+      style={{
+        backgroundColor: isSelected
+          ? tokens.colors.brand
+          : isHovered
+          ? tokens.colors.bgHover
+          : 'transparent',
+        color: isSelected ? tokens.colors.textInverse : tokens.colors.textSecondary,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0 transition-transform duration-300"
+          style={{
+            backgroundColor: isSelected ? tokens.colors.textInverse : tokens.colors.textMuted,
+            transform: isSelected ? 'scale(1.25)' : 'none',
+          }}
+        />
+        {!sidebarCollapsed ? (
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-[11px] truncate leading-tight">
+              {item.name}
+            </span>
+            <span 
+              className="text-[9px] mt-0.5 truncate select-none leading-none opacity-80" 
+              style={{ color: isSelected ? tokens.colors.textInverse : tokens.colors.textMuted }}
+            >
+              {item.badge || 'PAGE'} — {item.desc.slice(0, 18)}...
+            </span>
+          </div>
+        ) : (
+          <span className="text-[10px] font-bold font-mono">
+            {item.name.slice(0, 2).toUpperCase()}
+          </span>
+        )}
+      </div>
+      {!sidebarCollapsed && !isSelected && (
+        <span
+          className="text-[9px] font-mono opacity-0 group-hover:opacity-100 transition-all font-bold"
+          style={{ color: tokens.colors.textMuted }}
+        >
+          →
+        </span>
+      )}
+    </button>
+  );
+}
+
 function ThemePresetButton({ preset, isSelected, onClick, tokens }: any) {
   const [isHovered, setIsHovered] = React.useState(false);
   return (
@@ -163,6 +219,7 @@ function ThemePresetButton({ preset, isSelected, onClick, tokens }: any) {
 function StudioLayout() {
   const { tokens, activePreset, setPreset, activeTab, setActiveTab } = useDesignTokens();
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'playground' | 'tokens' | 'views' | 'docs'>('playground');
+  const [activeViewId, setActiveViewId] = useState<string>('bid-builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [workspaceCollapsed, setWorkspaceCollapsed] = useState(false);
@@ -207,6 +264,15 @@ function StudioLayout() {
     { id: 'breadcrumb' as const, label: '面包屑', en: 'Breadcrumb' },
     { id: 'pagination' as const, label: '自适应分页', en: 'Pagination' },
     { id: 'steps' as const, label: '步骤进度条', en: 'Steps' },
+    { id: 'tabs' as const, label: '选项卡', en: 'Tabs' },
+    { id: 'datepicker' as const, label: '日期选择器', en: 'DatePicker' },
+    { id: 'slider' as const, label: '自适应滑块', en: 'Slider' },
+    { id: 'card' as const, label: '智能卡片', en: 'Card' },
+    { id: 'progress' as const, label: '自适应进度条', en: 'Progress' },
+    { id: 'loading' as const, label: '状态加载器', en: 'Loading' },
+    { id: 'alert' as const, label: '警告提示条', en: 'Alert' },
+    { id: 'toast' as const, label: '浮动轻提示', en: 'Toast' },
+    { id: 'tag' as const, label: '标贴', en: 'Tag' },
   ];
 
   const presetsList = [
@@ -221,6 +287,14 @@ function StudioLayout() {
     (item) =>
       item.label.includes(searchQuery) ||
       item.en.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Filter registered views list based on search query
+  const filteredViews = VIEWS_REGISTRY.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.badge && item.badge.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      item.desc.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleComponentClick = (id: typeof activeTab) => {
@@ -332,30 +406,30 @@ function StudioLayout() {
               </AnimatePresence>
             </div>
 
-            {/* COMPONENTS group (Flat list underneath Workspace, satisfying the prompt) */}
-            <div className="space-y-2 flex-1 flex flex-col min-h-0">
+            {/* DYNAMIC LIST Group (Flat list underneath Workspace, supporting both Components and Pages dynamically) */}
+            <div className="space-y-2 flex-1 flex flex-col min-h-0 border-t pt-4" style={{ borderColor: tokens.colors.border }}>
               {!sidebarCollapsed && (
                 <div className="px-3 py-1 flex items-center justify-between select-none shrink-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono" style={{ color: tokens.colors.textMuted }}>
-                    Components
+                    {activeWorkspaceTab === 'views' ? 'Sandbox Views' : 'Components'}
                   </span>
                   <span
                     className="text-[8.5px] font-mono font-bold px-1.5 py-0.2 rounded-sm"
                     style={{ backgroundColor: tokens.colors.bgInput, color: tokens.colors.textSecondary }}
                   >
-                    {COMPONENT_LIST.length}
+                    {activeWorkspaceTab === 'views' ? filteredViews.length : filteredComponents.length}
                   </span>
                 </div>
               )}
 
-              {/* Component Search Input (only shown when not collapsed) */}
+              {/* Search Input */}
               {!sidebarCollapsed && (
                 <div className="px-3 py-1 shrink-0">
                   <div className="relative flex items-center h-8">
                     <Search className="w-3.5 h-3.5 absolute left-3" style={{ color: tokens.colors.textMuted }} />
                     <input
                       type="text"
-                      placeholder="搜索核心组件 & 令牌..."
+                      placeholder={activeWorkspaceTab === 'views' ? "搜索沙盒页面 & 描述..." : "搜索核心组件 & 令牌..."}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onFocus={() => setIsSearchFocused(true)}
@@ -380,21 +454,49 @@ function StudioLayout() {
                 </div>
               )}
 
-              {/* Flat list of components */}
+              {/* Dynamic scrollable list */}
               <div className="space-y-0.5 flex-1 overflow-y-auto px-1 mt-1 custom-scrollbar">
-                {filteredComponents.map((item) => {
-                  const isSelected = activeWorkspaceTab === 'playground' && activeTab === item.id;
-                  return (
-                    <ComponentListItem
-                      key={item.id}
-                      item={item}
-                      isSelected={isSelected}
-                      onClick={() => handleComponentClick(item.id)}
-                      sidebarCollapsed={sidebarCollapsed}
-                      tokens={tokens}
-                    />
-                  );
-                })}
+                {activeWorkspaceTab === 'views' ? (
+                  filteredViews.length > 0 ? (
+                    filteredViews.map((item) => {
+                      const isSelected = activeViewId === item.id;
+                      return (
+                        <ViewListItem
+                          key={item.id}
+                          item={item}
+                          isSelected={isSelected}
+                          onClick={() => setActiveViewId(item.id)}
+                          sidebarCollapsed={sidebarCollapsed}
+                          tokens={tokens}
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-6 text-[11px] select-none text-slate-400 font-medium">
+                      未找到相关业务页面
+                    </div>
+                  )
+                ) : (
+                  filteredComponents.length > 0 ? (
+                    filteredComponents.map((item) => {
+                      const isSelected = activeWorkspaceTab === 'playground' && activeTab === item.id;
+                      return (
+                        <ComponentListItem
+                          key={item.id}
+                          item={item}
+                          isSelected={isSelected}
+                          onClick={() => handleComponentClick(item.id)}
+                          sidebarCollapsed={sidebarCollapsed}
+                          tokens={tokens}
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-6 text-[11px] select-none text-slate-400 font-medium">
+                      未找到相关组件
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -587,7 +689,7 @@ function StudioLayout() {
             >
               {activeWorkspaceTab === 'tokens' && <DesignTokenPanel />}
               {activeWorkspaceTab === 'playground' && <ShowcasePanel />}
-              {activeWorkspaceTab === 'views' && <ViewsStudioContainer />}
+              {activeWorkspaceTab === 'views' && <ViewsStudioContainer activeViewId={activeViewId} onActiveViewIdChange={setActiveViewId} />}
               {activeWorkspaceTab === 'docs' && <FrameworkDocs />}
             </motion.div>
           </AnimatePresence>
@@ -600,7 +702,9 @@ function StudioLayout() {
 export default function App() {
   return (
     <DesignTokensProvider>
-      <StudioLayout />
+      <ToastProvider>
+        <StudioLayout />
+      </ToastProvider>
     </DesignTokensProvider>
   );
 }

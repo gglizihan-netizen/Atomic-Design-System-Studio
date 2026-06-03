@@ -104,6 +104,7 @@ export const INTELLIGENT_WORKSPACE: DesignTokens = {
     inputFocusRing: true,         // 有外发光
     modalDismissOverlay: true,    // 允许
     listHoverReveal: true,        // 允许悬停滑出操作项
+    cardHoverLift: 2,             // 高效工作风温和浮移 2px
   }
 };
 
@@ -196,6 +197,7 @@ export const SWISS_MODERN: DesignTokens = {
     inputFocusRing: true,         // 有外聚焦光轮环
     modalDismissOverlay: true,    // 允许通过点击黑色阴影遮罩区秒退弹窗
     listHoverReveal: false,       // 信息架构扁平化呈现，无需悬停披露
+    cardHoverLift: 1,             // 瑞士理性极简更低调微悬 1px
   }
 };
 
@@ -290,6 +292,7 @@ export const EDITORIAL_WARM: DesignTokens = {
     inputFocusRing: false,        // 无科技感荧光环，仅通过输入框线优雅变红酒色提示
     modalDismissOverlay: true,    // 允许通过点击黑色阴影遮罩区秒退弹窗
     listHoverReveal: false,       // 杜绝信息乱跳，保持经典的报刊大局观排版
+    cardHoverLift: 2,             // 书页古典沉稳悬停抬起 2px
   }
 };
 
@@ -382,6 +385,7 @@ export const SWEET_ROUNDED: DesignTokens = {
     inputFocusRing: true,         // 有外聚焦环，香芋紫的光雾气
     modalDismissOverlay: true,    // 允许随便按按空白处一秒欢退弹窗
     listHoverReveal: true,        // 悬浮时，列表会有一个俏皮的小微移高度卡位展开
+    cardHoverLift: 3,             // 萌系果冻微弹物理上浮 3px
   }
 };
 

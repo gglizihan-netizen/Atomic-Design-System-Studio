@@ -28,6 +28,10 @@ import { Input } from './atoms/Input';
 import { Dropdown } from './atoms/Dropdown';
 import { Modal } from './atoms/Modal';
 import { Breadcrumb } from './atoms/Breadcrumb';
+import { DatePicker } from './atoms/DatePicker';
+import { Slider } from './atoms/Slider';
+import { Progress } from './atoms/Progress';
+import { Loading } from './atoms/Loading';
 import { Home } from 'lucide-react';
 import {
   Server,
@@ -60,6 +64,8 @@ export const ScenarioSandbox: React.FC = () => {
   const [hostError, setHostError] = useState('');
   const [accessError, setAccessError] = useState('');
   const [isDeploying, setIsDeploying] = useState(false);
+  const [retirementDate, setRetirementDate] = useState<Date | string | null>('2026-06-15');
+  const [cpuLimit, setCpuLimit] = useState<number>(4);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [deployStep, setDeployStep] = useState(0);
 
@@ -80,6 +86,8 @@ export const ScenarioSandbox: React.FC = () => {
     setSubnet('asia-east1-a');
     setInstanceSize('std-2c4g');
     setAccessKey('');
+    setRetirementDate('2026-06-15');
+    setCpuLimit(4);
     setHostError('');
     setAccessError('');
   };
@@ -166,6 +174,39 @@ export const ScenarioSandbox: React.FC = () => {
               placeholder: 'name@company.com',
               size: 'md',
               required: true
+            }
+          },
+          {
+            element: 'DatePicker',
+            props: {
+              label: '计划启动执行日期 (Schedule Launch Date)',
+              description: '可指定一个未来的物理时间供 K8s 执行冷启动调度',
+              placeholder: '请点选未来调度日期...',
+              size: 'md'
+            }
+          },
+          {
+            element: 'Progress',
+            props: {
+              label: '节点安全合规度校验 (Security Compliance Metric)',
+              description: '系统正在实时执行 TLS 1.3 身份加密防泄露握手协议，当前安全度计算中...',
+              value: 85,
+              max: 100,
+              size: 'md',
+              status: 'active',
+              striped: true,
+              animated: true
+            }
+          },
+          {
+            element: 'Loading',
+            props: {
+              spinning: true,
+              type: 'dots',
+              size: 'sm',
+              color: 'brand',
+              tip: '密码机节点正安全连接中...',
+              tipPosition: 'right'
             }
           },
           {
@@ -373,6 +414,67 @@ export const ScenarioSandbox: React.FC = () => {
                       placeholder={child.props?.placeholder}
                       description={child.props?.description}
                       size={child.props?.size}
+                    />
+                  );
+                }
+                if (child.element === 'DatePicker') {
+                  return (
+                    <DatePicker 
+                      key={`ai-dp-${idx}`}
+                      label={child.props?.label}
+                      placeholder={child.props?.placeholder}
+                      description={child.props?.description}
+                      size={child.props?.size}
+                      value={child.props?.value}
+                      onChange={(date, dateString) => console.log(`🎉 运行时日期变更为: ${dateString}`)}
+                    />
+                  );
+                }
+                if (child.element === 'Slider') {
+                  return (
+                    <Slider
+                      key={`ai-slider-${idx}`}
+                      label={child.props?.label}
+                      description={child.props?.description}
+                      size={child.props?.size || 'md'}
+                      min={child.props?.min !== undefined ? Number(child.props?.min) : 0}
+                      max={child.props?.max !== undefined ? Number(child.props?.max) : 100}
+                      step={child.props?.step !== undefined ? Number(child.props?.step) : 1}
+                      showInput={child.props?.showInput}
+                      showTooltip={child.props?.showTooltip}
+                      value={child.props?.value !== undefined ? Number(child.props?.value) : 50}
+                      onChange={(val) => console.log(`🎉 运行时滑块值变更为: ${val}`)}
+                    />
+                  );
+                }
+                if (child.element === 'Progress') {
+                  return (
+                    <Progress
+                      key={`ai-progress-${idx}`}
+                      label={child.props?.label}
+                      description={child.props?.description}
+                      value={child.props?.value !== undefined ? Number(child.props?.value) : 60}
+                      max={child.props?.max !== undefined ? Number(child.props?.max) : 100}
+                      size={child.props?.size || 'md'}
+                      status={child.props?.status || 'default'}
+                      showInfo={child.props?.showInfo !== false}
+                      infoPosition={child.props?.infoPosition || 'right'}
+                      striped={child.props?.striped}
+                      animated={child.props?.animated}
+                    />
+                  );
+                }
+                if (child.element === 'Loading') {
+                  return (
+                    <Loading
+                      key={`ai-loading-${idx}`}
+                      spinning={child.props?.spinning !== false}
+                      type={child.props?.type || 'spinner'}
+                      size={child.props?.size || 'md'}
+                      color={child.props?.color || 'default'}
+                      tip={child.props?.tip}
+                      tipPosition={child.props?.tipPosition || 'bottom'}
+                      backdrop={child.props?.backdrop}
                     />
                   );
                 }
@@ -835,6 +937,28 @@ export const ScenarioSandbox: React.FC = () => {
                   iconLeft={<Cpu className="w-4 h-4" />}
                 />
 
+                {/* 字段 C: DatePicker 原子原语演示 */}
+                <DatePicker
+                  label="容器退役生命周期时间 (Retirement Schedule Date)"
+                  description="当达到选择的指定物理时间后，Nexus 将安全收回租期并抹除缓存介质"
+                  placeholder="请点击日历并设置自动退役时间..."
+                  value={retirementDate}
+                  onChange={(date, dateStr) => setRetirementDate(dateStr)}
+                />
+
+                {/* 字段 D: Slider 原子原语演示 */}
+                <Slider
+                  label="容器物理核心配额限额管理 (Container VCPU Limit Quota)"
+                  description="拖动或微调该安全阀指明当前容器 Pod 允许调用的的最大 VCPU 运算资源"
+                  min={1}
+                  max={32}
+                  step={1}
+                  value={cpuLimit}
+                  onChange={setCpuLimit}
+                  showInput={true}
+                  showTooltip={true}
+                />
+
                 {/* 页尾执行条 */}
                 <div
                   className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border-t mt-6 pt-5"
@@ -973,6 +1097,12 @@ export const ScenarioSandbox: React.FC = () => {
                   <span className="text-slate-400">规格套餐 (Computing Size)：</span>
                   <span className="font-semibold" style={{ color: tokens.colors.brand }}>
                     {sizeOptions.find((o) => o.value === instanceSize)?.label || instanceSize}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs border-t pt-2 border-dashed border-slate-200">
+                  <span className="text-slate-400">CPU 核心硬上限 (CPU Core Limit)：</span>
+                  <span className="font-semibold font-mono text-emerald-600">
+                    {cpuLimit} vCPU Cores
                   </span>
                 </div>
               </div>

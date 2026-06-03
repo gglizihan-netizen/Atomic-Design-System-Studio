@@ -419,6 +419,421 @@
         "behaviors.motionCurve (横纵向切换平滑自适应、动作插值和过渡曲线)",
         "behaviors.motionDurationFast (色彩、Hover渐淡高保真感知耗时)"
       ]
+    },
+    "Tabs": {
+      "tag": "div",
+      "category": "Navigation",
+      "description": "极高保真物理自适应选项卡。内置 Layout 独立流、滑动切换、胶囊高气泡和卡片微断层样式。支持图标和可选数字徽章，完美咬合全局 4 大设计系统主题机制，极致优雅的 PC 仪表盘体验。",
+      "props": {
+        "activeId": {
+          "type": "string",
+          "required": true,
+          "description": "当前已选激活项的唯一标识标识符。"
+        },
+        "items": {
+          "type": "TabItem[]",
+          "required": true,
+          "description": "选项面板数据列表。单个 TabItem 的字段结构有: id (必填标识符), label (必填展示文本), icon (可选矢量图标名), disabled (是否禁用激活), badge (可选提示数字或标徽)"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["line", "pill", "card"],
+          "default": "line",
+          "description": "展示风格形式：line(经典极简下底划线流变，高负空间感)；pill(圆角胶囊背景悬浮划动过渡，高聚合视感)；card(精美卡片断层卡槽，适合深层次划分)"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "自适应大小规格：sm(高密度精致，34px高)；md(常规中性，40px高)；lg(饱满开阔，48px高)"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["horizontal", "vertical"],
+          "default": "horizontal",
+          "description": "对齐朝向：horizontal (常规水平控制条); vertical (高级左侧侧边操控面板纵向平滑布局)"
+        },
+        "fullWidth": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否强令宽度占满 100% 父容器。开启后每个 tab 节点宽度自适应对等拉伸"
+        },
+        "onChange": {
+          "type": "Function (id => void)",
+          "required": true,
+          "description": "切换选项激活态的回调函数"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.buttonPressScale (点击选项微小弹性心率捏缩)",
+        "behaviors.motionCurve (Layout 布局共享层流畅的过渡滑动体验)",
+        "behaviors.motionDurationFast (精细 hover 悬浮变色、背景微光反应等)"
+      ]
+    },
+    "DatePicker": {
+      "tag": "div",
+      "category": "Data Entry",
+      "description": "高标高保真智能日期选择原语。集成可交互高斯模糊毛玻璃日历选择弹窗、月份/年份自适应滑切换、状态感控。完美融合全局 4 大设计系统品牌主题机制，自动继承色彩、圆角、阴影等视觉令牌与减震缓冲缓动曲线。",
+      "props": {
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "顶置标题标签，表明日期选择器的字段业务语境（如 error 有值，标签自动亮红，维持全局一致性）"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "次级辅助提示说明，可以补充说明选择规范，如无 error 状态则优雅显示"
+        },
+        "placeholder": {
+          "type": "string",
+          "default": "请选择日期...",
+          "description": "未选中日期时的提示占位。跟随主题提供安全易读灰色"
+        },
+        "value": {
+          "type": "string | Date",
+          "required": false,
+          "description": "受控绑定的日期值。支持标准 Date 对象、ISO 或是 2026-06-01 日期字符串格式"
+        },
+        "onChange": {
+          "type": "Function ((date: Date | null, dateString: string) => void)",
+          "required": true,
+          "description": "用户点击日历节点确定选中、或者清空时的变更回调通知，回调获得 Date 对象与 YYYY-MM-DD 格式的字符串"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "一键拉起只读禁用，外层及内部触发器处于磨砂禁用，鼠标动作变成 not-allowed"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "输入触发器高度自适应：sm(高密度高度34px)；md(默认高保真高度42px)；lg(触控大气高度50px)"
+        },
+        "error": {
+          "type": "string",
+          "required": false,
+          "description": "表单错误报警。若有值输入选择框和外框会被亮眼警戒霓虹红线裹包，并屏蔽常规 Focus Ring 高光，提醒立刻修正"
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否开启一键快速删除清空按钮，方便用户极速恢复无日期值状态"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.inputFocusRing (面板打开时光环反馈状态)",
+        "behaviors.motionCurve (日历小浮层弹出和月季切换时微动弹回缓冲曲线)",
+        "behaviors.motionDurationFast (下拉、清除和聚焦瞬态反应时间)"
+      ]
+    },
+    "Slider": {
+      "tag": "div",
+      "category": "Data Entry",
+      "description": "高标高保真物理自适应滑块原语。支持拖拽滑行控制、自定义阈值界限、精密辅助输入、拖拽数值气泡、边缘修饰图标等，完美自适应当前全局多品牌主题。",
+      "props": {
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "顶置解释标签，明确对位滑轨所关联的业务量度"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "次级辅助说明提示文案"
+        },
+        "value": {
+          "type": "number",
+          "required": true,
+          "description": "当前受控滑块的值"
+        },
+        "onChange": {
+          "type": "Function (value => void)",
+          "required": true,
+          "description": "数值变更回调通知处理器"
+        },
+        "min": {
+          "type": "number",
+          "default": 0,
+          "description": "允许数字拖动的最小物理下限边界"
+        },
+        "max": {
+          "type": "number",
+          "default": 100,
+          "description": "允许数字拖动的最大物理上限边界"
+        },
+        "step": {
+          "type": "number",
+          "default": 1,
+          "description": "拖拽或调节时的物理步长进给刻度"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "物理高密度尺寸：sm(细致滑轨与手持头，适宜微操紧密布局)；md(常规默认中性)；lg(厚实圆润大尺寸，适宜触控大屏)"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "高透明度优雅锁定置灰态，屏蔽所有的滚轮与滑手触拽交互"
+        },
+        "error": {
+          "type": "string",
+          "required": false,
+          "description": "校验报错。如不为空，滑轨和数值信息框会高亮闪红，表达警报状态"
+        },
+        "showInput": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否展示精密辅助调节数字输入框，可做双向高联控精密微调纠枉"
+        },
+        "showTooltip": {
+          "type": "boolean",
+          "default": true,
+          "description": "拖动滑手时是否在上方悬挂展示提示数值的气泡 Tooltip"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (滑动拖拽松手、手柄悬停和 tooltip 气泡闪现时的物理缓动摩擦曲线)",
+        "behaviors.motionDurationFast (数值流变瞬秒反应过渡)"
+      ]
+    },
+    "Progress": {
+      "tag": "div",
+      "category": "Data Display",
+      "description": "高标高保真智能数值进度条及健康状态呈现。自动提取并响应全局 4 大设计系统主题机制，支持流动高亮、斜向斑马纹、多种内置异常警戒状态以及多方位信息标识呈现，极大充实大盘数据监控仪表体验。",
+      "props": {
+        "value": {
+          "type": "number",
+          "required": true,
+          "description": "当前进度值，受控绑定。会根据 max 参数自动折算当前填充比例"
+        },
+        "max": {
+          "type": "number",
+          "default": 100,
+          "description": "最大填充值，默认为 100"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "垂直厚度粗细规格：sm(4px 高度)；md(8px 默认中性高度)；lg(12px 饱满圆润厚度，此时若开启 inside position 可在进度条内部显示居中的数字标签)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["default", "success", "warning", "exception", "active"],
+          "default": "default",
+          "description": "色彩及交互状态：default(使用当前主题的主品牌色)；success(成功、资产安全、连接成功绿色)；warning(临界预警黄色)；exception(资源溢出、网络异常、阻断警报炫红色)；active(具有呼吸式的光亮流动扫尾动画，表示该作业正在后台火热运转)"
+        },
+        "showInfo": {
+          "type": "boolean",
+          "default": true,
+          "description": "控制是否显示对应的数字或进度文案（如 75%）"
+        },
+        "infoPosition": {
+          "type": "string",
+          "enum": ["right", "top", "inside"],
+          "default": "right",
+          "description": "进度百分比文本的排版停靠方位：right(在进度条右侧水平居中排布)；top(在进度条上方与 label 水平并列展示，节省垂直开销)；inside(在进度条填充体内部，这仅在 size=lg 饱满状态下表现极佳)"
+        },
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "置顶说明标签文字，指明我们当前追踪的进度内容（在 exception 异常下会自动变为警示危险色）"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "下方补充的解释性轻灰色辅助文案"
+        },
+        "striped": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否为滑轨填充内部添加装饰性的极致动感斑马斜向半透明精细条纹"
+        },
+        "animated": {
+          "type": "boolean",
+          "default": false,
+          "description": "若为 true 且 striped 开启，斑马斜条纹将自发沿水平朝向开启丝滑的无尽向右流动动画，运动轨迹由 behaviors.motionCurve 减震加速适配"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (流动高光与百分比流变时的阻尼曲线反馈)",
+        "behaviors.motionDurationFast (数值动态流动物理运动耗时秒)"
+      ]
+    },
+    "Loading": {
+      "tag": "div",
+      "category": "Feedback",
+      "description": "高品质、具备多维视觉过渡与强设计系统令牌响应能力的智能加载呈现器。支持经典旋转(Spinner)、波浪水珠(Dots)、涟漪呼吸(Pulse)、顶部流光(Bar)和卡片骨架屏(Skeleton)等多重状态演绎，完美支持独立运作和容器包裹运作。",
+      "props": {
+        "spinning": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否正处于加载阶段运转中。如果是 false 且有子节点，则隐藏加载层直接展示子容器内容"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["spinner", "dots", "pulse", "bar", "skeleton"],
+          "default": "spinner",
+          "description": "加载呈现风格样式"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg", "xl"],
+          "default": "md",
+          "description": "加载呈现模块或水珠大小梯度规格"
+        },
+        "color": {
+          "type": "string",
+          "enum": ["default", "brand", "success", "warning", "error", "white"],
+          "default": "default",
+          "description": "加载状态视觉主题配色，支持自适应品牌主调色或各大物理警示色"
+        },
+        "tip": {
+          "type": "string",
+          "required": false,
+          "description": "伴随加载动画渲染的补充提示性文本"
+        },
+        "tipPosition": {
+          "type": "string",
+          "enum": ["bottom", "right"],
+          "default": "bottom",
+          "description": "提示性文本与动画形态相对放置排版朝向"
+        },
+        "backdrop": {
+          "type": "boolean",
+          "default": false,
+          "description": "当在包裹模式下时，是否加设极致透亮轻薄的毛玻璃悬浮覆盖层阻断用户在异步过程中的交互流"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (渐入渐出动画与三点波浪物理缓动阻力)",
+        "behaviors.motionDurationFast (不确定进度条、涟漪呼吸的能量流场周期耗时)"
+      ]
+    },
+    "Alert": {
+      "tag": "div",
+      "category": "Feedback",
+      "description": "高保真警告提示条，提供醒目的页面或局部提示。包含四种核心等级（展示、成功、警告、异常），采用轻质护眼色，左侧放置默认或自定义语义图标，并支持配置微操作区与手动叉号关闭。",
+      "props": {
+        "type": {
+          "type": "string",
+          "enum": ["info", "success", "warning", "error"],
+          "default": "info",
+          "description": "信息警告条样式等级配色"
+        },
+        "message": {
+          "type": "string",
+          "required": true,
+          "description": "警告提示核心标题内容"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "拓展补充解释细节描述文本"
+        },
+        "closable": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否展示手动关闭的微小叉号"
+        },
+        "showIcon": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否展示代表性质的状态大图标"
+        },
+        "action": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "可在右端自定义安插的衍生微交互操作插槽（例如“不再提示”等确认/撤销按钮）"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (警告条淡入淡出及整体折叠隐藏过渡曲线)"
+      ]
+    },
+    "Tag": {
+      "tag": "span",
+      "category": "Data Display",
+      "description": "高保真标贴组件，用于进行状态标记或属性分类。支持配置不同的形态、色彩与交互属性。",
+      "props": {
+        "type": {
+          "type": "string",
+          "enum": ["default", "primary", "success", "warning", "error"],
+          "default": "default",
+          "description": "决定 Tag 的基础色彩语义"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["solid", "soft", "outline", "dot"],
+          "default": "soft",
+          "description": "决定视觉重量。solid 用作强视觉，soft 用作轻描，outline 用于外发光边缘，dot 带有前置状态小圆点"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "决定自身占有的物理空间大小"
+        },
+        "closable": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否支持显示关闭操作"
+        },
+        "icon": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "左端置入代表状态的自定义图标"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (渐入式颜色融合)"
+      ]
+    },
+    "Toast": {
+      "tag": "div",
+      "category": "Feedback",
+      "description": "全局浮动轻量提示，用于临时反馈重要操作的结果（成功、异常、警告等）。浮于最上层，自上而下对齐堆叠并定时淡出消失。",
+      "props": {
+        "message": {
+          "type": "string",
+          "required": true,
+          "description": "主提示正文字句"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["info", "success", "warning", "error", "loading"],
+          "default": "info",
+          "description": "通知浮层类型"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "微缩拓展行描述"
+        },
+        "duration": {
+          "type": "number",
+          "default": 3000,
+          "description": "留存倒计时长，毫秒"
+        },
+        "closable": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否在右端展示一个叉号供提前手动关闭"
+        },
+        "position": {
+          "type": "string",
+          "enum": ["top-right", "top-left", "bottom-right", "bottom-left", "top-center", "bottom-center"],
+          "default": "top-center",
+          "description": "呼出呈现悬停方向"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (弹窗、流星般的渐变缩放及堆叠折叠动画)"
+      ]
     }
   },
   "usage_instruction_for_llm": "【⚠️ 关键人机协作准则】：当 AI (或任何 Agent) 收到为本项目拼装界面的用户 prompt（例如: “给我生成一个带确认的云节点配置和启动表单”）时，严禁使用 HTML 原生指令、非预装的外部三方 UI 组件等。AI 只能在上面列出的 5 大原子原语库中做挑选！AI 应根据意图组装符合 Layer 5 规范的「JSON Schema协议」，并将该 Schema 输出在文本中或直接传入 ScenarioSandbox 声明式解析运行时。如此能做到极致的一致性！"

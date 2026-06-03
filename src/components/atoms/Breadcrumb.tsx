@@ -72,7 +72,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
   // 1. 根据当前设计令牌行为，获取更精准的字型、字号与动画时长
   const fontStyle = {
-    fontFamily: tokens.typography.bodyFont === 'mono' ? tokens.typography.fontMono : tokens.typography.fontSans,
+    fontFamily: tokens.typography.bodyFont === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)',
     fontSize: tokens.typography.sizeSm, // 面包屑大多使用 sm 尺寸
   };
 

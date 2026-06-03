@@ -30,7 +30,7 @@ interface RegisteredView {
 // 视图注册中心 (VIEWS_REGISTRY) 
 // 在这里登记新开发的隔离业务页面，AI 往此处追加条目即可让用户在后台一键切换
 // =========================================================================
-const VIEWS_REGISTRY: RegisteredView[] = [
+export const VIEWS_REGISTRY: RegisteredView[] = [
   {
     id: 'bid-builder',
     name: '招标文件智能大纲与正文生成器',
@@ -47,83 +47,32 @@ const VIEWS_REGISTRY: RegisteredView[] = [
   },
 ];
 
-export const ViewsStudioContainer: React.FC = () => {
+interface ViewsStudioContainerProps {
+  activeViewId?: string;
+  onActiveViewIdChange?: (id: string) => void;
+}
+
+export const ViewsStudioContainer: React.FC<ViewsStudioContainerProps> = ({
+  activeViewId: propActiveViewId,
+  onActiveViewIdChange,
+}) => {
   const { tokens } = useDesignTokens();
-  const [activeViewId, setActiveViewId] = useState<string>(VIEWS_REGISTRY[0]?.id || 'default-template');
+  const [internalActiveViewId, setInternalActiveViewId] = useState<string>(VIEWS_REGISTRY[0]?.id || 'default-template');
+
+  const activeViewId = propActiveViewId !== undefined ? propActiveViewId : internalActiveViewId;
+  const setActiveViewId = onActiveViewIdChange !== undefined ? onActiveViewIdChange : setInternalActiveViewId;
 
   const activeView = VIEWS_REGISTRY.find(v => v.id === activeViewId);
   const ActiveComponent = activeView ? activeView.component : CustomPageTemplate;
 
   return (
-    <div className="space-y-4">
-      {/* Slim Tab Switcher Ribbon - Maximizing Content Viewport Space */}
-      <div 
-        className="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs"
-        style={{
-          backgroundColor: tokens.colors.bgCard,
-          borderRadius: tokens.borders.radiusMd,
-          border: `1px solid ${tokens.colors.border}`,
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <LayoutGrid className="w-4.5 h-4.5" style={{ color: tokens.colors.brand }} />
-          <div>
-            <h3 className="text-xs font-extrabold leading-none" style={{ color: tokens.colors.textPrimary }}>
-              业务隔离高保真沙盒 (Views Studio)
-            </h3>
-            <span className="text-[9px] text-slate-450 mt-0.5 block font-mono">
-              Views Attached: {VIEWS_REGISTRY.length}
-            </span>
-          </div>
-        </div>
-
-        {/* Low-profile Segment Switcher Caps */}
-        <div
-          className="flex flex-wrap gap-1.5 p-0.5 rounded-lg border"
-          style={{
-            backgroundColor: tokens.colors.bgInput,
-            borderColor: tokens.colors.border,
-          }}
-        >
-          {VIEWS_REGISTRY.map((view) => {
-            const isSelected = activeViewId === view.id;
-            return (
-              <button
-                key={view.id}
-                onClick={() => setActiveViewId(view.id)}
-                className="px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer rounded-md flex items-center gap-2"
-                style={{
-                  backgroundColor: isSelected ? tokens.colors.brand : 'transparent',
-                  color: isSelected ? tokens.colors.textInverse : tokens.colors.textPrimary,
-                }}
-              >
-                {view.badge && (
-                  <span 
-                    className="text-[9px] tracking-wider px-1.5 py-0.2 rounded-sm scale-90"
-                    style={{
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : `${tokens.colors.brand}12`,
-                      color: isSelected ? tokens.colors.textInverse : tokens.colors.brand,
-                    }}
-                  >
-                    {view.badge}
-                  </span>
-                )}
-                <span>{view.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Active running page container */}
-      <div 
-        className="transition-all duration-300"
-        style={{
-          borderRadius: tokens.borders.radiusLg,
-        }}
-      >
-        <ActiveComponent />
-      </div>
+    <div 
+      className="transition-all duration-300"
+      style={{
+        borderRadius: tokens.borders.radiusLg,
+      }}
+    >
+      <ActiveComponent />
     </div>
   );
 };

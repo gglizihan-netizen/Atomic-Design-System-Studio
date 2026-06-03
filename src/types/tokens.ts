@@ -126,6 +126,7 @@ export interface BehavioralSet {
   inputFocusRing: boolean;       // 重聚焦外光圈圈 (如为true，输入框聚焦时不仅加深边框，还会有一圈温和的外发光或额外环套)
   modalDismissOverlay: boolean;  // 模态弹窗是否允许点击黑色遮罩区一键关闭 (true为易关闭利于阅读，false为强控制必须通过确认按钮)
   listHoverReveal: boolean;      // 列表项悬停时，是否允许动态改变高度、背景或者滑出操作栏 (提高AI对主次要信息的隐藏策略)
+  cardHoverLift: number;         // 💎 卡片悬停时的 Y 轴物理抬升高度 (像素 px, 用于定制卡片微交互体验，硬朗瑞士 1px, 经典高效 2px, 典雅人文 3px, 果冻香芋 4px)
 }
 
 /**

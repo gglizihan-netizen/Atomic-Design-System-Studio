@@ -9,7 +9,16 @@ import { Icon } from './atoms/Icon';
 import { Breadcrumb } from './atoms/Breadcrumb';
 import { Pagination } from './atoms/Pagination';
 import { Steps } from './atoms/Steps';
-import { IconName } from '../types/components';
+import { Tabs } from './atoms/Tabs';
+import { DatePicker } from './atoms/DatePicker';
+import { Slider } from './atoms/Slider';
+import { Progress } from './atoms/Progress';
+import { Loading } from './atoms/Loading';
+import { Alert } from './atoms/Alert';
+import { Tag } from './atoms/Tag';
+import { useToast } from './atoms/Toast';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './atoms/Card';
+import { IconName, TabItem } from '../types/components';
 import {
   Code,
   Sliders,
@@ -37,8 +46,38 @@ import {
   Terminal,
   Activity,
   Award,
-  ChevronDown
+  ChevronDown,
+  CheckCircle2
 } from 'lucide-react';
+
+const ToggleSwitch: React.FC<{
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+}> = ({ checked, onChange, disabled }) => {
+  const { tokens } = useDesignTokens();
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
+        disabled ? 'opacity-40 cursor-not-allowed' : ''
+      }`}
+      style={{
+        backgroundColor: checked ? tokens.colors.brand : tokens.colors.border,
+      }}
+    >
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+          checked ? 'translate-x-[16px]' : 'translate-x-[2px]'
+        } mt-0.5`}
+      />
+    </button>
+  );
+};
 
 export const ShowcasePanel: React.FC = () => {
   const { tokens, activePreset, setPreset, activeTab } = useDesignTokens();
@@ -128,6 +167,106 @@ export const ShowcasePanel: React.FC = () => {
   const [stepsShowDesc, setStepsShowDesc] = useState<boolean>(true);
   const [stepsHasIcons, setStepsHasIcons] = useState<boolean>(true);
   const [stepsHasError, setStepsHasError] = useState<boolean>(false);
+
+  // 10. Tabs Demo states
+  const [tabsActiveId, setTabsActiveId] = useState<string>('dashboard');
+  const [tabsVariant, setTabsVariant] = useState<'line' | 'pill' | 'card'>('line');
+  const [tabsSize, setTabsSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [tabsDirection, setTabsDirection] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [tabsFullWidth, setTabsFullWidth] = useState<boolean>(false);
+  const [tabsWithIcon, setTabsWithIcon] = useState<boolean>(true);
+  const [tabsWithBadge, setTabsWithBadge] = useState<boolean>(true);
+  const [tabsWithDisabled, setTabsWithDisabled] = useState<boolean>(true);
+
+  // 11. DatePicker Demo states
+  const [dpSize, setDpSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [dpLabel, setDpLabel] = useState<string>('计划调度启动时间 (Schedule Launch Date)');
+  const [dpPlaceholder, setDpPlaceholder] = useState<string>('请点选未来启动时间...');
+  const [dpDesc, setDpDesc] = useState<string>('通过 K8s 控制中转调度，提前预置节点镜像');
+  const [dpError, setDpError] = useState<string>('');
+  const [dpDisabled, setDpDisabled] = useState<boolean>(false);
+  const [dpValue, setDpValue] = useState<Date | string | null>('2026-06-01');
+
+  // 12. Slider Demo states
+  const [sliderValue, setSliderValue] = useState<number>(35);
+  const [sliderMin, setSliderMin] = useState<number>(0);
+  const [sliderMax, setSliderMax] = useState<number>(100);
+  const [sliderStep, setSliderStep] = useState<number>(5);
+  const [sliderSize, setSliderSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [sliderLabel, setSliderLabel] = useState<string>('系统并发压力核心调控参数 (Load Quota Percent)');
+  const [sliderDesc, setSliderDesc] = useState<string>('实时分配节点可并发支撑的服务最大连接百分比例额度等级');
+  const [sliderError, setSliderError] = useState<string>('');
+  const [sliderDisabled, setSliderDisabled] = useState<boolean>(false);
+  const [sliderShowInput, setSliderShowInput] = useState<boolean>(true);
+  const [sliderShowTooltip, setSliderShowTooltip] = useState<boolean>(true);
+  const [sliderShowMarks, setSliderShowMarks] = useState<boolean>(true);
+
+  // 14. Progress Demo states
+  const [progValue, setProgValue] = useState<number>(65);
+  const [progMax, setProgMax] = useState<number>(100);
+  const [progSize, setProgSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [progStatus, setProgStatus] = useState<'default' | 'success' | 'warning' | 'exception' | 'active'>('active');
+  const [progShowInfo, setProgShowInfo] = useState<boolean>(true);
+  const [progInfoPosition, setProgInfoPosition] = useState<'right' | 'top' | 'inside'>('right');
+  const [progLabel, setProgLabel] = useState<string>('当前集群物理镜像拉取进度 (Docker Pull Progress)');
+  const [progDesc, setProgDesc] = useState<string>('系统正在通过 Nexus 物理内网千兆网口加速抓取镜像，拉取任务包含系统核心安全拦截防护插件文件包');
+  const [progStriped, setProgStriped] = useState<boolean>(true);
+  const [progAnimated, setProgAnimated] = useState<boolean>(true);
+
+  // 15. Loading Demo states
+  const [loadSpinning, setLoadSpinning] = useState<boolean>(true);
+  const [loadType, setLoadType] = useState<'spinner' | 'dots' | 'pulse' | 'bar' | 'skeleton'>('spinner');
+  const [loadSize, setLoadSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
+  const [loadColor, setLoadColor] = useState<'default' | 'brand' | 'success' | 'warning' | 'error' | 'white'>('default');
+  const [loadTip, setLoadTip] = useState<string>('正在安全对接到多云冷备计算宿主机 (Syncing Node Instance...)');
+  const [loadTipPosition, setLoadTipPosition] = useState<'bottom' | 'right'>('bottom');
+  const [loadBackdrop, setLoadBackdrop] = useState<boolean>(true);
+  const [loadUseWrapper, setLoadUseWrapper] = useState<boolean>(false);
+
+  // 16. Alert Demo states
+  const [alertType, setAlertType] = useState<'info' | 'success' | 'warning' | 'error'>('info');
+  const [alertMessage, setAlertMessage] = useState<string>('【系统维护通告】核心物理集群将于本日 23:00 进行例行冷备数据容灾切换！');
+  const [alertShowDescription, setAlertShowDescription] = useState<boolean>(false);
+  const [alertDescription, setAlertDescription] = useState<string>('此项操作不会干扰当前正处于微服务器高能运行状态下的应用容器。为确保安全，防范程序将会通过光纤内网向备份调度机发送心跳广播包进行保活。');
+  const [alertClosable, setAlertClosable] = useState<boolean>(true);
+  const [alertShowIcon, setAlertShowIcon] = useState<boolean>(true);
+  const [alertShowAction, setAlertShowAction] = useState<boolean>(true);
+  const [alertIsVisibleTest, setAlertIsVisibleTest] = useState<boolean>(true);
+
+  // 17. Toast Demo states
+  const [toastType, setToastType] = useState<'info' | 'success' | 'warning' | 'error' | 'loading'>('success');
+  const [toastMessage, setToastMessage] = useState<string>('多物理对等网关同步配置成功 (Node parity success)');
+  const [toastShowDescription, setToastShowDescription] = useState<boolean>(false);
+  const [toastDescription, setToastDescription] = useState<string>('内网光纤协议数据一致性测试：通过率 100%，响应延迟 ~1.2ms');
+  const [toastDuration, setToastDuration] = useState<number>(3000);
+  const [toastClosable, setToastClosable] = useState<boolean>(true);
+  const [toastPosition, setToastPosition] = useState<'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'>('top-center');
+  const toast = useToast();
+
+  // 18. Tag Demo states
+  const [tagType, setTagType] = useState<'default' | 'primary' | 'success' | 'warning' | 'error'>('primary');
+  const [tagVariant, setTagVariant] = useState<'solid' | 'soft' | 'outline' | 'dot'>('soft');
+  const [tagSize, setTagSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [tagClosable, setTagClosable] = useState<boolean>(false);
+  const [tagContent, setTagContent] = useState<string>('Active Proxy');
+  const [tagShowIcon, setTagShowIcon] = useState<boolean>(false);
+  const [tagIsVisibleTest, setTagIsVisibleTest] = useState<boolean>(true);
+
+  // 13. Card Demo states
+  const [cardVariant, setCardVariant] = useState<'standard-outline' | 'subtle-flat' | 'isometric-elevated'>('standard-outline');
+  const [cardHoverable, setCardHoverable] = useState<boolean>(true);
+  const [cardPadding, setCardPadding] = useState<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'>('md');
+  const [cardRadius, setCardRadius] = useState<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'>('lg');
+  const [cardGlow, setCardGlow] = useState<boolean>(false);
+  const [cardTitleText, setCardTitleText] = useState<string>('弹性容器智能物理节点 (Dynamic Micro Node 408)');
+  const [cardDescText, setCardDescText] = useState<string>('隶属于核心数据分析集群，自动分配内存并动态按需扩容');
+  const [cardHasHeaderBorder, setCardHasHeaderBorder] = useState<boolean>(false);
+  const [cardHasFooterBorder, setCardHasFooterBorder] = useState<boolean>(false);
+  const [cardFooterAlign, setCardFooterAlign] = useState<'left' | 'center' | 'right' | 'between'>('right');
+  const [cardClickedLog, setCardClickedLog] = useState<string>('暂无（点击上方卡片内按钮触发交互日志）');
+  const [cardWidth, setCardWidth] = useState<'narrow' | 'standard' | 'wide' | 'full'>('standard');
+  const [cardShowButtons, setCardShowButtons] = useState<boolean>(true);
+  const [cardIconName, setCardIconName] = useState<'Activity' | 'Zap' | 'Terminal' | 'Star' | 'None'>('Activity');
 
   // Toggle multiple sub options helper
   const handleToggleMultiple = (checked: boolean) => {
@@ -222,6 +361,95 @@ export const ShowcasePanel: React.FC = () => {
       setStepsShowDesc(true);
       setStepsHasIcons(true);
       setStepsHasError(false);
+    } else if (activeTab === 'tabs') {
+      setTabsActiveId('dashboard');
+      setTabsVariant('line');
+      setTabsSize('md');
+      setTabsDirection('horizontal');
+      setTabsFullWidth(false);
+      setTabsWithIcon(true);
+      setTabsWithBadge(true);
+      setTabsWithDisabled(true);
+    } else if (activeTab === 'datepicker') {
+      setDpSize('md');
+      setDpLabel('计划调度启动时间 (Schedule Launch Date)');
+      setDpPlaceholder('请点选未来启动时间...');
+      setDpDesc('通过 K8s 控制中转调度，提前预置节点镜像');
+      setDpError('');
+      setDpDisabled(false);
+      setDpValue('2026-06-01');
+    } else if (activeTab === 'slider') {
+      setSliderValue(35);
+      setSliderMin(0);
+      setSliderMax(100);
+      setSliderStep(5);
+      setSliderSize('md');
+      setSliderLabel('系统并发压力核心调控参数 (Load Quota Percent)');
+      setSliderDesc('实时分配节点可并发支撑的服务最大连接百分比例额度等级');
+      setSliderError('');
+      setSliderDisabled(false);
+      setSliderShowInput(true);
+      setSliderShowTooltip(true);
+      setSliderShowMarks(true);
+    } else if (activeTab === 'card') {
+      setCardVariant('standard-outline');
+      setCardHoverable(true);
+      setCardPadding('md');
+      setCardRadius('lg');
+      setCardGlow(false);
+      setCardTitleText('弹性容器智能物理节点 (Dynamic Micro Node 408)');
+      setCardDescText('隶属于核心数据分析集群，自动分配内存并动态按需扩容');
+      setCardHasHeaderBorder(false);
+      setCardHasFooterBorder(false);
+      setCardFooterAlign('right');
+      setCardWidth('standard');
+      setCardShowButtons(true);
+      setCardIconName('Activity');
+    } else if (activeTab === 'progress') {
+      setProgValue(65);
+      setProgMax(100);
+      setProgSize('md');
+      setProgStatus('active');
+      setProgShowInfo(true);
+      setProgInfoPosition('right');
+      setProgLabel('当前集群物理镜像拉取进度 (Docker Pull Progress)');
+      setProgDesc('系统正在通过 Nexus 物理内网千兆网口加速抓取镜像，拉取任务包含系统核心安全拦截防护插件文件包');
+      setProgStriped(true);
+      setProgAnimated(true);
+    } else if (activeTab === 'loading') {
+      setLoadSpinning(true);
+      setLoadType('spinner');
+      setLoadSize('md');
+      setLoadColor('default');
+      setLoadTip('正在安全对接到多云冷备计算宿主机 (Syncing Node Instance...)');
+      setLoadTipPosition('bottom');
+      setLoadBackdrop(true);
+      setLoadUseWrapper(false);
+    } else if (activeTab === 'alert') {
+      setAlertType('info');
+      setAlertMessage('【系统维护通告】核心物理集群将于本日 23:00 进行例行冷备数据容灾切换！');
+      setAlertShowDescription(false);
+      setAlertDescription('此项操作不会干扰当前正处于微服务器高能运行状态下的应用容器。为确保安全，防范程序将会通过光纤内网向备份调度机发送心跳广播包进行保活。');
+      setAlertClosable(true);
+      setAlertShowIcon(true);
+      setAlertShowAction(true);
+      setAlertIsVisibleTest(true);
+    } else if (activeTab === 'toast') {
+      setToastType('success');
+      setToastMessage('多物理对等网关同步配置成功 (Node parity success)');
+      setToastShowDescription(false);
+      setToastDescription('内网光纤协议数据一致性测试：通过率 100%，响应延迟 ~1.2ms');
+      setToastDuration(3000);
+      setToastClosable(true);
+      setToastPosition('top-center');
+    } else if (activeTab === 'tag') {
+      setTagType('primary');
+      setTagVariant('soft');
+      setTagSize('md');
+      setTagClosable(false);
+      setTagContent('Active Proxy');
+      setTagShowIcon(false);
+      setTagIsVisibleTest(true);
     }
   };
 
@@ -235,6 +463,24 @@ export const ShowcasePanel: React.FC = () => {
       propConfigStr = `size: "${dropSize}", search: ${dropSearch}, multiple: ${dropMultiple}, disabled: ${dropDisabled}, error: "${dropError}"`;
     } else if (activeTab === 'steps') {
       propConfigStr = `current: ${stepsCurrent}, direction: "${stepsDirection}", size: "${stepsSize}", clickable: ${stepsClickable}`;
+    } else if (activeTab === 'tabs') {
+      propConfigStr = `activeId: "${tabsActiveId}", variant: "${tabsVariant}", size: "${tabsSize}", direction: "${tabsDirection}", fullWidth: ${tabsFullWidth}`;
+    } else if (activeTab === 'datepicker') {
+      propConfigStr = `size: "${dpSize}", label: "${dpLabel}", placeholder: "${dpPlaceholder}", disabled: ${dpDisabled}, error: "${dpError}"`;
+    } else if (activeTab === 'slider') {
+      propConfigStr = `min: ${sliderMin}, max: ${sliderMax}, step: ${sliderStep}, size: "${sliderSize}", label: "${sliderLabel}", disabled: ${sliderDisabled}, error: "${sliderError}", showInput: ${sliderShowInput}, showTooltip: ${sliderShowTooltip}, showMarks: ${sliderShowMarks}`;
+    } else if (activeTab === 'card') {
+      propConfigStr = `variant: "${cardVariant}", hoverable: ${cardHoverable}, padding: "${cardPadding}", radius: "${cardRadius}", glow: ${cardGlow}, footerAlign: "${cardFooterAlign}", width: "${cardWidth}", showFooter: ${cardShowButtons}, icon: "${cardIconName}"`;
+    } else if (activeTab === 'progress') {
+      propConfigStr = `value: ${progValue}, max: ${progMax}, size: "${progSize}", status: "${progStatus}", showInfo: ${progShowInfo}, infoPosition: "${progInfoPosition}", label: "${progLabel}", striped: ${progStriped}, animated: ${progAnimated}`;
+    } else if (activeTab === 'loading') {
+      propConfigStr = `spinning: ${loadSpinning}, type: "${loadType}", size: "${loadSize}", color: "${loadColor}", tip: "${loadTip}", tipPosition: "${loadTipPosition}", backdrop: ${loadBackdrop}`;
+    } else if (activeTab === 'alert') {
+      propConfigStr = `type: "${alertType}", message: "${alertMessage}", description: "${alertShowDescription ? alertDescription : undefined}", closable: ${alertClosable}, showIcon: ${alertShowIcon}, action: ${alertShowAction ? 'ReactNode' : 'undefined'}`;
+    } else if (activeTab === 'toast') {
+      propConfigStr = `type: "${toastType}", message: "${toastMessage}", description: "${toastShowDescription ? toastDescription : undefined}", duration: ${toastDuration}, closable: ${toastClosable}, position: "${toastPosition}"`;
+    } else if (activeTab === 'tag') {
+      propConfigStr = `type: "${tagType}", variant: "${tagVariant}", size: "${tagSize}", closable: ${tagClosable}, icon: ${tagShowIcon}`;
     } else {
       propConfigStr = `id: "${activeTab}", preset: "${activePreset}"`;
     }
@@ -281,6 +527,42 @@ export const ShowcasePanel: React.FC = () => {
       steps: {
         title: 'Steps 步骤条 (Stepper)',
         desc: '引导用户按照既定流程安全推进的进度步骤条。完美支持横向流程网格或竖向垂直技术细节流程的双向无损切换。',
+      },
+      tabs: {
+        title: 'Tabs 选项卡 (Tabs Controller)',
+        desc: '支持 LayoutId 物理防抖和滑动聚焦的高保能选项卡切换控制器。全面集成 line 下划线、pill 胶囊和 card 卡槽三种精美变体，PC 后台仪表盘首选。',
+      },
+      datepicker: {
+        title: 'DatePicker 日期选择器',
+        desc: '高自适应毛玻璃风格的日期与日历管理组件。无臃肿三方依赖，完美继承设计系统圆角、色彩、阴影，并可自定义大小规格与范围校验约束。',
+      },
+      slider: {
+        title: 'Slider 高自变双向联控滑块',
+        desc: '支持阻尼拖曳与精密触摸值的智能滑块原语。內建微型高显 tooltip 数值气泡、双向受控数字微调框，并全量继承设计系统颜色、聚焦阴影和圆角令牌。',
+      },
+      card: {
+        title: 'Card 架构原子卡片容器',
+        desc: '支撑深度设计令牌感应的内容面板盒子。遵循“少用硬边缘线，多用精致底色色差”的国际设计规则，支持无缝 hover 微弹物理位移、呼吸光圈悬停与气象状态底板。',
+      },
+      progress: {
+        title: 'Progress 智能自适应进度条',
+        desc: '高自适应、感应设计令牌的数字进度条。完美支持品牌色、状态色及跑马灯活动态（Active），并內建斑马斜纹、高对比百分比方位，可随父级节点尺寸进行精准的宽度尺寸自适应。',
+      },
+      loading: {
+        title: 'Loading 智能状态加载器',
+        desc: '极其流畅的高保真加载呈现原语。完美契合五大经典反馈动画（旋转圆轮、多点波浪、双重脉冲涟漪、顶部流光、智能卡片骨架屏），兼容 standalone 独立渲染与容器包裹双重形态。',
+      },
+      alert: {
+        title: 'Alert 固定信息警告条',
+        desc: '深度融合状态意识的行内信息反馈横幅。支持四种标准严肃的物理安全色彩表达，搭配高对比状态图标与行内极简操作块，可灵活运用于高密度工作区或弹窗通告。',
+      },
+      toast: {
+        title: 'Toast 浮动轻提示',
+        desc: '高悬浮轻质毛玻璃弹出浮盒。支持经典的 Spring 簧力阻尼动画物理弹出，支持倒计时非侵入自销毁、多层安全顺滑堆叠及防连击限制，极具呼吸律动。',
+      },
+      tag: {
+        title: 'Tag 高保真微元标贴',
+        desc: '极简且具有高信息密度的块状行级标识。支持灵活的色彩变体、轮廓描边与圆点点缀（dot），甚至允许内嵌动态交互的快速消除操控区，常用于分类、标记和高密度的标签库展示。',
       },
     };
     return data[activeTab] || { title: 'Atom Component', desc: 'React high fidelity sandbox element.' };
@@ -449,7 +731,7 @@ export default function DataPages() {
 
 export default function StepsProgress() {
   const items = [
-    { title: '身分信息认证', description: '完成 OCR 及二要素验证' },
+    { title: '身份信息认证', description: '完成 OCR 及二要素验证' },
     { title: '连接清算银行', description: '授权银行结算代扣绑定' }
   ];
 
@@ -463,6 +745,209 @@ export default function StepsProgress() {
     />
   );
 }`;
+        case 'tabs':
+          return `import { Tabs } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function MyTabsControl() {
+  const [active, setActive] = useState('${tabsActiveId}');
+  const items = [
+    { id: 'dashboard', label: '控制大盘', icon: 'compass', badge: 12 },
+    { id: 'security', label: '系统安全', icon: 'shield' },
+    { id: 'settings', label: '全局配置', icon: 'settings', disabled: ${tabsWithDisabled} }
+  ];
+
+  return (
+    <Tabs
+      activeId={active}
+      items={items}
+      onChange={setActive}
+      variant="${tabsVariant}"
+      size="${tabsSize}"
+      direction="${tabsDirection}"
+      fullWidth={${tabsFullWidth}}
+    />
+  );
+}`;
+        case 'datepicker':
+          return `import { DatePicker } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function DateSelector() {
+  const [date, setDate] = useState<Date | string | null>('2026-06-01');
+
+  return (
+    <DatePicker
+      label="${dpLabel}"
+      description="${dpDesc}"
+      placeholder="${dpPlaceholder}"
+      size="${dpSize}"
+      value={date}
+      onChange={(selectedDate, dateStr) => setDate(dateStr)}${dpDisabled ? '\n      disabled' : ''}${dpError ? `\n      error="${dpError}"` : ''}
+    />
+  );
+}`;
+        case 'slider':
+          return `import { Slider } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function IntensitySelector() {
+  const [intensity, setIntensity] = useState<number>(${sliderValue});
+
+  return (
+    <Slider
+      label="${sliderLabel}"
+      description="${sliderDesc}"
+      min={${sliderMin}}
+      max={${sliderMax}}
+      step={${sliderStep}}
+      size="${sliderSize}"
+      value={intensity}
+      onChange={setIntensity}${sliderShowInput ? '\n      showInput' : ''}${sliderShowTooltip ? '\n      showTooltip' : ''}${sliderShowMarks ? '\n      showMarks' : ''}${sliderDisabled ? '\n      disabled' : ''}${sliderError ? `\n      error="${sliderError}"` : ''}
+    />
+  );
+}`;
+        case 'card':
+          const iconImport = cardIconName !== 'None' ? `import { ${cardIconName} } from 'lucide-react';\n` : '';
+          const iconJSX = cardIconName !== 'None' ? `\n          <${cardIconName} className="w-5 h-5 text-indigo-500 shrink-0" />` : '';
+          const footerJSX = cardShowButtons ? `\n      <CardFooter align="${cardFooterAlign}"\${cardHasFooterBorder ? ' bordered' : ''}>
+        <Button variant="outline" size="sm">下线节点</Button>
+        <Button variant="primary" size="sm">性能调阅</Button>
+      </CardFooter>` : '';
+          const wrapperStyleForCode = cardWidth !== 'full' ? `\n// 父级容器分配的物理尺寸: ${cardWidth === 'narrow' ? '290px' : cardWidth === 'standard' ? '390px' : '512px'}` : '';
+
+          return `import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Button } from 'atomix-ui';
+${iconImport}
+export default function NodeCard() {${wrapperStyleForCode}
+  return (
+    <Card
+      variant="${cardVariant}"\${cardHoverable ? '\\n      hoverable' : ''}
+      padding="${cardPadding}"
+      radius="${cardRadius}"\${cardGlow ? '\\n      glow' : ''}
+    >
+      <CardHeader\${cardHasHeaderBorder ? ' bordered' : ''}>
+        <div className="flex items-center justify-between gap-4">
+          <CardTitle size="lg">${cardTitleText}</CardTitle>${iconJSX}
+        </div>
+        <CardDescription>${cardDescText}</CardDescription>
+      </CardHeader>
+      
+      <CardContent>
+        <div className="py-2 text-sm text-slate-600">
+          节点状态正常，容器平均水位保持在 24% 的经典轻量态。
+        </div>
+      </CardContent>${footerJSX}
+    </Card>
+  );
+}`;
+        case 'progress':
+          return `import { Progress } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function LoadingProgress() {
+  const [val, setVal] = useState(${progValue});
+
+  return (
+    <Progress
+      value={val}
+      max={${progMax}}
+      size="${progSize}"
+      status="${progStatus}"${progShowInfo ? '\n      showInfo' : '\n      showInfo={false}'}
+      infoPosition="${progInfoPosition}"${progLabel ? `\n      label="${progLabel}"` : ''}${progDesc ? `\n      description="${progDesc}"` : ''}${progStriped ? '\n      striped' : ''}${progAnimated ? '\n      animated' : ''}
+    />
+  );
+}`;
+        case 'loading':
+          if (loadUseWrapper) {
+            return `import { Loading, Card, CardContent, Button } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function DelayedWrapper() {
+  const [loading, setLoading] = useState(${loadSpinning});
+
+  return (
+    <div className="w-full max-w-sm">
+      <Button size="sm" onClick={() => setLoading(!loading)} className="mb-4">
+        切换重载状态 (Toggle Loading)
+      </Button>
+
+      <Loading
+        spinning={loading}
+        type="${loadType}"
+        size="${loadSize}"
+        color="${loadColor}"${loadTip ? `\n        tip="${loadTip}"` : ''}
+        tipPosition="${loadTipPosition}"${loadBackdrop ? '\n        backdrop' : ''}
+      >
+        <Card variant="standard-outline" padding="md">
+          <CardContent>
+            <h4 className="font-bold text-sm text-slate-800">宿主机物理插口规格卡片</h4>
+            <p className="text-xs text-slate-500 mt-1">此内容块被智能 Loading 遮罩层进行非侵入式包裹防触控。</p>
+          </CardContent>
+        </Card>
+      </Loading>
+    </div>
+  );
+}`;
+          }
+          return `import { Loading } from 'atomix-ui';
+
+export default function LoadingIndicator() {
+  return (
+    <Loading
+      spinning={${loadSpinning}}
+      type="${loadType}"
+      size="${loadSize}"
+      color="${loadColor}"${loadTip ? `\n      tip="${loadTip}"` : ''}
+      tipPosition="${loadTipPosition}"
+    />
+  );
+}`;
+        case 'alert':
+          return `import { Alert } from 'atomix-ui';
+
+export default function AlertBannerDemo() {
+  return (
+    <Alert
+      type="${alertType}"
+      message="${alertMessage}"${alertShowDescription ? `\n      description="${alertDescription}"` : ''}
+      closable={${alertClosable}}
+      showIcon={${alertShowIcon}}${alertShowAction ? `\n      action={<button className="text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors">不再提示</button>}` : ''}
+    />
+  );
+}`;
+        case 'toast':
+          return `import { Button, useToast } from 'atomix-ui';
+
+export default function ToastTriggerDemo() {
+  const toast = useToast();
+
+  const handleLaunch = () => {
+    toast.${toastType}("${toastMessage}", {
+${toastShowDescription ? `      description: "${toastDescription}",\n` : ''}      duration: ${toastDuration},
+      closable: ${toastClosable}
+    });
+  };
+
+  return (
+    <Button variant="primary" onClick={handleLaunch}>
+      发射 ${toastType.toUpperCase()} 轻型浮窗
+    </Button>
+  );
+}`;
+        case 'tag':
+          return `import { Tag } from 'atomix-ui';${tagShowIcon ? `\nimport { CheckCircle2 } from 'lucide-react';` : ''}
+
+export default function TagDemo() {
+  return (
+    <Tag
+      type="${tagType}"
+      variant="${tagVariant}"
+      size="${tagSize}"${tagClosable ? `\n      closable={true}\n      onClose={() => console.log('Tag closed')}` : ''}${tagShowIcon ? `\n      icon={<CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2.5} />}` : ''}
+    >
+      ${tagContent}
+    </Tag>
+  );
+}`;
         default:
           return ``;
       }
@@ -471,7 +956,7 @@ export default function StepsProgress() {
 <template>
   <a-components-sandbox>
     <a-${activeTab} 
-      :preset="activePreset"${activeTab === 'button' ? `\n      variant="${btnVariant}"\n      size="${btnSize}"\n      :loading="${btnLoading}"\n      :disabled="${btnDisabled}"` : ''}${activeTab === 'input' ? `\n      label="${inputLabel}"\n      placeholder="${inputPlaceholder}"\n      :disabled="${inputDisabled}"\n      :error="${inputError}"` : ''}${activeTab === 'steps' ? `\n      :current="${stepsCurrent}"\n      direction="${stepsDirection}"\n      size="${stepsSize}"` : ''}
+      :preset="activePreset"${activeTab === 'button' ? `\n      variant="${btnVariant}"\n      size="${btnSize}"\n      :loading="${btnLoading}"\n      :disabled="${btnDisabled}"` : ''}${activeTab === 'input' ? `\n      label="${inputLabel}"\n      placeholder="${inputPlaceholder}"\n      :disabled="${inputDisabled}"\n      :error="${inputError}"` : ''}${activeTab === 'steps' ? `\n      :current="${stepsCurrent}"\n      direction="${stepsDirection}"\n      size="${stepsSize}"` : ''}${activeTab === 'progress' ? `\n      :value="${progValue}"\n      :max="${progMax}"\n      status="${progStatus}"\n      size="${progSize}"\n      :striped="${progStriped}"\n      :animated="${progAnimated}"` : ''}${activeTab === 'loading' ? `\n      :spinning="${loadSpinning}"\n      type="${loadType}"\n      size="${loadSize}"\n      color="${loadColor}"\n      tip="${loadTip}"\n      tip-position="${loadTipPosition}"\n      :backdrop="${loadBackdrop}"` : ''}${activeTab === 'alert' ? `\n      type="${alertType}"\n      message="${alertMessage}"${alertShowDescription ? `\n      description="${alertDescription}"` : ''}\n      :closable="${alertClosable}"\n      :show-icon="${alertShowIcon}"` : ''}${activeTab === 'toast' ? `\n      type="${toastType}"\n      message="${toastMessage}"${toastShowDescription ? `\n      description="${toastDescription}"` : ''}\n      :duration="${toastDuration}"\n      :closable="${toastClosable}"` : ''}${activeTab === 'tag' ? `\n      type="${tagType}"\n      variant="${tagVariant}"\n      size="${tagSize}"\n      :closable="${tagClosable}"` : ''}
     />
   </a-components-sandbox>
 </template>
@@ -554,6 +1039,85 @@ export class AtomixDemoComponent {
           { name: 'items', type: 'Array<{title, description, icon}>', default: '[]', desc: '步骤数组集合，包含基础各层次标题，及多模态矢量图标键' },
           { name: 'direction', type: "'horizontal' | 'vertical'", default: "'horizontal'", desc: '排布朝向，经典左右平铺 vs 详情垂直展开，完全支持响应式' },
           { name: 'clickable', type: 'boolean', default: 'true', desc: '是否允许点击非当前节点来进行快捷跳转推进' },
+        ];
+      case 'datepicker':
+        return [
+          { name: 'value', type: "'Date' | 'string' | 'null'", default: 'null', desc: '选定日期。支持标准 Date 实体、标准的 YYYY-MM-DD 字符，或者为 null 清除值' },
+          { name: 'onChange', type: '(date, dateString) => void', default: 'undefined', desc: '选值变化回调，同时带回 Date 实例与 YYYY-MM-DD 格式的字符串' },
+          { name: 'placeholder', type: 'string', default: "'请选择日期...'", desc: '值未选定时的提示灰字' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '尺寸规格高度。小：34px（高密度），中：42px，高：50px' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: '一键将输入区和内置动作全部置灰哑状态，鼠标光标变禁入' },
+          { name: 'error', type: 'string', default: "''", desc: '如果不为空，日历控件外轮廓整体泛起红色警戒警告，光圈锁定为防守型微红色阴影' },
+        ];
+      case 'slider':
+        return [
+          { name: 'value', type: 'number', default: '0', desc: '当前处于激活状态的滑块数值' },
+          { name: 'onChange', type: '(value: number) => void', default: 'undefined', desc: '数值漂移改变的回调触发函数' },
+          { name: 'min', type: 'number', default: '0', desc: '物理最小取值约束边界' },
+          { name: 'max', type: 'number', default: '100', desc: '物理最大取值约束边界' },
+          { name: 'step', type: 'number', default: '1', desc: '滑动阶段允许的推进最小步幅像素节点' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '滑片高度以及拖动触点的包容盒尺寸体系规格' },
+          { name: 'showInput', type: 'boolean', default: 'false', desc: '是否在右侧渲染一个双向受控联接的精密数字刻度微调框' },
+          { name: 'showTooltip', type: 'boolean', default: 'false', desc: '是否在拖曳滑片时，在滑块上方呼出带物理淡入动画的微气泡展示实时数值' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: '是否挂起所有滑动画片交互并将外轮廓灰化置哑' },
+          { name: 'error', type: 'string', default: "''", desc: '激活错误提示。传入信息后，滑片填充和微调输入框边线会以红色硬核警示色高光聚焦显现，同时展现底置报错信噪文案' },
+        ];
+      case 'card':
+        return [
+          { name: 'variant', type: "'standard-outline' | 'subtle-flat' | 'isometric-elevated'", default: "'standard-outline'", desc: '卡片的视觉外观风格：标准浅浅细框线、微秒扁平高低色差、或者有立体物理阴影的高级卡块' },
+          { name: 'hoverable', type: 'boolean', default: 'true', desc: '开启后卡片悬停时会有微妙上浮的微交互物理缓冲动画反馈' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", desc: '卡片内部填充的尺寸规格。无、特小、小、中、大、特大，适配内容密度需求' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'lg'", desc: '卡片的圆角裁剪大小梯度' },
+          { name: 'glow', type: 'boolean', default: 'false', desc: '在悬停卡片时，是否有品牌外发光的流光粒子效果包裹' },
+        ];
+      case 'progress':
+        return [
+          { name: 'value', type: 'number', default: '0', desc: '当前处于激活状态的实时进度数值（百分比分子）' },
+          { name: 'max', type: 'number', default: '100', desc: '满载参考上限边界值（百分比分母字段，默认为 100）' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '进度条的粗细厚度尺寸规格体系' },
+          { name: 'status', type: "'default' | 'success' | 'warning' | 'exception' | 'active'", default: "'default'", desc: '进度条运行时的状态变体：包含默认品牌蓝、健康绿、警告黄、故障红或有跑马灯跑动流转的超级活动态' },
+          { name: 'showInfo', type: 'boolean', default: 'true', desc: '是否渲染百分比进度提示指标文本' },
+          { name: 'infoPosition', type: "'right' | 'top' | 'inside'", default: "'right'", desc: '百分比计数器以及说明方位。右侧对齐、顶部独立行或大规格（lg）下的居中内嵌状态' },
+          { name: 'label', type: 'string', default: "''", desc: '进度顶置文字标题，提供高自适应可访问指标' },
+          { name: 'striped', type: 'boolean', default: 'false', desc: '是否给进度填充面施加经典的斑马斜纹条纹图案' },
+          { name: 'animated', type: 'boolean', default: 'false', desc: '斜纹是否向右以常驻滑行流畅滚动方式循环演绎，表现节点进行中物理高能运作' },
+        ];
+      case 'loading':
+        return [
+          { name: 'spinning', type: 'boolean', default: 'true', desc: '是否正处于加载运转中。如果传入子节点 (children)，将作为优雅的数据遮罩层包裹内容运作' },
+          { name: 'type', type: "'spinner' | 'dots' | 'pulse' | 'bar' | 'skeleton'", default: "'spinner'", desc: '加载器动画形态变体体系（圆轮旋转、波浪三点、漣漪呼吸、顶部无限进度、占位骨架屏）' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl'", default: "'md'", desc: '加载模块物理解析大小（影响转圈直径、三点粗细、骨架厚度）' },
+          { name: 'color', type: "'default' | 'brand' | 'success' | 'warning' | 'error' | 'white'", default: "'default'", desc: '加载器主色调方案。支持自适应匹配主设计系统色调、各大状态警告色及透亮纯白' },
+          { name: 'tip', type: 'string', default: "''", desc: '伴随加载过渡组件呈现的精练解释或状态回溯文字' },
+          { name: 'tipPosition', type: "'bottom' | 'right'", default: "'bottom'", desc: '提示文字位于加载体底置还是右侧（右侧排列时将转为行布局排布，适合小规格 sm）' },
+          { name: 'backdrop', type: 'boolean', default: 'false', desc: '在组件有 children (包裹模式) 加载时，是否开启毛玻璃轻质磨砂阻断悬浮层' },
+        ];
+      case 'alert':
+        return [
+          { name: 'type', type: "'info' | 'success' | 'warning' | 'error'", default: "'info'", desc: '警告条的主题语义背景配色分级体系（展示、成功、警惕、高危阻断）' },
+          { name: 'message', type: 'string', default: "''", desc: '极其精巧、高度可访问的单句通栏或卡内关键说明标题（必填）' },
+          { name: 'description', type: 'string', default: "''", desc: '补充、详尽且安全的第二能级具体解释说明子段段落（选填）' },
+          { name: 'closable', type: 'boolean', default: 'false', desc: '是否在最右端提供一个可一键交互消除并且自动触发滑梯式折叠删除动画的叉号' },
+          { name: 'onClose', type: '() => void', default: 'undefined', desc: '点击手动关闭时的优雅行为挂钩或是回溯通知' },
+          { name: 'showIcon', type: 'boolean', default: 'true', desc: '是否在最左端按比例对称渲染能代表级安全状态的大图标' },
+          { name: 'action', type: 'React.ReactNode', default: 'undefined', desc: '可在右端自定义扩展安插的微交互操作插槽（例如“不再提示”等文字按钮）' },
+        ];
+      case 'toast':
+        return [
+          { name: 'message', type: 'string', default: "''", desc: '浮窗的核心单行文案提示，支持标准精细化防折行（必填）' },
+          { name: 'type', type: "'info' | 'success' | 'warning' | 'error' | 'loading'", default: "'info'", desc: '发射反馈类型（常规通知、全绿成功、金黄提防、猩红警告或带不间断旋转圆弧的进程常挂态）' },
+          { name: 'description', type: 'string', default: "''", desc: '伴随主标题生成的附加状态详情细节文本（选填）' },
+          { name: 'duration', type: 'number', default: '3000', desc: '在物理界面中平滑维系的可显时长（毫秒）。设为 0 时，除非由叉号或逻辑强制捏碎，否则该浮片保持永续常驻不闭合' },
+          { name: 'closable', type: 'boolean', default: 'true', desc: '是否允许在右边缘渲染可手动提前捏裂和隐藏该提示的微叉号' },
+        ];
+      case 'tag':
+        return [
+          { name: 'children', type: 'React.ReactNode', default: 'null', desc: '标签正文主体' },
+          { name: 'type', type: "'default' | 'primary' | 'success' | 'warning' | 'error'", default: "'default'", desc: '色彩类型，自适应语义色彩体系' },
+          { name: 'variant', type: "'solid' | 'soft' | 'outline' | 'dot'", default: "'soft'", desc: '变体，控制背景轻重、外框有无，以及前置实心状态点的开关' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: '标贴的三大级排版规格空间，自动调整内边距以及字型大小比例' },
+          { name: 'closable', type: 'boolean', default: 'false', desc: '是否具备一键删除的能力(尾部微叉号图标交互)' },
+          { name: 'icon', type: 'React.ReactNode', default: 'undefined', desc: '头部置放代表该标贴性质的状态性引导图标 (建议使用 Lucide 14px)' },
         ];
       default:
         return [
@@ -953,17 +1517,422 @@ export class AtomixDemoComponent {
                         />
                       </div>
                     )}
+
+                    {activeTab === 'tabs' && (
+                      <div className="w-full flex flex-col items-center justify-center gap-6">
+                        <Tabs
+                          activeId={tabsActiveId}
+                          items={[
+                            { id: 'dashboard', label: '控制大盘', icon: tabsWithIcon ? 'compass' : undefined, badge: tabsWithBadge ? 12 : undefined },
+                            { id: 'security', label: '系统安全', icon: tabsWithIcon ? 'shield' : undefined },
+                            { id: 'settings', label: '全局配置', icon: tabsWithIcon ? 'settings' : undefined, disabled: tabsWithDisabled }
+                          ]}
+                          onChange={(id) => setTabsActiveId(id)}
+                          variant={tabsVariant}
+                          size={tabsSize}
+                          direction={tabsDirection}
+                          fullWidth={tabsFullWidth}
+                        />
+                        {/* 动态关联对应的内容渲染 */}
+                        <div 
+                          className="w-full max-w-xl p-5 border rounded-2xl animate-fade-in transition-all text-xs"
+                          style={{
+                            backgroundColor: tokens.colors.bgCard,
+                            borderColor: tokens.colors.border
+                          }}
+                        >
+                          <h4 className="font-bold token-font-heading text-sm mb-2" style={{ color: tokens.colors.textPrimary }}>
+                            {tabsActiveId === 'dashboard' ? '📊 控制大盘运行时 (Dashboard View)' : 
+                             tabsActiveId === 'security'  ? '🔒 安全合规审定中心 (Security Audit)' : 
+                             '⚙️ 全局配置控制台 (Global Configs)'}
+                          </h4>
+                          <p style={{ color: tokens.colors.textSecondary }} className="leading-relaxed">
+                            {tabsActiveId === 'dashboard' ? '您正在查阅云集群基础控制大盘。此面板挂钩了 12 个生产容器实例生命周期的遥测数据，支持高频物理曲线自适应侦听。' : 
+                             tabsActiveId === 'security'  ? '系统正在为您拦截网络异常。目前 SSL 证书 and 数据通道契约 100% 保持闭环且安全系数达到五星评级，多重签名防御开启。' : 
+                             '此处为全局预设中心。在这里一键配置当前原子组件库的核心视觉效果或导入自定义 Design Tokens JSON。'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'datepicker' && (
+                      <div className="w-full flex justify-center animate-fade-in py-8">
+                        <div className="w-full max-w-sm">
+                          <DatePicker
+                            label={dpLabel}
+                            description={dpDesc}
+                            placeholder={dpPlaceholder}
+                            size={dpSize}
+                            disabled={dpDisabled}
+                            error={dpError}
+                            value={dpValue}
+                            onChange={(date, dateStr) => setDpValue(dateStr)}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'slider' && (
+                      <div className="w-full flex justify-center animate-fade-in py-8">
+                        <div className="w-full max-w-md px-4">
+                          <Slider
+                            label={sliderLabel}
+                            description={sliderDesc}
+                            min={sliderMin}
+                            max={sliderMax}
+                            step={sliderStep}
+                            size={sliderSize}
+                            disabled={sliderDisabled}
+                            error={sliderError}
+                            showInput={sliderShowInput}
+                            showTooltip={sliderShowTooltip}
+                            showMarks={sliderShowMarks}
+                            value={sliderValue}
+                            onChange={setSliderValue}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'card' && (
+                      <div className="w-full flex justify-center animate-fade-in py-6">
+                        <div 
+                          className="w-full px-4 transition-all duration-300"
+                          style={{
+                            maxWidth: 
+                              cardWidth === 'narrow' ? '290px' : 
+                              cardWidth === 'standard' ? '390px' : 
+                              cardWidth === 'wide' ? '512px' : '100%'
+                          }}
+                        >
+                          <Card
+                            variant={cardVariant}
+                            hoverable={cardHoverable}
+                            padding={cardPadding}
+                            radius={cardRadius}
+                            glow={cardGlow}
+                          >
+                            <CardHeader bordered={cardHasHeaderBorder}>
+                              <div className="flex items-center justify-between gap-4">
+                                <CardTitle size="lg">{cardTitleText}</CardTitle>
+                                {cardIconName === 'Activity' && <Activity className="w-5 h-5 shrink-0 animate-pulse" style={{ color: tokens.colors.brand }} />}
+                                {cardIconName === 'Zap' && <Zap className="w-5 h-5 shrink-0" style={{ color: tokens.colors.brand }} />}
+                                {cardIconName === 'Terminal' && <Terminal className="w-5 h-5 shrink-0 font-mono" style={{ color: tokens.colors.brand }} />}
+                                {cardIconName === 'Star' && <Star className="w-5 h-5 shrink-0" style={{ color: tokens.colors.brand }} />}
+                              </div>
+                              <CardDescription>{cardDescText}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="py-2 text-[13px] leading-relaxed" style={{ color: tokens.colors.textSecondary }}>
+                                节点状态运行极其正常，容器内平均吞吐量在 24% 的经典轻载姿势。
+                                本物理机已连续顺稳运行 4,000+ 个核小时无任何报错预警。
+                              </div>
+                            </CardContent>
+                            {cardShowButtons && (
+                              <CardFooter align={cardFooterAlign} bordered={cardHasFooterBorder}>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCardClickedLog('已触发 [下线节点] 指令！平滑退役并调换调度流量。');
+                                  }}
+                                >
+                                  下线节点
+                                </Button>
+                                <Button 
+                                  variant="primary" 
+                                  size="sm" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCardClickedLog('已触发 [性能调阅]! CPU 24% ｜ RAM 18% ｜ DISK IOPS 极佳');
+                                  }}
+                                >
+                                  性能调阅
+                                </Button>
+                              </CardFooter>
+                            )}
+                          </Card>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'progress' && (
+                      <div className="w-full flex justify-center animate-fade-in py-8">
+                        <div className="w-full max-w-md px-4">
+                          <Progress
+                            label={progLabel}
+                            description={progDesc}
+                            value={progValue}
+                            max={progMax}
+                            size={progSize}
+                            status={progStatus}
+                            showInfo={progShowInfo}
+                            infoPosition={progInfoPosition}
+                            striped={progStriped}
+                            animated={progAnimated}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'loading' && (
+                      <div className="w-full flex flex-col items-center animate-fade-in py-6">
+                        <div className="w-full max-w-md px-4 flex flex-col items-center gap-5">
+                          {/* 简易开关，供用户测试 loading 触发/取消过程的动画渐变状态 */}
+                          <div className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-150/40 bg-slate-50/20 mb-1">
+                            <span className="text-xs font-semibold text-slate-500 font-mono">
+                              💡 交互测试: {loadSpinning ? '运行中 (SPINNING)' : '已就绪 (READY)'}
+                            </span>
+                            <Button
+                              variant={loadSpinning ? 'primary' : 'outline'}
+                              size="xs"
+                              onClick={() => setLoadSpinning(!loadSpinning)}
+                              className="font-bold shrink-0 text-[10px]"
+                            >
+                              {loadSpinning ? '停止加载 (Stop)' : '启动加载 (Start)'}
+                            </Button>
+                          </div>
+
+                          {!loadUseWrapper ? (
+                            /* 独立模式 Standalone */
+                            <div className="w-full py-8 flex items-center justify-center border border-dashed rounded-2xl border-slate-200/50 min-h-[160px] bg-white">
+                              <Loading
+                                spinning={loadSpinning}
+                                type={loadType}
+                                size={loadSize}
+                                color={loadColor}
+                                tip={loadTip}
+                                tipPosition={loadTipPosition}
+                                backdrop={loadBackdrop}
+                              />
+                            </div>
+                          ) : (
+                            /* 容器代理包裹模式 Wrapper */
+                            <div className="w-full">
+                              <Loading
+                                spinning={loadSpinning}
+                                type={loadType}
+                                size={loadSize}
+                                color={loadColor}
+                                tip={loadTip}
+                                tipPosition={loadTipPosition}
+                                backdrop={loadBackdrop}
+                              >
+                                <Card variant="standard-outline" padding="md" className="shadow-sm">
+                                  <CardHeader>
+                                    <div className="flex items-center gap-1.5">
+                                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                                      <CardTitle size="md">被高能加载层包裹的原子信息容器</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                      这里是宿主机物理冷备插口规格信息块，在异步拉取数据时，双重模式会自动阻止误触并覆盖遮罩。
+                                    </CardDescription>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="space-y-2 py-1 text-xs text-slate-500 font-mono">
+                                      <div className="flex justify-between">
+                                        <span>HOST CLUSTER</span>
+                                        <span className="font-bold text-slate-700">hk-cloud-node-091a</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span>BANDWIDTH</span>
+                                        <span className="font-bold text-slate-700">10 Gbps (Fiber)</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span>PING LATENCY</span>
+                                        <span className="font-bold text-emerald-600">~12.4ms (EXCELLENT)</span>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                  <CardFooter align="right" className="pt-2">
+                                    <Button variant="outline" size="xs">下发指令</Button>
+                                    <Button variant="primary" size="xs">同步参数</Button>
+                                  </CardFooter>
+                                </Card>
+                              </Loading>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'alert' && (
+                      <div className="w-full flex flex-col items-center animate-fade-in py-10">
+                        <div className="w-full max-w-xl px-4 space-y-6">
+                          {alertIsVisibleTest ? (
+                            <div className="space-y-4">
+                              <Alert
+                                type={alertType}
+                                message={alertMessage}
+                                description={alertShowDescription ? alertDescription : undefined}
+                                closable={alertClosable}
+                                showIcon={alertShowIcon}
+                                action={
+                                  alertShowAction ? (
+                                    <button
+                                      className="text-[11px] font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors ml-2"
+                                      onClick={() => {
+                                        toast.success('已设为不再提示');
+                                        setAlertIsVisibleTest(false);
+                                      }}
+                                    >
+                                      不再提示
+                                    </button>
+                                  ) : undefined
+                                }
+                                onClose={() => {
+                                  toast.info('检测到警告提示条已通过 onClose 发起移除');
+                                  setAlertIsVisibleTest(false);
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="py-10 border border-dashed border-slate-200 rounded-3xl bg-slate-50/50 flex flex-col items-center justify-center text-center p-6 space-y-3">
+                              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                <Info className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-bold text-slate-600">通知警告提示条已被手动销毁</h4>
+                                <p className="text-[10px] text-slate-400 mt-0.5">回调 onClose 已经捕获释放内存。您可以再次点击下方键位进行唤醒。</p>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                onClick={() => setAlertIsVisibleTest(true)}
+                                className="font-bold text-[10px]"
+                              >
+                                重新激活警告条 (Revive Alert)
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'toast' && (
+                      <div className="w-full flex flex-col items-center animate-fade-in py-12">
+                        <div className="w-full max-w-sm px-4 text-center space-y-6">
+                          <div className="p-6 border border-slate-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 rounded-3xl shadow-sm space-y-5">
+                            <div className="flex flex-col items-center space-y-1">
+                              <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 rounded-full font-mono font-bold text-[9px] tracking-wider uppercase">
+                                Feedback Sandbox
+                              </span>
+                              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-200">全局浮型轻提示控制器</h3>
+                              <p className="text-[10px] text-slate-400 leading-relaxed">
+                                配置左侧侧边栏参数后，在下方直接触发物理发射，享受高斯模糊层叠和渐进淡出等极致微交互。
+                              </p>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                // 动态根据 toastType 映射执行 toast 方法
+                                const options = {
+                                  description: toastShowDescription ? toastDescription : undefined,
+                                  duration: toastDuration,
+                                  closable: toastClosable,
+                                };
+
+                                switch (toastType) {
+                                  case 'success':
+                                    toast.success(toastMessage, options);
+                                    break;
+                                  case 'error':
+                                    toast.error(toastMessage, options);
+                                    break;
+                                  case 'warning':
+                                    toast.warning(toastMessage, options);
+                                    break;
+                                  case 'loading':
+                                    toast.loading(toastMessage, options);
+                                    break;
+                                  case 'info':
+                                  default:
+                                    toast.show(toastMessage, options);
+                                    break;
+                                }
+                              }}
+                              className="w-full relative py-3 px-5 rounded-2xl text-xs font-bold text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                              style={{
+                                backgroundColor: tokens.colors.brand,
+                              }}
+                            >
+                              <Sparkles className="w-4 h-4 animate-pulse" />
+                              <span>触发【{toastType.toUpperCase()}】广播轻提示</span>
+                            </button>
+
+                            {toastType === 'loading' && (
+                              <p className="text-[9px] text-amber-500 font-bold -mt-2">
+                                💡 提示：LOADING 类型为进程中状态，除非点击叉号或调用 closeAll，否则它不会计时自动隐退。
+                              </p>
+                            )}
+
+                            <div className="flex gap-2 justify-center pt-2">
+                              <Button
+                                size="xs"
+                                variant="outline"
+                                onClick={() => {
+                                  toast.closeAll();
+                                  toast.info('已清除全部活跃中的 Toast 栈数据');
+                                }}
+                                className="text-[10px] text-slate-500"
+                              >
+                                一键销毁全部 Toast
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'tag' && (
+                      <div className="w-full flex justify-center items-center py-20 animate-fade-in">
+                        {tagIsVisibleTest ? (
+                          <Tag
+                            type={tagType}
+                            variant={tagVariant}
+                            size={tagSize}
+                            closable={tagClosable}
+                            onClose={() => {
+                              toast.info('检测到标贴关闭动作已触发 onClose');
+                              setTagIsVisibleTest(false);
+                            }}
+                            icon={tagShowIcon ? <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2.5} /> : undefined}
+                          >
+                            {tagContent}
+                          </Tag>
+                        ) : (
+                          <div className="text-center animate-fade-in">
+                            <span className="text-[11px] text-slate-400 block mb-3 font-mono">
+                              // 标贴组件已被逻辑剥离
+                            </span>
+                            <Button variant="outline" size="sm" onClick={() => setTagIsVisibleTest(true)}>
+                              恢复实体与 DOM
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Micro interaction logging lines nested on preview block bottom */}
-                {['breadcrumb', 'pagination', 'steps'].includes(activeTab) && (
+                {['breadcrumb', 'pagination', 'steps', 'tabs', 'datepicker', 'slider', 'card', 'progress', 'loading', 'alert', 'toast', 'tag'].includes(activeTab) && (
                   <div className="px-6 py-2.5 bg-slate-50/30 border-t border-slate-150 flex items-center justify-between text-[11px]">
                     <span className="text-slate-400 font-bold font-mono">📡 Interaction Logger:</span>
                     <span className="text-indigo-600 font-bold">
                       {activeTab === 'breadcrumb' && breadClickedLog}
                       {activeTab === 'pagination' && `页码 Page ${pagCurrentPage} | 页长 ${pagPageSize} 条 | 共计 ${pagTotalPages} 页`}
                       {activeTab === 'steps' && `流程阶段 [${stepsCurrent + 1}/3] - 当前正在进行: ${stepsCurrent === 0 ? '一要素 OCR 验证身份' : (stepsCurrent === 1 ? (stepsHasError ? '网络清算 [金融异常拦截]' : '银行结算协议清算') : '核心安全防范测评完成')}`}
+                      {activeTab === 'tabs' && `活动选项卡 ID: "${tabsActiveId}" | 风格: ${tabsVariant} | 朝向: ${tabsDirection}`}
+                      {activeTab === 'datepicker' && `当前选定日期值: ${dpValue ? (dpValue instanceof Date ? dpValue.toLocaleDateString('zh-CN') : dpValue.toString()) : 'null'}`}
+                      {activeTab === 'slider' && `当前拖动滑块实时数值: ${sliderValue}`}
+                      {activeTab === 'card' && cardClickedLog}
+                      {activeTab === 'progress' && `当前进度条实时数值: ${progValue} / ${progMax} (${Math.round((progValue / Math.max(1, progMax)) * 100)}%) | 状态: ${progStatus} | 斑马斜纹: ${progStriped ? '已开启' : '已关闭'}`}
+                      {activeTab === 'loading' && `加载呈现状态: ${loadSpinning ? '运行中' : '静止/就绪'} | 类型变体: ${loadType} | 规格: ${loadSize} | 配色: ${loadColor} | 包裹应用: ${loadUseWrapper ? '已开启' : '关闭(独立)'}`}
+                      {activeTab === 'alert' && `警告条等级: ${alertType} | 状态大图标: ${alertShowIcon ? '开启' : '隐藏'} | 详细描述: ${alertShowDescription ? '开启' : '关闭'} | 是否可见: ${alertIsVisibleTest ? '常驻显示中' : '已手动 onClose 关闭'}`}
+                      {activeTab === 'toast' && `轻提示类型: ${toastType} | 时长: ${toastDuration}ms | 可手动消除: ${toastClosable ? '是' : '否'}`}
+                      {activeTab === 'tag' && `标贴等级: ${tagType} | 变体: ${tagVariant} | 尺寸: ${tagSize} | 可视状态: ${tagIsVisibleTest ? '常显活跃' : '已被交互移除'}`}
                     </span>
                   </div>
                 )}
@@ -1110,13 +2079,15 @@ export class AtomixDemoComponent {
         {/* Right configuration side panel */}
         <div
           id="parameter-config-sidebar"
-          className="lg:col-span-3 pb-8 flex flex-col gap-5 p-5 border rounded-2xl token-font-body token-lh-normal"
+          className="lg:col-span-3 lg:sticky lg:top-4 lg:h-[calc(100vh-112px)] flex flex-col p-5 border rounded-2xl token-font-body token-lh-normal overflow-hidden"
           style={{
             backgroundColor: tokens.colors.bgCard,
             borderColor: tokens.colors.border,
           }}
         >
-          <div className="space-y-5 animate-fade-in" style={{ color: tokens.colors.textSecondary }}>
+          {/* Scrollable parameters list container */}
+          <div className="flex-1 overflow-y-auto scrollbar-thin pr-1 flex flex-col gap-5">
+            <div className="space-y-5 animate-fade-in" style={{ color: tokens.colors.textSecondary }}>
             <div className="border-b pb-2 mb-3" style={{ borderColor: tokens.colors.border }}>
               <span className="text-sm token-font-heading token-weight-bold token-lh-tight block uppercase tracking-wider" style={{ color: tokens.colors.textPrimary }}>
                 基本属性 (Base props)
@@ -1175,23 +2146,17 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold" style={{ color: tokens.colors.textSecondary }}>禁用状态 (Disabled)</span>
-                      <input
-                        type="checkbox"
+                      <span className="font-semibold text-xs" style={{ color: tokens.colors.textSecondary }}>禁用状态 (Disabled)</span>
+                      <ToggleSwitch
                         checked={btnDisabled}
-                        onChange={(e) => setBtnDisabled(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setBtnDisabled}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold" style={{ color: tokens.colors.textSecondary }}>缓冲加载 (Is Loading)</span>
-                      <input
-                        type="checkbox"
+                      <span className="font-semibold text-xs" style={{ color: tokens.colors.textSecondary }}>缓冲加载 (Is Loading)</span>
+                      <ToggleSwitch
                         checked={btnLoading}
-                        onChange={(e) => setBtnLoading(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setBtnLoading}
                       />
                     </div>
                   </div>
@@ -1293,23 +2258,17 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>前置 Mail 图标</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>前置 Mail 图标</span>
+                      <ToggleSwitch
                         checked={inputIconLeft}
-                        onChange={(e) => setInputIconLeft(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setInputIconLeft}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>只读禁用状态</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>只读禁用状态</span>
+                      <ToggleSwitch
                         checked={inputDisabled}
-                        onChange={(e) => setInputDisabled(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setInputDisabled}
                       />
                     </div>
                   </div>
@@ -1368,43 +2327,31 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>多选 checkbox 药丸</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>多选 checkbox 药丸</span>
+                      <ToggleSwitch
                         checked={dropMultiple}
-                        onChange={(e) => handleToggleMultiple(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={handleToggleMultiple}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>词串前向检索</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>词串前向检索</span>
+                      <ToggleSwitch
                         checked={dropSearch}
-                        onChange={(e) => setDropSearch(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setDropSearch}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>呈现选项子解释</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>呈现选项子解释</span>
+                      <ToggleSwitch
                         checked={dropShowDesc}
-                        onChange={(e) => setDropShowDesc(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setDropShowDesc}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>锁定禁用状态</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>锁定禁用状态</span>
+                      <ToggleSwitch
                         checked={dropDisabled}
-                        onChange={(e) => setDropDisabled(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setDropDisabled}
                       />
                     </div>
                   </div>
@@ -1451,23 +2398,17 @@ export class AtomixDemoComponent {
 
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>显示底部操作列</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>显示底部操作列</span>
+                      <ToggleSwitch
                         checked={modalHasFooter}
-                        onChange={(e) => setModalHasFooter(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setModalHasFooter}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>信息通知提示风格 (i)</span>
-                      <input
-                        type="checkbox"
+                      <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>信息通知提示风格 (i)</span>
+                      <ToggleSwitch
                         checked={modalIsAlertStyle}
-                        onChange={(e) => setModalIsAlertStyle(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setModalIsAlertStyle}
                       />
                     </div>
                   </div>
@@ -1620,22 +2561,19 @@ export class AtomixDemoComponent {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 animate-fade-in">
                       <div className="flex justify-between font-mono text-xs">
                         <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>精准像素大小</label>
                         <span className="font-bold" style={{ color: tokens.colors.brand }}>{iconCustomSize}px</span>
                       </div>
-                      <input
-                        type="range"
-                        min="16"
-                        max="80"
+                      <Slider
+                        min={16}
+                        max={80}
                         value={iconCustomSize}
-                        onChange={(e) => setIconCustomSize(Number(e.target.value))}
-                        className="w-full cursor-pointer h-1.5 rounded-lg appearance-none"
-                        style={{
-                          accentColor: tokens.colors.brand,
-                          backgroundColor: tokens.colors.border,
-                        }}
+                        onChange={setIconCustomSize}
+                        showTooltip={false}
+                        showInput={false}
+                        size="sm"
                       />
                     </div>
                   )}
@@ -1657,15 +2595,12 @@ export class AtomixDemoComponent {
                     />
                   </div>
 
-                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>循环旋转动画</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={iconSpinning}
-                        onChange={(e) => setIconSpinning(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setIconSpinning}
                       />
                     </div>
                   </div>
@@ -1676,7 +2611,7 @@ export class AtomixDemoComponent {
               {activeTab === 'breadcrumb' && (
                 <div className="space-y-4 font-sans text-xs">
                   <div
-                    className="space-y-1.5 p-2 rounded-xl border"
+                    className="space-y-1.5 p-2 rounded-xl border animate-fade-in"
                     style={{
                       backgroundColor: tokens.colors.bgInput,
                       borderColor: tokens.colors.border,
@@ -1686,17 +2621,14 @@ export class AtomixDemoComponent {
                       <label className="block text-sm font-medium mb-1.5 mb-1" style={{ color: tokens.colors.textPrimary }}>最长展层限制 (Max Items)</label>
                       <span className="font-bold" style={{ color: tokens.colors.brand }}>{breadMaxItems} 级</span>
                     </div>
-                    <input
-                      type="range"
-                      min="2"
-                      max="5"
+                    <Slider
+                      min={2}
+                      max={5}
                       value={breadMaxItems}
-                      onChange={(e) => setBreadMaxItems(Number(e.target.value))}
-                      className="w-full cursor-pointer h-1.5 rounded-lg appearance-none mt-1"
-                      style={{
-                        accentColor: tokens.colors.brand,
-                        backgroundColor: tokens.colors.border,
-                      }}
+                      onChange={setBreadMaxItems}
+                      showTooltip={false}
+                      showInput={false}
+                      size="sm"
                     />
                   </div>
 
@@ -1763,35 +2695,26 @@ export class AtomixDemoComponent {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>锁定禁用分页</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={pagDisabled}
-                        onChange={(e) => setPagDisabled(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setPagDisabled}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>一键快速首尾跳转</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={pagShowFirstLast}
-                        onChange={(e) => setPagShowFirstLast(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setPagShowFirstLast}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>下拉步长调节</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={pagShowSizeChanger}
-                        onChange={(e) => setPagShowSizeChanger(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setPagShowSizeChanger}
                       />
                     </div>
                   </div>
@@ -1898,45 +2821,1027 @@ export class AtomixDemoComponent {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t space-y-2" style={{ borderColor: tokens.colors.border }}>
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>使能步骤快点切换</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={stepsClickable}
-                        onChange={(e) => setStepsClickable(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setStepsClickable}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>反馈副层辅助小描述</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={stepsShowDesc}
-                        onChange={(e) => setStepsShowDesc(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setStepsShowDesc}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>插入物理状态小图标</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={stepsHasIcons}
-                        onChange={(e) => setStepsHasIcons(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setStepsHasIcons}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textDanger || '#EF4444' }}>模拟清算故障拦截 (error)</span>
-                      <input
-                        type="checkbox"
+                      <ToggleSwitch
                         checked={stepsHasError}
-                        onChange={(e) => setStepsHasError(e.target.checked)}
-                        className="w-4 h-4 rounded cursor-pointer transition-all"
-                        style={{ accentColor: tokens.colors.brand }}
+                        onChange={setStepsHasError}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TABS选项卡 props controllers */}
+              {activeTab === 'tabs' && (
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>选项卡风格 (Variant)</label>
+                    <Dropdown
+                      options={[
+                        { label: '下划线简洁风 (Line)', value: 'line' },
+                        { label: '圆弧气泡胶囊 (Pill)', value: 'pill' },
+                        { label: '高质立体卡块 (Card)', value: 'card' },
+                      ]}
+                      value={tabsVariant}
+                      onChange={(val) => setTabsVariant(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>选项卡尺寸 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={tabsSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setTabsSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            tabsSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: tabsSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>排布朝向 (Direction)</label>
+                    <div
+                      className="grid grid-cols-2 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      <Button
+                        variant={tabsDirection === 'horizontal' ? 'primary' : 'text'}
+                        size="sm"
+                        onClick={() => {
+                          setTabsDirection('horizontal');
+                          setTabsFullWidth(false);
+                        }}
+                        className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                          tabsDirection === 'horizontal' ? '' : 'hover:text-slate-800'
+                        }`}
+                        style={{
+                          color: tabsDirection === 'horizontal' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
+                      >
+                        横向 COMP
+                      </Button>
+                      <Button
+                        variant={tabsDirection === 'vertical' ? 'primary' : 'text'}
+                        size="sm"
+                        onClick={() => {
+                          setTabsDirection('vertical');
+                          setTabsFullWidth(true);
+                        }}
+                        className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                          tabsDirection === 'vertical' ? '' : 'hover:text-slate-800'
+                        }`}
+                        style={{
+                          color: tabsDirection === 'vertical' ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                        }}
+                      >
+                        纵向 PANEL
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>撑满拉伸 (fullWidth)</span>
+                      <ToggleSwitch
+                        disabled={tabsDirection === 'vertical'}
+                        checked={tabsFullWidth}
+                        onChange={setTabsFullWidth}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示矢量图标 (withIcon)</span>
+                      <ToggleSwitch
+                        checked={tabsWithIcon}
+                        onChange={setTabsWithIcon}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>右侧数字徽章 (withBadge)</span>
+                      <ToggleSwitch
+                        checked={tabsWithBadge}
+                        onChange={setTabsWithBadge}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>包含禁用条目 (withDisabled)</span>
+                      <ToggleSwitch
+                        checked={tabsWithDisabled}
+                        onChange={setTabsWithDisabled}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DATEPICKER props controllers */}
+              {activeTab === 'datepicker' && (
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>顶置标题 (Label)</label>
+                    <Input
+                      value={dpLabel}
+                      onChange={(e) => setDpLabel(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>占位提示 (Placeholder)</label>
+                    <Input
+                      value={dpPlaceholder}
+                      onChange={(e) => setDpPlaceholder(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>辅助描述 (Description)</label>
+                    <Input
+                      value={dpDesc}
+                      onChange={(e) => setDpDesc(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>选择器高度等级 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={dpSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setDpSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            dpSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: dpSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>无动作禁用状态 (disabled)</span>
+                      <ToggleSwitch
+                        checked={dpDisabled}
+                        onChange={setDpDisabled}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>错误提示信息 (error)</span>
+                      <Input
+                        value={dpError}
+                        onChange={(e) => setDpError(e.target.value)}
+                        placeholder="留空则算校验安全通过..."
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SLIDER props controllers */}
+              {activeTab === 'slider' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>顶置标题 (Label)</label>
+                    <Input
+                      value={sliderLabel}
+                      onChange={(e) => setSliderLabel(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>辅助描述 (Description)</label>
+                    <Input
+                      value={sliderDesc}
+                      onChange={(e) => setSliderDesc(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>最小边界</label>
+                      <Input
+                        type="number"
+                        value={sliderMin}
+                        onChange={(e) => setSliderMin(Number(e.target.value))}
+                        size="sm"
+                        className="text-center font-semibold font-mono"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>最大边界</label>
+                      <Input
+                        type="number"
+                        value={sliderMax}
+                        onChange={(e) => setSliderMax(Number(e.target.value))}
+                        size="sm"
+                        className="text-center font-semibold font-mono"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>步进细度</label>
+                      <Input
+                        type="number"
+                        value={sliderStep}
+                        onChange={(e) => setSliderStep(Number(e.target.value))}
+                        size="sm"
+                        className="text-center font-semibold font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>吸附规格 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={sliderSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setSliderSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            sliderSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: sliderSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>精密控制文本框 (showInput)</span>
+                      <ToggleSwitch
+                        checked={sliderShowInput}
+                        onChange={setSliderShowInput}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>瞬时值阻尼提示 (showTooltip)</span>
+                      <ToggleSwitch
+                        checked={sliderShowTooltip}
+                        onChange={setSliderShowTooltip}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示分级刻度点 (showMarks)</span>
+                      <ToggleSwitch
+                        checked={sliderShowMarks}
+                        onChange={setSliderShowMarks}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>触点置哑禁用状态 (disabled)</span>
+                      <ToggleSwitch
+                        checked={sliderDisabled}
+                        onChange={setSliderDisabled}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>校验拦截文本 (error)</span>
+                      <Input
+                        value={sliderError}
+                        onChange={(e) => setSliderError(e.target.value)}
+                        placeholder="留空即为安全通过验证..."
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CARD props controllers */}
+              {activeTab === 'card' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>卡片标题内容 (Card Title)</label>
+                    <Input
+                      value={cardTitleText}
+                      onChange={(e) => setCardTitleText(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>卡片副标题内容 (Card Description)</label>
+                    <textarea
+                      value={cardDescText}
+                      onChange={(e) => setCardDescText(e.target.value)}
+                      rows={2}
+                      className="w-full text-xs px-2.5 py-1.5 border rounded-lg focus:outline-none transition-all animate-fade-in resize-none"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                        color: tokens.colors.textPrimary,
+                        fontFamily: tokens.typography.fontSans || 'inherit',
+                        borderRadius: tokens.borders.radiusMd || '8px',
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>美学固化预设变体 (Aesthetic Preset Variant)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'standard-outline 经典物理框线', value: 'standard-outline', description: '主白底 / 精细外边框' },
+                        { label: 'subtle-flat 极简色差感底板', value: 'subtle-flat', description: '无硬性边界 / bgTag 淡底色' },
+                        { label: 'isometric-elevated 气垫高空层', value: 'isometric-elevated', description: '无阻隔线 / 弥散型 shadow.md 悬游' },
+                      ]}
+                      value={cardVariant}
+                      onChange={(val) => setCardVariant(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>呼吸内边距</label>
+                      <Dropdown
+                        options={[
+                          { label: 'sm (8px)', value: 'sm' },
+                          { label: 'md (16px)', value: 'md' },
+                          { label: 'lg (24px)', value: 'lg' },
+                          { label: 'xl (32px)', value: 'xl' },
+                        ]}
+                        value={cardPadding}
+                        onChange={(val) => setCardPadding(val as any)}
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>弧度弯角</label>
+                      <Dropdown
+                        options={[
+                          { label: 'none (直角)', value: 'none' },
+                          { label: 'sm (微圆)', value: 'sm' },
+                          { label: 'md (常规)', value: 'md' },
+                          { label: 'lg (大圆)', value: 'lg' },
+                          { label: 'xl (大版圆角)', value: 'xl' },
+                          { label: 'full (胶囊药丸)', value: 'full' },
+                        ]}
+                        value={cardRadius}
+                        onChange={(val) => setCardRadius(val as any)}
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>页脚排列</label>
+                      <Dropdown
+                        options={[
+                          { label: 'left', value: 'left' },
+                          { label: 'center', value: 'center' },
+                          { label: 'right', value: 'right' },
+                          { label: 'between', value: 'between' },
+                        ]}
+                        value={cardFooterAlign}
+                        onChange={(val) => setCardFooterAlign(val as any)}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>父级宽度规格</label>
+                      <Dropdown
+                        options={[
+                          { label: 'narrow (窄宽 290px)', value: 'narrow' },
+                          { label: 'standard (标准 390px)', value: 'standard' },
+                          { label: 'wide (宽轨 512px)', value: 'wide' },
+                          { label: 'full (撑满流式自适应)', value: 'full' },
+                        ]}
+                        value={cardWidth}
+                        onChange={(val) => setCardWidth(val as any)}
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>页眉插槽徽标</label>
+                      <Dropdown
+                        options={[
+                          { label: 'Pulse 脉搏', value: 'Activity' },
+                          { label: 'Zap 闪电', value: 'Zap' },
+                          { label: 'Terminal 命令行', value: 'Terminal' },
+                          { label: 'Star 星标', value: 'Star' },
+                          { label: 'None 无徽标图纹', value: 'None' },
+                        ]}
+                        value={cardIconName}
+                        onChange={(val) => setCardIconName(val as any)}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>浮雕微弹悬浮 (hoverable)</span>
+                      <ToggleSwitch
+                        checked={cardHoverable}
+                        onChange={setCardHoverable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>品牌呼吸外发光 (glow)</span>
+                      <ToggleSwitch
+                        checked={cardGlow}
+                        onChange={setCardGlow}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>启用操作按钮 (showFooter)</span>
+                      <ToggleSwitch
+                        checked={cardShowButtons}
+                        onChange={setCardShowButtons}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>页眉底部附分割线</span>
+                      <ToggleSwitch
+                        checked={cardHasHeaderBorder}
+                        onChange={setCardHasHeaderBorder}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>页脚顶部附分割线</span>
+                      <ToggleSwitch
+                        checked={cardHasFooterBorder}
+                        onChange={setCardHasFooterBorder}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PROGRESS props controllers */}
+              {activeTab === 'progress' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>顶置标题 (Label)</label>
+                    <Input
+                      value={progLabel}
+                      onChange={(e) => setProgLabel(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>辅助描述 (Description)</label>
+                    <Input
+                      value={progDesc}
+                      onChange={(e) => setProgDesc(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>当前进度值 (Value)</label>
+                      <Input
+                        type="number"
+                        value={progValue}
+                        onChange={(e) => setProgValue(Number(e.target.value))}
+                        size="sm"
+                        className="text-center font-semibold font-mono"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>最大边界 (Max)</label>
+                      <Input
+                        type="number"
+                        value={progMax}
+                        onChange={(e) => setProgMax(Number(e.target.value))}
+                        size="sm"
+                        className="text-center font-semibold font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>百分比方位</label>
+                      <Dropdown
+                        options={[
+                          { label: 'Right (右侧并列)', value: 'right' },
+                          { label: 'Top (顶部同行)', value: 'top' },
+                          { label: 'Inside (内嵌，需LG)', value: 'inside' },
+                        ]}
+                        value={progInfoPosition}
+                        onChange={(val) => setProgInfoPosition(val as any)}
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>运行时状态 (Status)</label>
+                      <Dropdown
+                        options={[
+                          { label: 'Default (品牌色)', value: 'default' },
+                          { label: 'Success (健康绿)', value: 'success' },
+                          { label: 'Warning (警告黄)', value: 'warning' },
+                          { label: 'Exception (异常红)', value: 'exception' },
+                          { label: 'Active (高动感跑马灯)', value: 'active' },
+                        ]}
+                        value={progStatus}
+                        onChange={(val) => setProgStatus(val as any)}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>吸附规格 (Size)</label>
+                    <div
+                      className="grid grid-cols-3 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={progSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setProgSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            progSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: progSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示百分比指示器</span>
+                      <ToggleSwitch
+                        checked={progShowInfo}
+                        onChange={setProgShowInfo}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>开启斑马斜纹 (striped)</span>
+                      <ToggleSwitch
+                        checked={progStriped}
+                        onChange={setProgStriped}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>斜纹滚动 (animated)</span>
+                      <ToggleSwitch
+                        checked={progAnimated}
+                        onChange={setProgAnimated}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* LOADING props controllers */}
+              {activeTab === 'loading' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>动态加载类型 (Type)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'Spinner (经典安全旋转菊花圆轮)', value: 'spinner', description: '适合局部转圈数据对齐' },
+                        { label: 'Dots (三点缩放波浪呼吸反馈)', value: 'dots', description: '多维极简点状节奏态' },
+                        { label: 'Pulse (双重立体脉冲涟漪效应)', value: 'pulse', description: '高质感核心宿主机对接态' },
+                        { label: 'Bar (顶部无限自适应行进流光条)', value: 'bar', description: '无感度最上层加载' },
+                        { label: 'Skeleton (智能占位骨架屏骨架体)', value: 'skeleton', description: '符合内容密度的骨架盒' },
+                      ]}
+                      value={loadType}
+                      onChange={(val) => setLoadType(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>提示文案内容 (Tip Message)</label>
+                    <Input
+                      value={loadTip}
+                      onChange={(e) => setLoadTip(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>主配色体系 (Color)</label>
+                      <Dropdown
+                        options={[
+                          { label: 'Default (中性深灰)', value: 'default' },
+                          { label: 'Brand (品牌高能蓝/紫)', value: 'brand' },
+                          { label: 'Success (生态健康绿)', value: 'success' },
+                          { label: 'Warning (安全警告黄)', value: 'warning' },
+                          { label: 'Error (阻塞异常红)', value: 'error' },
+                        ]}
+                        value={loadColor}
+                        onChange={(val) => setLoadColor(val as any)}
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-medium" style={{ color: tokens.colors.textSecondary }}>文案排布方位</label>
+                      <Dropdown
+                        options={[
+                          { label: 'Bottom (位于底置下方)', value: 'bottom' },
+                          { label: 'Right (位于右侧同行布局)', value: 'right' },
+                        ]}
+                        value={loadTipPosition}
+                        onChange={(val) => setLoadTipPosition(val as any)}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>组件规格梯度 (Size)</label>
+                    <div
+                      className="grid grid-cols-4 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                      style={{
+                        backgroundColor: tokens.colors.bgInput,
+                        borderColor: tokens.colors.border,
+                      }}
+                    >
+                      {(['sm', 'md', 'lg', 'xl'] as const).map((s) => (
+                        <Button
+                          key={s}
+                          variant={loadSize === s ? 'primary' : 'text'}
+                          size="sm"
+                          onClick={() => setLoadSize(s)}
+                          className={`py-0.8 text-[9px] font-black h-7 rounded-lg ${
+                            loadSize === s ? '' : 'hover:text-slate-800'
+                          }`}
+                          style={{
+                            color: loadSize === s ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                          }}
+                        >
+                          {s.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>包裹渲染容器模式</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">加载器可作为遮罩包裹并锁定其子组件</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={loadUseWrapper}
+                        onChange={setLoadUseWrapper}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>毛玻璃阻断遮罩 (backdrop)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">磨砂质感防透射，仅在包裹模式生效</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={loadBackdrop}
+                        onChange={setLoadBackdrop}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ALERT props controllers */}
+              {activeTab === 'alert' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>警告条语义类型 (Type)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'Info (信息广播中性灰/深蓝)', value: 'info', description: '提供核心日常维护和基础心跳通告说明' },
+                        { label: 'Success (执行成功生态健康绿)', value: 'success', description: '标记指令正确解析及系统恢复健康层' },
+                        { label: 'Warning (安全合规关注警惕黄)', value: 'warning', description: '通告当前网关或物理盘位潜在的高负荷威胁' },
+                        { label: 'Error (阻塞异常高位拦截红)', value: 'error', description: '提示致命错误、未授权认证等急需排查的事件' },
+                      ]}
+                      value={alertType}
+                      onChange={(val) => setAlertType(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>主提示标题 (Message)</label>
+                    <Input
+                      value={alertMessage}
+                      onChange={(e) => setAlertMessage(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-3 border-t space-y-4 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示详细描述 (showDescription)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">大多数情况下主标题即可，开启可输入详细解释</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alertShowDescription}
+                        onChange={setAlertShowDescription}
+                      />
+                    </div>
+                    
+                    {alertShowDescription && (
+                      <div className="space-y-1.5 animate-fade-in pl-2 border-l-2" style={{ borderColor: tokens.colors.brand }}>
+                        <textarea
+                          value={alertDescription}
+                          onChange={(e) => setAlertDescription(e.target.value)}
+                          className="w-full text-xs p-2 rounded-xl border focus:outline-none focus:ring-1 focus:ring-indigo-500 font-sans leading-relaxed transition-all"
+                          style={{
+                            backgroundColor: tokens.colors.bgInput,
+                            borderColor: tokens.colors.border,
+                            color: tokens.colors.textPrimary,
+                          }}
+                          rows={3}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-3 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示左侧大图标 (showIcon)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">提供能够快速传达级别的对称状态大矢量图标</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alertShowIcon}
+                        onChange={setAlertShowIcon}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>允许手动叉号关闭 (closable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">允许在最右侧显示关闭键以触发回呼和收折动画</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alertClosable}
+                        onChange={setAlertClosable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>支持自定义微交互扩展操作 (action)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">例如额外增加“不再提示”、“去处理”等引导操作</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alertShowAction}
+                        onChange={setAlertShowAction}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TOAST props controllers */}
+              {activeTab === 'toast' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>提示发射反馈类型 (Type)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'Success (全绿经典成功通知)', value: 'success', description: '标记指令同步/校验成功' },
+                        { label: 'Error (阻塞猩红异常示警)', value: 'error', description: '标记网关连接故障、高危阻断' },
+                        { label: 'Warning (特别关注暗黄提防)', value: 'warning', description: '标记存储或流量水位高荷预警戒' },
+                        { label: 'Info (经典商务中性通知)', value: 'info', description: '传达不阻断流常态的心跳状态或通告' },
+                        { label: 'Loading (进程中常挂态)', value: 'loading', description: '展示旋转圆轮表现进程繁忙状态' },
+                      ]}
+                      value={toastType}
+                      onChange={(val) => setToastType(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>轻提示标题 (Message)</label>
+                    <Input
+                      value={toastMessage}
+                      onChange={(e) => setToastMessage(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-sm font-medium" style={{ color: tokens.colors.textPrimary }}>轻提示说明文案 (Description)</label>
+                      <ToggleSwitch checked={toastShowDescription} onChange={setToastShowDescription} />
+                    </div>
+                    {toastShowDescription && (
+                      <Input
+                        value={toastDescription}
+                        onChange={(e) => setToastDescription(e.target.value)}
+                        size="sm"
+                      />
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>延迟自销毁时长 (Duration)</label>
+                    <Dropdown
+                      options={[
+                        { label: '1.5秒 | 特快微交互反馈', value: '1500' },
+                        { label: '3.0秒 | 标准默认可读长款 (推荐)', value: '3000' },
+                        { label: '5.0秒 | 详尽说明长停留状态', value: '5000' },
+                        { label: '永不自动隐退 (0) | 必须手动叉碎', value: '0' },
+                      ]}
+                      value={toastDuration.toString()}
+                      onChange={(val) => setToastDuration(Number(val))}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>支持手动提前叉灭 (closable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">右上角渲染精细微叉号，允许立刻销毁</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={toastClosable}
+                        onChange={setToastClosable}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAG props controllers */}
+              {activeTab === 'tag' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>色彩基调语义 (Color Semantic)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'Primary (优先核心行动态)', value: 'primary', description: '运用品牌主基色' },
+                        { label: 'Success (绿意畅通态)', value: 'success', description: '用于正向、审核通过等反馈' },
+                        { label: 'Warning (橙色预警态)', value: 'warning', description: '用于容量上限防备或告警' },
+                        { label: 'Error (红区危机态)', value: 'error', description: '高危致命错误、封禁或失败' },
+                        { label: 'Default (次级空阶默认)', value: 'default', description: '中性色彩，不引入额外情绪' },
+                      ]}
+                      value={tagType}
+                      onChange={(val) => setTagType(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>变体样式设计 (Variant Silhouette)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'Soft (微量轻薄基底)', value: 'soft', description: '适用于大批量密集阵列呈现' },
+                        { label: 'Solid (实心醒目体)', value: 'solid', description: '具有最高优先级视觉引导力' },
+                        { label: 'Outline (边框外发光)', value: 'outline', description: '中等感官强度，保留干净空气感' },
+                        { label: 'Dot (前置圆盾点阵)', value: 'dot', description: '像指示灯一般纯净聚焦' },
+                      ]}
+                      value={tagVariant}
+                      onChange={(val) => setTagVariant(val as any)}
+                      size="sm"
+                      showDescription={true}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>视觉缩放比例 (Size Array)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'SM - 高密极致收缩版 (适用于表格列)', value: 'sm' },
+                        { label: 'MD - 设计系推荐基准', value: 'md' },
+                        { label: 'LG - 宽敞醒目陈述级', value: 'lg' },
+                      ]}
+                      value={tagSize}
+                      onChange={(val) => setTagSize(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>内置核心字符文本 (Content)</label>
+                    <Input
+                      value={tagContent}
+                      onChange={(e) => setTagContent(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>支持删除销毁动作 (Closable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">挂载微小交叉叉号，提供 onClose 回调</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tagClosable}
+                        onChange={setTagClosable}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2 border-t space-y-2 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>展示附随微标 (Status Icon)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">左侧挂载相关指示矢量矢量图标</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tagShowIcon}
+                        onChange={setTagShowIcon}
                       />
                     </div>
                   </div>
@@ -1969,10 +3874,12 @@ export class AtomixDemoComponent {
             </div>
           </div>
 
-          <div className="border-t my-1" style={{ borderColor: tokens.colors.border }} />
+          </div> {/* End of scrollable parameters list container */}
+
+          <div className="border-t my-3 pt-2 shrink-0" style={{ borderColor: tokens.colors.border }} />
 
           {/* Form Actions footer */}
-          <div className="flex flex-col gap-2 pt-1">
+          <div className="flex flex-col gap-2 shrink-0">
             <button
               onClick={handleResetDefaults}
               className="cursor-pointer py-2.5 border rounded-xl text-xs token-weight-medium token-lh-normal flex items-center justify-center gap-1.5 transition-all"
