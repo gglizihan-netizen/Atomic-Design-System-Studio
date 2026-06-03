@@ -273,6 +273,11 @@ function StudioLayout() {
     { id: 'alert' as const, label: '警告提示条', en: 'Alert' },
     { id: 'toast' as const, label: '浮动轻提示', en: 'Toast' },
     { id: 'tag' as const, label: '标贴', en: 'Tag' },
+    { id: 'list' as const, label: '列表', en: 'List' },
+    { id: 'table' as const, label: '表格', en: 'Table' },
+    { id: 'imageviewer' as const, label: '图片预览', en: 'ImageViewer' },
+    { id: 'skeleton' as const, label: '骨架屏', en: 'Skeleton' },
+    { id: 'sidebar' as const, label: '智能侧边栏', en: 'Sidebar' },
   ];
 
   const presetsList = [

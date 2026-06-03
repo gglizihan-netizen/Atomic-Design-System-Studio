@@ -45,7 +45,14 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
-  Info
+  Info,
+  // 5. 图像预览专属常用微操图标
+  ZoomIn,
+  ZoomOut,
+  RotateCw,
+  RotateCcw,
+  FlipHorizontal,
+  Minimize2
 } from 'lucide-react';
 import { IconProps, IconName } from '../../types/components';
 
@@ -82,7 +89,14 @@ const ICON_COMPONENTS_MAP: Record<IconName, React.ComponentType<any>> = {
   'success': CheckCircle,
   'warning': AlertTriangle,
   'error': XCircle,
-  'info': Info
+  'info': Info,
+  // 图像控制专属字形
+  'zoom-in': ZoomIn,
+  'zoom-out': ZoomOut,
+  'rotate-cw': RotateCw,
+  'rotate-ccw': RotateCcw,
+  'flip-x': FlipHorizontal,
+  'minimize-2': Minimize2
 };
 
 export const Icon: React.FC<IconProps> = ({

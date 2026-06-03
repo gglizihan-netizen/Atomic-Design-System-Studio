@@ -834,7 +834,245 @@
       "behaviors_inherited": [
         "behaviors.motionCurve (弹窗、流星般的渐变缩放及堆叠折叠动画)"
       ]
+    },
+    "List": {
+      "tag": "div",
+      "category": "Data Display",
+      "description": "通用数据驱动列表原语，自适应各种项目排版与卡片布局，支持可定制的头部、尾部、切分线、行间距以及自带的高性能底部轻量分页。",
+      "props": {
+        "dataSource": {
+          "type": "array",
+          "required": true,
+          "description": "列表渲染的数据源数组，每项通常为 JSON 实体"
+        },
+        "bordered": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否展示整个列表的外圈边框，随当前主题圆角与边框色安全自适应"
+        },
+        "split": {
+          "type": "boolean",
+          "default": true,
+          "description": "各行列表项之间是否渲染一条精致的中性极细切分线"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "尺寸标准选择，控制上下左右的内边距间隙：sm (紧凑，高度收缩)；md (标准，中性留白)；lg (空灵大方，适合宽敞看板)"
+        },
+        "loading": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否加载中。为 true 时提供平滑渐变骨架屏或旋转菊花，阻断列表交互"
+        },
+        "emptyText": {
+          "type": "string",
+          "default": "暂无数据",
+          "description": "当 dataSource 为空数组或未定义时渲染的保底安慰字句"
+        },
+        "transparent": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否移除一切白色或主题卡片背景底色，保持主体背景完全透明状态"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (列表单行入场微动画过渡效果)"
+      ]
+    },
+    "Table": {
+      "tag": "table",
+      "category": "Data Display",
+      "description": "高密度数据展示通用表格原子原语。支持列展示、排序、斑马线、行选中、列对齐、骨架加载以及高保真的底部轻型合并式分页系统。",
+      "props": {
+        "columns": {
+          "type": "Array<{ key: string, title: string, dataIndex?: string, width?: string|number, align?: 'left'|'center'|'right', sorter?: boolean }>",
+          "required": true,
+          "description": "表格列定义配置数组。支持标题、属性字段绑定、独立对齐以及是否开启即时客户端列内容排序"
+        },
+        "dataSource": {
+          "type": "array",
+          "required": true,
+          "description": "列表渲染的数据源实体数组。"
+        },
+        "bordered": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否展示表格卡片外圈物理微边框"
+        },
+        "striped": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否开启斑马斜交替行背景色纹理（Zebra crossing)"
+        },
+        "hoverable": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否在鼠标 hover 行项时渲染淡色背景与指针微动效反馈"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["sm", "md", "lg"],
+          "default": "md",
+          "description": "行高尺寸微调体系：sm (紧凑行高py-1.5，高密度)；md (常规行高py-3)；lg (尊享大气行高py-4.5)"
+        },
+        "loading": {
+          "type": "boolean",
+          "default": false,
+          "description": "一键激活表格脉冲呼吸渐变骨架加载，阻断误触"
+        },
+        "emptyText": {
+          "type": "string",
+          "default": "暂无数据",
+          "description": "数据未连通或空闲时的保底安慰文本"
+        },
+        "rowSelection": {
+          "type": "object",
+          "description": "表格选中行行为控制器，传入 selectedRowKeys 数组和 onChange(keys, rows) 函数"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (表格排序切换及选择框淡入边缘曲线)"
+      ]
+    },
+    "ImageViewer": {
+      "tag": "div",
+      "category": "Feedback & Media",
+      "description": "高保真、AI-Native 图片预览灯箱，支持单图及多图走马灯、水平/垂直旋转、镜像、无限手势缩放、鼠标拖拽漫游与一键物理下发下载。",
+      "props": {
+        "src": {
+          "type": "string | string[]",
+          "required": true,
+          "description": "图片数据源。支持传入单独的图片 URL，或者传入图片 URL 字符串数组"
+        },
+        "visible": {
+          "type": "boolean",
+          "required": true,
+          "description": "是否开启并呈现场景预览遮罩"
+        },
+        "current": {
+          "type": "number",
+          "default": 0,
+          "description": "若 src 传入数组，此参数可指定受控激活首展示哪个下标的图片"
+        },
+        "titles": {
+          "type": "string | string[]",
+          "description": "图片顶部显示的对等文字标题或对应索引下的标题数组"
+        },
+        "downloadable": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否允许在底部控制条中开启本地电脑一键下载保存当前媒体的功能"
+        },
+        "enableKeyboard": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否开启键盘操作，例如 Esc 关闭预览，左/右切换图片，上/下放大缩小图片"
+        },
+        "enableMaskClose": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否允许通过单击磨砂模糊底层遮罩部分触发 onClose"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (遮罩渐显、多图弹球及底部浮岛滑入缓动因子)",
+        "behaviors.motionDurationFast (边缘微动响应速)"
+      ]
+    },
+    "Skeleton": {
+      "tag": "div",
+      "category": "Feedback & LoadingStates",
+      "description": "高品质、可伸缩的骨架屏占位系统。支持圆形、矩形、单/多行文本、卡片、列表等多形态预设组合，具备脉冲和流光行波双重高阶炫光阻尼动效，一键对接四大美学主题色泽。",
+      "props": {
+        "variant": {
+          "type": "string",
+          "enum": ["circle", "rect", "text", "image", "button", "card", "list", "complex"],
+          "default": "text",
+          "description": "基础占位形态/场景组合。circle为圆形(常见于头像)；rect为直角/微圆角矩形；text为行高定制的单行文本；image为带媒体配图占位标志的图片块；button为操作键骨架占位；card为卡片大板块占位；list为经典多行列表占位；complex为包含头像、标题、正文段落等多通道智能复合场景"
+        },
+        "width": {
+          "type": "string | number",
+          "description": "物理宽度，例如 '100%', '4rem', 240 等"
+        },
+        "height": {
+          "type": "string | number",
+          "description": "物理高度，对 circle 亦指代直径。支持 '1rem', '200px', 48 等"
+        },
+        "animation": {
+          "type": "string",
+          "enum": ["pulse", "wave", "none"],
+          "default": "wave",
+          "description": "炫光动效形态：pulse (优雅渐隐渐显呼吸表现)；wave (从左到右流畅的流光炫动亮色行波)；none (纯深灰静态骨屏，剔除任何动能损耗)"
+        },
+        "rows": {
+          "type": "number",
+          "default": 3,
+          "description": "当 variant 为 text, list 或 complex 时，渲染多少行渐变骨架流。系统自带最后一行宽度自动折缩(如 61%)的高端美学呈现"
+        },
+        "avatar": {
+          "type": "boolean",
+          "default": true,
+          "description": "针对 list 或 complex 类型的复合形态，左方是否增添标准圆形头像骨架块"
+        },
+        "title": {
+          "type": "boolean",
+          "default": true,
+          "description": "针对 list 或 complex 类型的复合形态，顶部是否增添短促的加粗标题占位"
+        },
+        "active": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否激活骨架加载态。若为 false，将借助 motion/react 淡出过渡，优雅无缝过渡渲染 children 挂载的具体真内容"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (无缝淡出及流光推进缓动比例)",
+        "behaviors.motionDurationFast (边缘微动响应速)"
+      ]
+    },
+    "Sidebar": {
+      "tag": "div",
+      "category": "Navigation",
+      "description": "高品质、可伸缩的智能导航侧边栏系统。支持多级树形嵌套子菜单、手风琴折叠展开效果、徽标角标提示、经典/现代/极简三大美学变体和极其流畅的原生缓动阻泥状态压缩折叠动效。",
+      "props": {
+        "activeId": {
+          "type": "string",
+          "description": "当前激活的选项节点 ID，对子菜单和父层同步支持高亮深度咬合"
+        },
+        "collapsed": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否隐藏侧边栏并进入极简图标窄带折叠态"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["classic", "modern", "minimal"],
+          "default": "classic",
+          "description": "侧边栏变体美学风格。classic为经典卡条式分割底色分界栏；modern为带优雅悬浮背景与毛玻璃高阶圆角卡片分栏；minimal为极简无框，与页面完全无缝融合的先锋风格"
+        },
+        "width": {
+          "type": "string | number",
+          "default": 240,
+          "description": "展开时的标准物理像素宽度，如 240, '16rem' 等"
+        },
+        "collapsedWidth": {
+          "type": "string | number",
+          "default": 64,
+          "description": "折叠状态下的物理像素窄幅宽度，如 64, '4rem'"
+        },
+        "showCollapseButton": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否在侧边栏底盘自带并悬挂一键控制收紧折叠切换的高阶微按钮"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (收缩和子菜单折叠弹跳动画因子)",
+        "behaviors.motionDurationFast (侧边栏渐变流体收缩速)"
+      ]
     }
   },
-  "usage_instruction_for_llm": "【⚠️ 关键人机协作准则】：当 AI (或任何 Agent) 收到为本项目拼装界面的用户 prompt（例如: “给我生成一个带确认的云节点配置和启动表单”）时，严禁使用 HTML 原生指令、非预装的外部三方 UI 组件等。AI 只能在上面列出的 5 大原子原语库中做挑选！AI 应根据意图组装符合 Layer 5 规范的「JSON Schema协议」，并将该 Schema 输出在文本中或直接传入 ScenarioSandbox 声明式解析运行时。如此能做到极致的一致性！"
+  "usage_instruction_for_llm": "【⚠️ 关键人机协作准则】：当 AI (或任何 Agent) 收到为本项目拼装界面的用户 prompt（例如: “给我生成一个带确认的云节点配置和启动表单”）时，严禁使用 HTML 原生指令、非预装的外部三方 UI 组件等。AI 只能在上面列出的 5 大原子原原语库中做挑选！AI 应根据意图组装符合 Layer 5 规范的「JSON Schema协议」，并将该 Schema 输出在文本中或直接传入 ScenarioSandbox 声明式解析运行时。如此能做到极致的一致性！"
 }

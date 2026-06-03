@@ -139,12 +139,19 @@
 - **JSON 交互契约登记**：在 `/src/components/AI_MANIFEST.json` 的 `"components"` 列表中追加属性元数据与交互描述解释（作为沙盒和 JSON 动态拼装的依据）。
 
 ### 2. 物理繁衍 (Physical Creation)
-在 `/src/components/atoms/` 下，建立符合类型约束且拥有中文交互保姆注释的 `.tsx` 实体：
-- 首行 Named Import，绝不使用 `import type` 引用 TS Enums。
+在 `/src/components/atoms/` 下，建立符合类型约束且自备中文注释的 `.tsx` 实体：
+- **【精简且必要的中文注释】**：新原语文件必须包含清晰的中文注释，以利于后续其他 AI 模型或开发者维护。注释应覆盖以下两个层面：
+  1. **文件头部概览注释**：简要说明文件名称、功能定位，以及如何通过 `props` / 插槽（例如 `column.render`）在外部自定义渲染以避免任何业务硬编码。
+  2. **代码关键实现注释**：在内部状态流转、动效过渡、以及核心事件处理等关键代码逻辑段加入大体步骤注释。
+- 首行 Named Import，绝不使用 `import type` 引用 TS Enums.
 - 导入并解析 `useDesignTokens`，将配色、字体字重、动画回弹曲线应用到其视图层实现，绝对做到多品牌一秒兼容。
 
-### 3. 运行时挂载 (Runtime Mapping)
-由于系统具有 Layer 5 声明式渲染的实战沙盒特性，你必须在 `/src/components/ScenarioSandbox.tsx` 中的渲染匹配分支（如 `parseDeclarativeElement` 函数）内注册新写原语的翻译动作，好让它支持模拟 Prompt 实时生成和展示。
+### 3. 运行时挂载与工作台注册 (Runtime Mapping & Workspace Registry)
+由于系统具有完美的物理测试与 Layer 5 声明式渲染双重特性，新原语必须同时注册到大底座与物理工坊：
+- **声明式配置运行时挂载**：在 `/src/components/ScenarioSandbox.tsx` 中的渲染匹配分支（如 `parseDeclarativeElement` 函数）内注册新写原语的翻译动作，好让它支持模拟 Prompt 实时生成和展示；
+- **全局状态上下文注册**：在 `/src/components/base/DesignTokensContext.tsx` 中，在 `activeTab` 状态、类型声明和 `setActiveTab` 方法的类型联合体（Union Type）中，追补新原语标识符（如 `'tag' | 'list'`)；
+- **工作台主导航列表注册**：在 `/src/App.tsx` 中的工作台侧边栏组件列表（通常在 `componentsList` 中）追加你的新原语项目；
+- **物理工坊面板注册**：在 `/src/components/ShowcasePanel.tsx` 中，在组件样例映射（`case` 条件渲染）、TSX/HTML代码实时生成逻辑（`case 'tag'` / `case 'list'`)、Props 属性定义解释字典（`case 'tag'` / `case 'list'`)，以及后边的 Props 控制器配置区域（`{activeTab === 'tag' && ...}`)、微交互日志（Interaction Logger）列表和渲染面板中，**必须完全配齐** 相关的渲染和调节节点。
 
 ### 4. 编译闭环校验 (Verify & Lint)
 不把带病的组件留给用户，本地静静运行：

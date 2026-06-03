@@ -16,6 +16,11 @@ import { Progress } from './atoms/Progress';
 import { Loading } from './atoms/Loading';
 import { Alert } from './atoms/Alert';
 import { Tag } from './atoms/Tag';
+import { List } from './atoms/List';
+import { Table } from './atoms/Table';
+import { ImageViewer } from './atoms/ImageViewer';
+import { Skeleton } from './atoms/Skeleton';
+import { Sidebar } from './atoms/Sidebar';
 import { useToast } from './atoms/Toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './atoms/Card';
 import { IconName, TabItem } from '../types/components';
@@ -47,7 +52,10 @@ import {
   Activity,
   Award,
   ChevronDown,
-  CheckCircle2
+  CheckCircle2,
+  Cpu,
+  Database,
+  Server
 } from 'lucide-react';
 
 const ToggleSwitch: React.FC<{
@@ -252,6 +260,105 @@ export const ShowcasePanel: React.FC = () => {
   const [tagShowIcon, setTagShowIcon] = useState<boolean>(false);
   const [tagIsVisibleTest, setTagIsVisibleTest] = useState<boolean>(true);
 
+  // 19. List Demo states
+  const [listBordered, setListBordered] = useState<boolean>(true);
+  const [listSplit, setListSplit] = useState<boolean>(true);
+  const [listSize, setListSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [listLoading, setListLoading] = useState<boolean>(false);
+  const [listEmpty, setListEmpty] = useState<boolean>(false);
+  const [listEmptyText, setListEmptyText] = useState<string>('库中无正在连接的运行机房 (No running compute clusters)');
+  const [listShowPagination, setListShowPagination] = useState<boolean>(true);
+  const [listCurrentPage, setListCurrentPage] = useState<number>(1);
+  const [listClickedLog, setListClickedLog] = useState<string>('暂无行项点击交互');
+  const [listTransparent, setListTransparent] = useState<boolean>(false);
+  const [listShowHeader, setListShowHeader] = useState<boolean>(false);
+  const [listShowFooter, setListShowFooter] = useState<boolean>(false);
+  const [listShowIcons, setListShowIcons] = useState<boolean>(false);
+  const [listShowActions, setListShowActions] = useState<boolean>(true);
+  const [listShowDesc, setListShowDesc] = useState<boolean>(true);
+
+  // 20. Table Demo states
+  const [tableBordered, setTableBordered] = useState<boolean>(true);
+  const [tableStriped, setTableStriped] = useState<boolean>(false);
+  const [tableHoverable, setTableHoverable] = useState<boolean>(true);
+  const [tableLoading, setTableLoading] = useState<boolean>(false);
+  const [tableSize, setTableSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [tableEmpty, setTableEmpty] = useState<boolean>(false);
+  const [tableEmptyText, setTableEmptyText] = useState<string>('当前没有正在运行的数据库实例 (No cluster instances found)');
+  const [tableShowSelection, setTableShowSelection] = useState<boolean>(true);
+  const [tableShowPagination, setTableShowPagination] = useState<boolean>(true);
+  const [tableCurrentPage, setTableCurrentPage] = useState<number>(1);
+  const [tableSelectedKeys, setTableSelectedKeys] = useState<string[]>([]);
+  const [tableClickedLog, setTableClickedLog] = useState<string>('暂无表格行点击交互');
+
+  // 21. ImageViewer Demo states & constants
+  const DEMO_IMAGES = [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1200&q=80'
+  ];
+  const DEMO_TITLES = [
+    '设计方案 01 — 抽象莫兰迪科技感艺术海报',
+    '设计方案 02 — 三维多维流体折射偏振晶体',
+    '设计方案 03 — 极客数字极简美学高级终端'
+  ];
+  const [ivVisible, setIvVisible] = useState<boolean>(false);
+  const [ivUrlsType, setIvUrlsType] = useState<'single' | 'multiple'>('multiple');
+  const [ivDownloadable, setIvDownloadable] = useState<boolean>(true);
+  const [ivEnableKeyboard, setIvEnableKeyboard] = useState<boolean>(true);
+  const [ivEnableMaskClose, setIvEnableMaskClose] = useState<boolean>(true);
+  const [ivRotatable, setIvRotatable] = useState<boolean>(true);
+  const [ivMirrorable, setIvMirrorable] = useState<boolean>(true);
+  const [ivZoomable, setIvZoomable] = useState<boolean>(true);
+  const [ivCurrentIndex, setIvCurrentIndex] = useState<number>(0);
+  const [ivClickedLog, setIvClickedLog] = useState<string>('暂无媒体预览交互记录');
+
+  // 12b. Skeleton Demo states
+  const [skVariant, setSkVariant] = useState<'circle' | 'rect' | 'text' | 'image' | 'button' | 'card' | 'list' | 'complex'>('complex');
+  const [skAnimation, setSkAnimation] = useState<'pulse' | 'wave' | 'none'>('wave');
+  const [skRows, setSkRows] = useState<number>(4);
+  const [skAvatar, setSkAvatar] = useState<boolean>(true);
+  const [skTitle, setSkTitle] = useState<boolean>(true);
+  const [skActive, setSkActive] = useState<boolean>(true);
+  const [skWidth, setSkWidth] = useState<string>('100%');
+  const [skHeight, setSkHeight] = useState<string>('');
+  const [skClickedLog, setSkClickedLog] = useState<string>('暂无骨架态变更日志');
+
+  // 12c. Sidebar Demo states
+  const [sbActiveId, setSbActiveId] = useState<string>('home');
+  const [sbCollapsed, setSbCollapsed] = useState<boolean>(false);
+  const [sbVariant, setSbVariant] = useState<'classic' | 'modern' | 'minimal'>('classic');
+  const [sbWidth, setSbWidth] = useState<number>(240);
+  const [sbCollapsedWidth, setSbCollapsedWidth] = useState<number>(64);
+  const [sbShowCollapseButton, setSbShowCollapseButton] = useState<boolean>(true);
+  const [sbShowHeader, setSbShowHeader] = useState<boolean>(true);
+  const [sbShowFooter, setSbShowFooter] = useState<boolean>(true);
+  const [sbClickedLog, setSbClickedLog] = useState<string>('暂无侧边栏导航变更日志');
+
+  const defaultSidebarItems = [
+    { id: 'home', label: '工作台首页', icon: 'Home', badge: 'New', badgeType: 'primary' as const },
+    {
+      id: 'resources',
+      label: '云资源清单',
+      icon: 'Server',
+      children: [
+        { id: 'ecs', label: '弹性计算 CPU', icon: 'Cpu', badge: 15, badgeType: 'default' as const },
+        { id: 'redis', label: '缓存型 Redis', icon: 'Database' },
+        { id: 'rds', label: '高可用 RDS', icon: 'Database' }
+      ]
+    },
+    {
+      id: 'security',
+      label: '防火墙策略',
+      icon: 'ShieldAlert',
+      children: [
+        { id: 'rules', label: '访问控制规则', icon: 'Settings' },
+        { id: 'audit', label: '日志合规审计', icon: 'Terminal' }
+      ]
+    },
+    { id: 'settings', label: '全局环境配置', icon: 'Settings', badge: 'Beta', badgeType: 'warning' as const }
+  ];
+
   // 13. Card Demo states
   const [cardVariant, setCardVariant] = useState<'standard-outline' | 'subtle-flat' | 'isometric-elevated'>('standard-outline');
   const [cardHoverable, setCardHoverable] = useState<boolean>(true);
@@ -450,6 +557,55 @@ export const ShowcasePanel: React.FC = () => {
       setTagContent('Active Proxy');
       setTagShowIcon(false);
       setTagIsVisibleTest(true);
+    } else if (activeTab === 'list') {
+      setListBordered(true);
+      setListSplit(true);
+      setListSize('md');
+      setListLoading(false);
+      setListTransparent(false);
+      setListShowPagination(true);
+      setListShowHeader(false);
+      setListShowFooter(false);
+      setListShowIcons(false);
+      setListShowDesc(true);
+      setListShowActions(true);
+    } else if (activeTab === 'table') {
+      setTableBordered(true);
+      setTableStriped(false);
+      setTableHoverable(true);
+      setTableLoading(false);
+      setTableSize('md');
+      setTableEmpty(false);
+      setTableShowSelection(true);
+      setTableShowPagination(true);
+    } else if (activeTab === 'imageviewer') {
+      setIvUrlsType('multiple');
+      setIvDownloadable(true);
+      setIvEnableKeyboard(true);
+      setIvEnableMaskClose(true);
+      setIvCurrentIndex(0);
+      setIvVisible(false);
+      setIvClickedLog('已重置媒体预览参数配置');
+    } else if (activeTab === 'skeleton') {
+      setSkVariant('complex');
+      setSkAnimation('wave');
+      setSkRows(4);
+      setSkAvatar(true);
+      setSkTitle(true);
+      setSkActive(true);
+      setSkWidth('100%');
+      setSkHeight('');
+      setSkClickedLog('已重置骨架屏参数配置');
+    } else if (activeTab === 'sidebar') {
+      setSbActiveId('home');
+      setSbCollapsed(false);
+      setSbVariant('classic');
+      setSbWidth(240);
+      setSbCollapsedWidth(64);
+      setSbShowCollapseButton(true);
+      setSbShowHeader(true);
+      setSbShowFooter(true);
+      setSbClickedLog('已重置智能侧边栏参数配置');
     }
   };
 
@@ -481,6 +637,14 @@ export const ShowcasePanel: React.FC = () => {
       propConfigStr = `type: "${toastType}", message: "${toastMessage}", description: "${toastShowDescription ? toastDescription : undefined}", duration: ${toastDuration}, closable: ${toastClosable}, position: "${toastPosition}"`;
     } else if (activeTab === 'tag') {
       propConfigStr = `type: "${tagType}", variant: "${tagVariant}", size: "${tagSize}", closable: ${tagClosable}, icon: ${tagShowIcon}`;
+    } else if (activeTab === 'list') {
+      propConfigStr = `bordered: ${listBordered}, split: ${listSplit}, size: "${listSize}", loading: ${listLoading}, transparent: ${listTransparent}, pagination: ${listShowPagination}`;
+    } else if (activeTab === 'imageviewer') {
+      propConfigStr = `src: ${ivUrlsType === 'single' ? `'${DEMO_IMAGES[0]}'` : 'string[]'}, visible: ${ivVisible}, current: ${ivCurrentIndex}, downloadable: ${ivDownloadable}, enableKeyboard: ${ivEnableKeyboard}, enableMaskClose: ${ivEnableMaskClose}, rotatable: ${ivRotatable}, mirrorable: ${ivMirrorable}, zoomable: ${ivZoomable}`;
+    } else if (activeTab === 'skeleton') {
+      propConfigStr = `variant: "${skVariant}", animation: "${skAnimation}", rows: ${skRows}, avatar: ${skAvatar}, title: ${skTitle}, active: ${skActive}${skWidth ? `, width: "${skWidth}"` : ''}${skHeight ? `, height: "${skHeight}"` : ''}`;
+    } else if (activeTab === 'sidebar') {
+      propConfigStr = `items: defaultSidebarItems, activeId: "${sbActiveId}", collapsed: ${sbCollapsed}, variant: "${sbVariant}", width: ${sbWidth}, collapsedWidth: ${sbCollapsedWidth}, showCollapseButton: ${sbShowCollapseButton}`;
     } else {
       propConfigStr = `id: "${activeTab}", preset: "${activePreset}"`;
     }
@@ -563,6 +727,26 @@ export const ShowcasePanel: React.FC = () => {
       tag: {
         title: 'Tag 高保真微元标贴',
         desc: '极简且具有高信息密度的块状行级标识。支持灵活的色彩变体、轮廓描边与圆点点缀（dot），甚至允许内嵌动态交互的快速消除操控区，常用于分类、标记和高密度的标签库展示。',
+      },
+      list: {
+        title: 'List 数据列表',
+        desc: '通用数据驱动列表原语。自适应各种项目排版与卡片布局，支持可定制的头部、尾部、切分线、行间距以及内置的高性能底部轻量分页。',
+      },
+      table: {
+        title: 'Table 通用表格',
+        desc: '极其强大的一体化数据表格原子原语。内置全列定制渲染、客户端快速数据排序、奇偶斑马条纹、自适应内间距、优雅渐变骨架、行级CheckBox批量操作和轻量脚部分页合并系统。',
+      },
+      imageviewer: {
+        title: 'ImageViewer 沉浸式图片预览灯箱',
+        desc: '高保真且符合物理阻尼行为契约的图片灯箱原语。内置全方位顺逆时针无极旋转、水平镜像翻转、手势/按键双重双击缩放、大图漫游拖拽定位以及本地便捷一键物理下发下载。',
+      },
+      skeleton: {
+        title: 'Skeleton 智能骨架占位屏',
+        desc: '极其强大且调性完备的骨架占位原语。支持圆形、矩形、单/多行文本排版段落、占位图片卡块、经典操作键、以及复合装载卡与头像列表等 8 大形态组合。支持呼吸脉冲和渐变流光行波双重高阶动效。',
+      },
+      sidebar: {
+        title: 'Sidebar 智能导航侧边栏',
+        desc: '极其强大且高柔性折叠拉伸的侧边栏。支持多层嵌套子菜单（手风琴形式阻尼展开）、快捷徽标徽章角标、经典/现代/极简三大美学变体和极其流畅的原生折叠缓动阻泥压缩收纳微交互。',
       },
     };
     return data[activeTab] || { title: 'Atom Component', desc: 'React high fidelity sandbox element.' };
@@ -948,6 +1132,257 @@ export default function TagDemo() {
     </Tag>
   );
 }`;
+        case 'list':
+          return `import { List } from 'atomix-ui';
+import { Server } from 'lucide-react';
+
+export default function ListDemo() {
+  const listData = Array.from({ length: 5 }).map((_, i) => ({
+    id: \`item-\${i + 1}\`,
+    title: '列表主内容',
+    desc: '列表内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容'
+  }));
+
+  return (
+    <List
+      dataSource={listData}
+      bordered={${listBordered}}
+      split={${listSplit}}
+      transparent={${listTransparent}}
+      size="${listSize}"
+      loading={${listLoading}}
+      emptyText="${listEmptyText}"${listShowHeader ? `\n      header={\n        <div className="flex items-center justify-between w-full text-sm font-semibold">\n          <span>列表头部</span>\n        </div>\n      }` : ''}${listShowFooter ? `\n      footer={\n        <div className="text-xs text-slate-400">列表尾部</div>\n      }` : ''}${listShowPagination ? `\n      pagination={{\n        currentPage: ${listCurrentPage},\n        totalPages: 5,\n        onChange: (page) => console.log('Page switched to', page)\n      }}` : ''}
+      renderItem={(item) => (
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-start gap-4">
+            {${listShowIcons} && (
+              <Server className="w-5 h-5 mt-0.5 shrink-0" style={{ color: tokens.colors.textSecondary }} />
+            )}
+            <div className="flex flex-col text-left">
+              <span className="font-medium text-base" style={{ color: tokens.colors.textPrimary }}>{item.title}</span>
+              {${listShowDesc} && (
+                <span className="text-sm mt-1.5" style={{ color: tokens.colors.textSecondary }}>{item.desc}</span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-4 ml-4 shrink-0">
+            {${listShowActions} && (
+              <div className="flex gap-2">
+                <Button variant="text" size="sm" onClick={() => {}}>操作1</Button>
+                <Button variant="text" size="sm" onClick={() => {}}>操作2</Button>
+                <Button variant="text" size="sm" onClick={() => {}}>操作3</Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    />
+  );
+}`;
+        case 'table':
+          return `import { Table } from 'atomix-ui';
+
+export default function TableDemo() {
+  const columns = [
+    { key: 'id', title: '实例 ID', dataIndex: 'id', align: 'left' },
+    { key: 'name', title: '集群名称', dataIndex: 'name', align: 'left' },
+    { key: 'cpu', title: 'CPU 限额', dataIndex: 'cpu', sorter: true, align: 'right' },
+    { key: 'status', title: '状态', dataIndex: 'status', align: 'center',
+      render: (val) => <span className="text-xs text-emerald-500 font-semibold">{val}</span>
+    }
+  ];
+
+  const tableData = [
+    { id: 'nexus-01', name: '云容器节点-主应用-01', cpu: 16, status: '运行中' },
+    { id: 'nexus-02', name: '云容器节点-副数据库-02', cpu: 32, status: '运行中' },
+    { id: 'nexus-03', name: '开发调试沙箱容器-03', cpu: 4, status: '已暂停' }
+  ];
+
+  return (
+    <Table
+      columns={columns}
+      dataSource={tableData}
+      bordered={${tableBordered}}
+      striped={${tableStriped}}
+      hoverable={${tableHoverable}}
+      size="${tableSize}"
+      loading={${tableLoading}}
+      emptyText="${tableEmptyText}"${tableShowSelection ? `\n      rowSelection={{\n        selectedRowKeys: [],\n        onChange: (keys, rows) => console.log('Selected Row Keys', keys)\n      }}` : ''}${tableShowPagination ? `\n      pagination={{\n        currentPage: ${tableCurrentPage},\n        totalPages: 5,\n        onChange: (page) => console.log('Switched to Page', page)\n      }}` : ''}
+    />
+  );
+}`;
+        case 'imageviewer':
+          return `import { ImageViewer, Button } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function ImageViewerDemo() {
+  const [visible, setVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // 预置高保真 Unsplash 展示图片与对应标题库
+  const DEMO_IMAGES = [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1200&q=80'
+  ];
+  const DEMO_TITLES = [
+    '设计方案 01 — 抽象莫兰迪科技感艺术海报',
+    '设计方案 02 — 三维多维流体折射偏振晶体',
+    '设计方案 03 — 极客数字极简美学高级终端'
+  ];
+
+  const images = ${ivUrlsType === 'single' ? `DEMO_IMAGES[0]` : `DEMO_IMAGES`};
+  const titles = ${ivUrlsType === 'single' ? `DEMO_TITLES[0]` : `DEMO_TITLES`};
+
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-center">
+      <Button 
+        variant="primary" 
+        onClick={() => {
+          setCurrentIndex(0);
+          setVisible(true);
+        }}
+      >
+        一键拉起图片灯箱组件
+      </Button>
+      
+      <ImageViewer
+        src={images}
+        titles={titles}
+        visible={visible}
+        current={currentIndex}
+        onClose={() => setVisible(false)}
+        onIndexChange={(idx) => setCurrentIndex(idx)}
+        downloadable={${ivDownloadable}}
+        enableKeyboard={${ivEnableKeyboard}}
+        enableMaskClose={${ivEnableMaskClose}}
+        rotatable={${ivRotatable}}
+        mirrorable={${ivMirrorable}}
+        zoomable={${ivZoomable}}
+      />
+    </div>
+  );
+}`;
+        case 'skeleton':
+          return `import { Skeleton } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function SkeletonDemo() {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <div className="space-y-6 max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+      {/* 1. 顶部控制切换 */}
+      <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
+        <span className="text-sm font-semibold">演示内容加载态</span>
+        <button 
+          onClick={() => setLoading(!loading)}
+          className="px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400"
+        >
+          {loading ? '开始加载真内容' : '切回骨架屏占位'}
+        </button>
+      </div>
+
+      {/* 2. 骨架屏 vs 真内容无缝淡出淡入过渡 */}
+      <Skeleton 
+        variant="${skVariant}"
+        animation="${skAnimation}"
+        rows={${skRows}}
+        avatar={${skAvatar}}
+        title={${skTitle}}
+        active={loading}
+      >
+        <div className="p-1">
+          <div className="flex items-center gap-4">
+            <div className="w-[52px] h-[52px] rounded-full bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 font-semibold">
+              User
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">高保真智能物理节点-Nexus-01</h3>
+              <p className="text-xs text-slate-500">已经顺利部署于华东一区 (Asia-East1-Container-Cluster)</p>
+            </div>
+          </div>
+          <div className="mt-4 space-y-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            <p>这个是一个真实的负载容器节点配置详情页。在初始化尚未拉取成功第三方 Spanner 数据库或 K8S Pod 之前，骨架占位屏能极大降低用户的等待焦虑感。</p>
+          </div>
+          <div className="flex justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button className="px-4 py-2 text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded-md">暂 停</button>
+            <button className="px-4 py-2 text-xs font-semibold bg-indigo-600 text-white rounded-md">启 动</button>
+          </div>
+        </div>
+      </Skeleton>
+    </div>
+  );
+}`;
+        case 'sidebar':
+          return `import { Sidebar } from 'atomix-ui';
+import { useState } from 'react';
+
+export default function SidebarDemo() {
+  const [activeId, setActiveId] = useState('${sbActiveId}');
+  const [collapsed, setCollapsed] = useState(${sbCollapsed});
+
+  const sidebarItems = [
+    { id: 'home', label: '工作台首页', icon: 'Home', badge: 'New', badgeType: 'primary' },
+    {
+      id: 'resources',
+      label: '云资源清单',
+      icon: 'Server',
+      children: [
+        { id: 'ecs', label: '弹性计算 CPU', icon: 'Cpu', badge: 15, badgeType: 'default' },
+        { id: 'redis', label: '缓存型 Redis', icon: 'Database' },
+        { id: 'rds', label: '高可用 RDS', icon: 'Database' }
+      ]
+    },
+    {
+      id: 'security',
+      label: '防火墙策略',
+      icon: 'ShieldAlert',
+      children: [
+        { id: 'rules', label: '访问控制规则', icon: 'Settings' },
+        { id: 'audit', label: '日志合规审计', icon: 'Terminal' }
+      ]
+    },
+    { id: 'settings', label: '全局环境配置', icon: 'Settings', badge: 'Beta', badgeType: 'warning' }
+  ];
+
+  return (
+    <div className="h-[500px] flex border border-slate-100 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950">
+      <Sidebar
+        items={sidebarItems}
+        activeId={activeId}
+        onChange={(id) => setActiveId(id)}
+        collapsed={collapsed}
+        onCollapseChange={(collapsedVal) => setCollapsed(collapsedVal)}
+        variant="${sbVariant}"
+        width={${sbWidth}}
+        collapsedWidth={${sbCollapsedWidth}}
+        showCollapseButton={${sbShowCollapseButton}}
+        header={
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-6 h-6 rounded bg-indigo-600 text-white font-black flex items-center justify-center text-xs">▲</div>
+            <div className="font-bold text-sm tracking-tight text-slate-800 dark:text-slate-100">Atomix Cloud</div>
+          </div>
+        }
+        footer={
+          <div className="flex items-center gap-2.5 px-1 py-1 text-slate-700 dark:text-slate-200">
+            <div className="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center font-bold text-xs text-indigo-600">JD</div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold leading-none truncate">John Doe</span>
+              <span className="text-[10px] text-slate-400 mt-1 truncate">Admin Profile</span>
+            </div>
+          </div>
+        }
+      />
+      <div className="flex-1 p-6 flex flex-col justify-center items-center">
+        <h4 className="text-sm font-bold text-slate-400 mb-1">当前激活页面 ID</h4>
+        <div className="px-4 py-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 font-mono font-bold rounded-lg text-lg">
+          {activeId}
+        </div>
+      </div>
+    </div>
+  );
+}`;
         default:
           return ``;
       }
@@ -956,7 +1391,7 @@ export default function TagDemo() {
 <template>
   <a-components-sandbox>
     <a-${activeTab} 
-      :preset="activePreset"${activeTab === 'button' ? `\n      variant="${btnVariant}"\n      size="${btnSize}"\n      :loading="${btnLoading}"\n      :disabled="${btnDisabled}"` : ''}${activeTab === 'input' ? `\n      label="${inputLabel}"\n      placeholder="${inputPlaceholder}"\n      :disabled="${inputDisabled}"\n      :error="${inputError}"` : ''}${activeTab === 'steps' ? `\n      :current="${stepsCurrent}"\n      direction="${stepsDirection}"\n      size="${stepsSize}"` : ''}${activeTab === 'progress' ? `\n      :value="${progValue}"\n      :max="${progMax}"\n      status="${progStatus}"\n      size="${progSize}"\n      :striped="${progStriped}"\n      :animated="${progAnimated}"` : ''}${activeTab === 'loading' ? `\n      :spinning="${loadSpinning}"\n      type="${loadType}"\n      size="${loadSize}"\n      color="${loadColor}"\n      tip="${loadTip}"\n      tip-position="${loadTipPosition}"\n      :backdrop="${loadBackdrop}"` : ''}${activeTab === 'alert' ? `\n      type="${alertType}"\n      message="${alertMessage}"${alertShowDescription ? `\n      description="${alertDescription}"` : ''}\n      :closable="${alertClosable}"\n      :show-icon="${alertShowIcon}"` : ''}${activeTab === 'toast' ? `\n      type="${toastType}"\n      message="${toastMessage}"${toastShowDescription ? `\n      description="${toastDescription}"` : ''}\n      :duration="${toastDuration}"\n      :closable="${toastClosable}"` : ''}${activeTab === 'tag' ? `\n      type="${tagType}"\n      variant="${tagVariant}"\n      size="${tagSize}"\n      :closable="${tagClosable}"` : ''}
+      :preset="activePreset"${activeTab === 'button' ? `\n      variant="${btnVariant}"\n      size="${btnSize}"\n      :loading="${btnLoading}"\n      :disabled="${btnDisabled}"` : ''}${activeTab === 'input' ? `\n      label="${inputLabel}"\n      placeholder="${inputPlaceholder}"\n      :disabled="${inputDisabled}"\n      :error="${inputError}"` : ''}${activeTab === 'steps' ? `\n      :current="${stepsCurrent}"\n      direction="${stepsDirection}"\n      size="${stepsSize}"` : ''}${activeTab === 'progress' ? `\n      :value="${progValue}"\n      :max="${progMax}"\n      status="${progStatus}"\n      size="${progSize}"\n      :striped="${progStriped}"\n      :animated="${progAnimated}"` : ''}${activeTab === 'loading' ? `\n      :spinning="${loadSpinning}"\n      type="${loadType}"\n      size="${loadSize}"\n      color="${loadColor}"\n      tip="${loadTip}"\n      tip-position="${loadTipPosition}"\n      :backdrop="${loadBackdrop}"` : ''}${activeTab === 'alert' ? `\n      type="${alertType}"\n      message="${alertMessage}"${alertShowDescription ? `\n      description="${alertDescription}"` : ''}\n      :closable="${alertClosable}"\n      :show-icon="${alertShowIcon}"` : ''}${activeTab === 'toast' ? `\n      type="${toastType}"\n      message="${toastMessage}"${toastShowDescription ? `\n      description="${toastDescription}"` : ''}\n      :duration="${toastDuration}"\n      :closable="${toastClosable}"` : ''}${activeTab === 'tag' ? `\n      type="${tagType}"\n      variant="${tagVariant}"\n      size="${tagSize}"\n      :closable="${tagClosable}"` : ''}${activeTab === 'list' ? `\n      :bordered="${listBordered}"\n      :split="${listSplit}"\n      size="${listSize}"\n      :loading="${listLoading}"\n      :pagination="${listShowPagination}"` : ''}${activeTab === 'table' ? `\n      :bordered="${tableBordered}"\n      :striped="${tableStriped}"\n      :hoverable="${tableHoverable}"\n      size="${tableSize}"\n      :loading="${tableLoading}"\n      :row-selection="${tableShowSelection}"\n      :pagination="${tableShowPagination}"` : ''}
     />
   </a-components-sandbox>
 </template>
@@ -1913,11 +2348,455 @@ export class AtomixDemoComponent {
                         )}
                       </div>
                     )}
+
+                    {activeTab === 'list' && (
+                      <div className="w-full flex flex-col p-6 animate-fade-in max-w-2xl mx-auto">
+                        <div className="mb-4 flex items-center justify-between">
+                          <span className="text-xs font-mono text-slate-400">
+                            数据控制台: <strong style={{ color: tokens.colors.brand }}>{listClickedLog}</strong>
+                          </span>
+                          {listClickedLog !== '暂无行项点击交互' && (
+                            <button 
+                              onClick={() => setListClickedLog('暂无行项点击交互')}
+                              className="text-[10px] text-slate-400 hover:text-slate-600 underline"
+                            >
+                              清除反馈
+                            </button>
+                          )}
+                        </div>
+
+                        <List
+                          dataSource={listEmpty ? [] : Array.from({ length: 5 }).map((_, i) => ({
+                            id: `item-${i + 1}`,
+                            title: '列表主内容',
+                            desc: '列表内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容',
+                          }))}
+                          bordered={listBordered}
+                          split={listSplit}
+                          transparent={listTransparent}
+                          size={listSize}
+                          loading={listLoading}
+                          emptyText={listEmptyText}
+                          hoverable={true}
+                          onRowClick={(item) => {
+                            setListClickedLog(`点击了单项 [${item.id}]`);
+                          }}
+                          header={listShowHeader ? (
+                            <div className="flex items-center justify-between w-full text-sm font-semibold">
+                              <span>列表头部概览</span>
+                            </div>
+                          ) : undefined}
+                          footer={listShowFooter ? (
+                            <div className="flex items-center justify-between w-full text-xs text-slate-400 dark:text-slate-500">
+                              <span>列表尾部总结</span>
+                            </div>
+                          ) : undefined}
+                          pagination={listShowPagination ? {
+                            currentPage: listCurrentPage,
+                            totalPages: 5,
+                            onChange: (page) => {
+                              toast.info(`切换至列表第 ${page} 分页数据流`);
+                              setListCurrentPage(page);
+                            }
+                          } : undefined}
+                          renderItem={(item) => (
+                            <div className="flex items-center justify-between select-none py-1.5 w-full">
+                              <div className="flex items-start gap-4">
+                                {listShowIcons && (
+                                  <Server className="w-5 h-5 mt-0.5 px-0 rounded shrink-0" style={{ color: tokens.colors.textSecondary }} />
+                                )}
+                                <div className="flex flex-col text-left">
+                                  <span className="font-medium text-base" style={{ color: tokens.colors.textPrimary }}>
+                                    {item.title}
+                                  </span>
+                                  {listShowDesc && (
+                                    <span className="text-sm mt-1.5" style={{ color: tokens.colors.textSecondary }}>{item.desc}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm ml-4 shrink-0">
+                                {listShowActions && (
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="text"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toast.success(`执行操作1`);
+                                      }}
+                                    >
+                                      操作1
+                                    </Button>
+                                    <Button
+                                      variant="text"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toast.success(`执行操作2`);
+                                      }}
+                                    >
+                                      操作2
+                                    </Button>
+                                    <Button
+                                      variant="text"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toast.success(`执行操作3`);
+                                      }}
+                                    >
+                                      操作3
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'table' && (
+                      <div className="w-full flex flex-col p-6 animate-fade-in max-w-3xl mx-auto">
+                        <div className="mb-4 flex items-center justify-between">
+                          <span className="text-xs font-mono text-slate-400">
+                            数据控制台: <strong style={{ color: tokens.colors.brand }}>{tableClickedLog}</strong>
+                            {tableSelectedKeys.length > 0 && (
+                              <span className="ml-3 text-indigo-600 font-semibold bg-indigo-50/50 dark:bg-indigo-950/20 px-2 py-0.5 rounded">
+                                已选中 {tableSelectedKeys.length} 行数据
+                              </span>
+                            )}
+                          </span>
+                          <div className="flex gap-2">
+                            {tableSelectedKeys.length > 0 && (
+                              <button 
+                                onClick={() => {
+                                  toast.success(`批量执行安全阻断 [${tableSelectedKeys.length} 个容器]`);
+                                  setTableSelectedKeys([]);
+                                }}
+                                className="text-[10px] text-red-500 hover:text-red-600 font-semibold underline"
+                              >
+                                批量阻断 ({tableSelectedKeys.length})
+                              </button>
+                            )}
+                            {(tableClickedLog !== '暂无表格行点击交互' || tableSelectedKeys.length > 0) && (
+                              <button 
+                                onClick={() => {
+                                  setTableClickedLog('暂无表格行点击交互');
+                                  setTableSelectedKeys([]);
+                                }}
+                                className="text-[10px] text-slate-400 hover:text-slate-600 underline"
+                              >
+                                重置选择
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <Table
+                          columns={[
+                            { key: 'id', title: '可用区', dataIndex: 'id', align: 'left', width: '22%' },
+                            { key: 'name', title: '节点容器名称', dataIndex: 'name', align: 'left', width: '33%' },
+                            { key: 'cpu', title: 'CPU 核心限制', dataIndex: 'cpu', sorter: true, align: 'right', width: '23%' },
+                            { 
+                              key: 'status', 
+                              title: '全局健康状态', 
+                              dataIndex: 'status', 
+                              align: 'center',
+                              width: '22%',
+                              render: (val) => {
+                                const isOnline = val === '运行中';
+                                return (
+                                  <span 
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    style={{
+                                      backgroundColor: isOnline ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                      color: isOnline ? '#10b981' : '#ef4444',
+                                    }}
+                                  >
+                                    <span 
+                                      className="w-1.5 h-1.5 rounded-full" 
+                                      style={{ backgroundColor: isOnline ? '#10b981' : '#ef4444' }} 
+                                    />
+                                    {val}
+                                  </span>
+                                );
+                              }
+                            }
+                          ]}
+                          dataSource={tableEmpty ? [] : [
+                            { id: 'ap-shanghai', name: 'Web-Kubernetes-Worker-A', cpu: 16, status: '运行中' },
+                            { id: 'ap-singapore', name: 'Database-Primary-Master', cpu: 64, status: '运行中' },
+                            { id: 'us-east-1', name: 'OAuth-Token-Service-Hub', cpu: 8, status: '已暂停' },
+                            { id: 'eu-west-1', name: 'Media-Processing-Pipeline', cpu: 32, status: '运行中' }
+                          ]}
+                          bordered={tableBordered}
+                          striped={tableStriped}
+                          hoverable={tableHoverable}
+                          size={tableSize}
+                          loading={tableLoading}
+                          emptyText={tableEmptyText}
+                          onRowClick={(record) => {
+                            setTableClickedLog(`单击行实例 [${record.name}]`);
+                          }}
+                          rowSelection={tableShowSelection ? {
+                            selectedRowKeys: tableSelectedKeys,
+                            onChange: (keys) => {
+                              setTableSelectedKeys(keys);
+                            }
+                          } : undefined}
+                          pagination={tableShowPagination ? {
+                            currentPage: tableCurrentPage,
+                            totalPages: 5,
+                            onChange: (page) => {
+                              toast.info(`表格拉取第 ${page} 分页物理数据帧`);
+                              setTableCurrentPage(page);
+                            }
+                          } : undefined}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'imageviewer' && (
+                      <div className="w-full flex flex-col p-6 animate-fade-in max-w-xl mx-auto text-center justify-center items-center">
+                        <p className="text-sm font-semibold mb-6" style={{ color: tokens.colors.textSecondary }}>
+                          点击下方任意缩略图，或点击主控制键启动沉浸式多维度图片预览 (ImageViewer)
+                        </p>
+                        
+                        {/* 缩略图集合 */}
+                        <div className="grid grid-cols-3 gap-4 mb-8 w-full">
+                          {DEMO_IMAGES.map((url, i) => (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                setIvUrlsType('multiple');
+                                setIvCurrentIndex(i);
+                                setIvVisible(true);
+                                setIvClickedLog(`激活缩略图下标: [${i}], 文件标题: ${DEMO_TITLES[i]}`);
+                              }}
+                              className="relative rounded-xl overflow-hidden aspect-[4/3] border group transition-all cursor-pointer shadow-sm hover:shadow-md focus:outline-none bg-slate-100"
+                              style={{ borderColor: tokens.colors.border }}
+                            >
+                              <img src={url} alt={DEMO_TITLES[i]} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 animate-fade-in" referrerPolicy="no-referrer" />
+                              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="text-[10px] text-white font-semibold bg-slate-900/80 px-2 py-1 rounded">点击查看图 {i + 1}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* 启动大图按钮操作栏 */}
+                        <div className="flex gap-4.5 justify-center">
+                          <Button 
+                            variant="primary" 
+                            onClick={() => {
+                              setIvUrlsType('multiple');
+                              setIvCurrentIndex(0);
+                              setIvVisible(true);
+                              setIvClickedLog(`一键启动多图画廊灯箱 (3张精选美图流转)`);
+                            }}
+                          >
+                            加载多图走马灯 (库组)
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => {
+                              setIvUrlsType('single');
+                              setIvCurrentIndex(0);
+                              setIvVisible(true);
+                              setIvClickedLog(`一键启动单图模式灯箱`);
+                            }}
+                          >
+                            加载单图灯箱组
+                          </Button>
+                        </div>
+
+                        {/* 图片预览组件实体 */}
+                        <ImageViewer
+                          src={ivUrlsType === 'multiple' ? DEMO_IMAGES : DEMO_IMAGES[0]}
+                          titles={ivUrlsType === 'multiple' ? DEMO_TITLES : DEMO_TITLES[0]}
+                          visible={ivVisible}
+                          current={ivCurrentIndex}
+                           onClose={() => {
+                             setIvVisible(false);
+                             setIvClickedLog('图片灯箱已被执行 onClose() 安全关闭');
+                           }}
+                           onIndexChange={(idx) => {
+                             setIvCurrentIndex(idx);
+                             setIvClickedLog(`物理走切换至下标: [${idx}] | 标题: ${DEMO_TITLES[idx]}`);
+                           }}
+                          downloadable={ivDownloadable}
+                          enableKeyboard={ivEnableKeyboard}
+                          enableMaskClose={ivEnableMaskClose}
+                          rotatable={ivRotatable}
+                          mirrorable={ivMirrorable}
+                          zoomable={ivZoomable}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'skeleton' && (
+                      <div className="w-full flex flex-col p-6 animate-fade-in max-w-xl mx-auto">
+                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100 dark:border-slate-800/40">
+                          <div>
+                            <span className="text-sm font-bold block" style={{ color: tokens.colors.textPrimary }}>
+                              骨架屏状态装载过渡 (Transition Test Area)
+                            </span>
+                            <span className="text-[11px] text-slate-400 block -mt-0.5">
+                              点击右侧按钮控制 active 属性，触发骨架占位态与真内容之间的优雅淡入淡出。
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const newActive = !skActive;
+                              setSkActive(newActive);
+                              setSkClickedLog(`用户一键切换骨架状态：${newActive ? '已进入[骨架态占位]' : '已进入[真实真内容渲染]'}`);
+                            }}
+                            className="px-3 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                            style={{
+                              backgroundColor: skActive ? tokens.colors.brand : tokens.colors.bgHover,
+                              color: skActive ? tokens.colors.textInverse : tokens.colors.textPrimary,
+                            }}
+                          >
+                            <Zap className="w-3.5 h-3.5" />
+                            {skActive ? '切换到真内容' : '切回骨架屏占位'}
+                          </button>
+                        </div>
+
+                        {/* 核心展示区 */}
+                        <div className="p-4 border rounded-xl bg-white dark:bg-slate-900/60 shadow-sm min-h-[220px] flex items-center justify-center transition-all" style={{ borderColor: tokens.colors.border }}>
+                          <div className="w-full">
+                            <Skeleton
+                              variant={skVariant}
+                              animation={skAnimation}
+                              rows={skRows}
+                              avatar={skAvatar}
+                              title={skTitle}
+                              active={skActive}
+                              width={skWidth || undefined}
+                              height={skHeight || undefined}
+                            >
+                              <div className="w-full p-1 animate-fade-in text-left">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-[52px] h-[52px] rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center">
+                                    CORE
+                                  </div>
+                                  <div>
+                                    <h3 className="text-sm font-extrabold" style={{ color: tokens.colors.textPrimary }}>
+                                      云主权物理计算集群 (Host-Root-Hyper-K8s)
+                                    </h3>
+                                    <span className="text-xs text-slate-400 font-mono block">
+                                      IP: 10.244.1.18 — CLUSTER STATE: STABLE - UP TIME: 462h
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="space-y-2.5 mt-4 text-xs leading-relaxed" style={{ color: tokens.colors.textSecondary }}>
+                                  <p>
+                                    高保真五层原语体系下的物理状态详情卡片已成功加载！通过点击右上侧的高阶触控开关，你可以观察从带波纹扫尾、呼吸阻尼律动动画的 Skeleton 骨架骨块，到真内容显露之间的无缝切换。
+                                  </p>
+                                  <p>
+                                    此复合卡片完美对接当前的四大定制品牌微美学，在瑞士现代（锐利折角）与香芋气泡（极致圆角）下，骨头圆外形也会随之智能变化。
+                                  </p>
+                                </div>
+                                <div className="flex gap-2.5 justify-end mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                  <button className="px-3.5 py-1.5 text-xs font-semibold rounded" style={{ backgroundColor: tokens.colors.bgHover, color: tokens.colors.textPrimary }}>
+                                    深度维护模式
+                                  </button>
+                                  <button className="px-3.5 py-1.5 text-xs font-semibold rounded text-white" style={{ backgroundColor: tokens.colors.brand }}>
+                                    资源弹性扩容
+                                  </button>
+                                </div>
+                              </div>
+                            </Skeleton>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'sidebar' && (
+                      <div className="w-full h-[480px] flex animate-fade-in border rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950/20" style={{ borderColor: tokens.colors.border }}>
+                        <Sidebar
+                          items={defaultSidebarItems}
+                          activeId={sbActiveId}
+                          onChange={(id, item) => {
+                            setSbActiveId(id);
+                            setSbClickedLog(`用户触发跳转 → 选中路径 [${id}] (菜单: ${item.label})`);
+                          }}
+                          collapsed={sbCollapsed}
+                          onCollapseChange={(collapsedVal) => {
+                            setSbCollapsed(collapsedVal);
+                            setSbClickedLog(`导航栏一键伸缩变更：${collapsedVal ? '[折叠窄态]' : '[展开宽幅态]'}`);
+                          }}
+                          variant={sbVariant}
+                          width={sbWidth}
+                          collapsedWidth={sbCollapsedWidth}
+                          showCollapseButton={sbShowCollapseButton}
+                          header={
+                            sbShowHeader ? (
+                              <div className="flex items-center gap-2.5 px-1 min-w-0">
+                                <div className="w-7 h-7 rounded bg-indigo-600 dark:bg-indigo-500 font-extrabold flex items-center justify-center text-white text-xs select-none shadow-sm shadow-indigo-400 shrink-0">
+                                  ▲
+                                </div>
+                                <div className="flex flex-col text-left leading-none min-w-0">
+                                  <span className="font-bold text-[13px] tracking-tight text-slate-800 dark:text-slate-100 truncate">Atomix Desk</span>
+                                  <span className="text-[9.5px] text-slate-400 mt-1 truncate">Platform Console</span>
+                                </div>
+                              </div>
+                            ) : undefined
+                          }
+                          footer={
+                            sbShowFooter ? (
+                              <div className="flex items-center gap-2.5 px-1 py-1 text-slate-700 dark:text-slate-200 select-none min-w-0">
+                                <div className="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center font-bold text-xs text-indigo-600 shrink-0">
+                                  AZ
+                                </div>
+                                <div className="flex flex-col text-left min-w-0">
+                                  <span className="text-xs font-bold leading-none truncate">Alizé Z.</span>
+                                  <span className="text-[9.5px] text-slate-400 mt-1 truncate">Platform Admin</span>
+                                </div>
+                              </div>
+                            ) : undefined
+                          }
+                        />
+                        <div className="flex-1 p-8 flex flex-col justify-center items-center relative bg-white/70 dark:bg-slate-900/30">
+                          {/* 装饰水印背景 */}
+                          <div className="absolute right-4 top-4 select-none opacity-5 pointer-events-none">
+                            <span className="font-sans font-black text-6xl tracking-tight uppercase">ATOMIX</span>
+                          </div>
+
+                          <div className="w-12 h-12 rounded-full mb-3 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border shadow-sm" style={{ borderColor: tokens.colors.border }}>
+                            {sbActiveId === 'home' && <Home className="w-5 h-5" />}
+                            {sbActiveId === 'ecs' && <Cpu className="w-5 h-5" />}
+                            {sbActiveId === 'redis' && <Database className="w-5 h-5" />}
+                            {sbActiveId === 'rds' && <Database className="w-5 h-5" />}
+                            {sbActiveId === 'rules' && <Sliders className="w-5 h-5" />}
+                            {sbActiveId === 'audit' && <Terminal className="w-5 h-5" />}
+                            {sbActiveId === 'settings' && <Sliders className="w-5 h-5" />}
+                          </div>
+
+                          <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Active Sandbox View ID</h4>
+                          <div 
+                            className="px-5 py-2 font-mono font-black text-xl rounded-xl border select-all transition-all duration-300"
+                            style={{
+                              backgroundColor: tokens.colors.bgHover || 'rgba(79, 70, 229, 0.05)',
+                              borderColor: tokens.colors.border,
+                              color: tokens.colors.brand,
+                            }}
+                          >
+                            /{sbActiveId}
+                          </div>
+                          
+                          <p className="text-[11px] text-slate-400 text-center max-w-xs mt-3 leading-relaxed">
+                            点击左侧导航栏中的叶子菜单或展开树状子菜单，均可在此处对选中的路径激活参数进行实时受控状态映射。
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Micro interaction logging lines nested on preview block bottom */}
-                {['breadcrumb', 'pagination', 'steps', 'tabs', 'datepicker', 'slider', 'card', 'progress', 'loading', 'alert', 'toast', 'tag'].includes(activeTab) && (
+                {['breadcrumb', 'pagination', 'steps', 'tabs', 'datepicker', 'slider', 'card', 'progress', 'loading', 'alert', 'toast', 'tag', 'imageviewer', 'skeleton', 'sidebar'].includes(activeTab) && (
                   <div className="px-6 py-2.5 bg-slate-50/30 border-t border-slate-150 flex items-center justify-between text-[11px]">
                     <span className="text-slate-400 font-bold font-mono">📡 Interaction Logger:</span>
                     <span className="text-indigo-600 font-bold">
@@ -1933,6 +2812,9 @@ export class AtomixDemoComponent {
                       {activeTab === 'alert' && `警告条等级: ${alertType} | 状态大图标: ${alertShowIcon ? '开启' : '隐藏'} | 详细描述: ${alertShowDescription ? '开启' : '关闭'} | 是否可见: ${alertIsVisibleTest ? '常驻显示中' : '已手动 onClose 关闭'}`}
                       {activeTab === 'toast' && `轻提示类型: ${toastType} | 时长: ${toastDuration}ms | 可手动消除: ${toastClosable ? '是' : '否'}`}
                       {activeTab === 'tag' && `标贴等级: ${tagType} | 变体: ${tagVariant} | 尺寸: ${tagSize} | 可视状态: ${tagIsVisibleTest ? '常显活跃' : '已被交互移除'}`}
+                      {activeTab === 'imageviewer' && ivClickedLog}
+                      {activeTab === 'skeleton' && skClickedLog}
+                      {activeTab === 'sidebar' && sbClickedLog}
                     </span>
                   </div>
                 )}
@@ -3842,6 +4724,610 @@ export class AtomixDemoComponent {
                       <ToggleSwitch
                         checked={tagShowIcon}
                         onChange={setTagShowIcon}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* LIST props controllers */}
+              {activeTab === 'list' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>内间距尺寸 (Size Spec)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'SM - 紧凑精细版 (py-2 px-3.5)', value: 'sm' },
+                        { label: 'MD - 设计系推荐日常版 (py-3.5 px-5)', value: 'md' },
+                        { label: 'LG - 宽绰呼吸版 (py-5 px-6)', value: 'lg' },
+                      ]}
+                      value={listSize}
+                      onChange={(val) => setListSize(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>未连通兜底文本 (Empty Text)</label>
+                    <Input
+                      value={listEmptyText}
+                      onChange={(e) => setListEmptyText(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>外层硬壳边框 (Bordered)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">是否使用 1px solid 边框包裹</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listBordered}
+                        onChange={setListBordered}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>下层项目切分线 (Split Items)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">各行项项之间渲染精密中性线</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listSplit}
+                        onChange={setListSplit}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>骨架脉冲加载态 (Loading)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">开启优雅发光的列表仿真骨架屏</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listLoading}
+                        onChange={setListLoading}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>空数据测试 (Empty State)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">置空数据源以展示 Inbox 兜底插画</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listEmpty}
+                        onChange={setListEmpty}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>自带页脚分页 (Show Pagination)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">列表末尾附加自适应轻量分页控制器</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowPagination}
+                        onChange={setListShowPagination}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>去背景白底彻底透明 (Transparent)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">移除卡片底色，透出后台系统背景</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listTransparent}
+                        onChange={setListTransparent}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示卡片头部页眉 (Show Header)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">是否渲染带有网口监视字的头部</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowHeader}
+                        onChange={setListShowHeader}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示卡片尾部页脚 (Show Footer)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">尾部增加安全密钥与签名传输条</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowFooter}
+                        onChange={setListShowFooter}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>列表单项图标 (Show Item Icons)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">在列表每行前置优雅机架服务器图标</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowIcons}
+                        onChange={setListShowIcons}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>列表单项辅助描述 (Show Item Desc)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">在每行主标题下附加两组功能描述</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowDesc}
+                        onChange={setListShowDesc}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>列表单项可配置按钮 (Show Actions)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">列表项右部渲染呼入诊断与排产按钮</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={listShowActions}
+                        onChange={setListShowActions}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TABLE props controllers */}
+              {activeTab === 'table' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>内联单元规格 (Row Size)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'SM - 高密精细排版 (py-1.5 px-3)', value: 'sm' },
+                        { label: 'MD - 日常最简标准版 (py-3 px-4)', value: 'md' },
+                        { label: 'LG - 畅快空灵留白板 (py-4.5 px-6)', value: 'lg' },
+                      ]}
+                      value={tableSize}
+                      onChange={(val) => setTableSize(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>空数据兜底陈叙 (Empty Text)</label>
+                    <Input
+                      value={tableEmptyText}
+                      onChange={(e) => setTableEmptyText(e.target.value)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>外层包封外框 (Bordered)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">是否展示高质感外包硬壳底图线</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableBordered}
+                        onChange={setTableBordered}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>斑马斜横交错 (Zebra Striped)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">奇奇数偶数行交叠渲染微调背景底纹</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableStriped}
+                        onChange={setTableStriped}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>悬浮移入高亮 (Hover Highlight)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">移入行内项是否淡化触发感官响应</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableHoverable}
+                        onChange={setTableHoverable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>骨架脉冲加载态 (Loading Status)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">渲染优雅发光的表格防占位骨架行项</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableLoading}
+                        onChange={setTableLoading}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>无数据源测试 (Empty State)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">强制置空可用区数据流，触发优雅保底</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableEmpty}
+                        onChange={setTableEmpty}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>批量复选选择器 (Row Selections)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">启用左侧多选 CheckBox 批量操作控制链</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableShowSelection}
+                        onChange={setTableShowSelection}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>尾底嵌入式分页 (Pages System)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">在表格末尾拼接自带的微型分页页脚</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={tableShowPagination}
+                        onChange={setTableShowPagination}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* IMAGEVIEWER props controllers */}
+              {activeTab === 'imageviewer' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>画廊组合 / 单图模式</label>
+                    <Dropdown
+                      options={[
+                        { label: '多图循环切换走马灯画廊组', value: 'multiple' },
+                        { label: '单个图像定焦沉浸式模式', value: 'single' },
+                      ]}
+                      value={ivUrlsType}
+                      onChange={(val) => setIvUrlsType(val as any)}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>一键物理下载 (Downloadable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">加载下载按钮并下发本源高清图像</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivDownloadable}
+                        onChange={setIvDownloadable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>快捷物理按键 (Keyboard Controls)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">支持左右物理切图键与 Esc 快速逃离</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivEnableKeyboard}
+                        onChange={setIvEnableKeyboard}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>遮罩层点击外退 (Mask Closable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">支持点选暗色背景遮罩退还控制面板</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivEnableMaskClose}
+                        onChange={setIvEnableMaskClose}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>顺/逆时针旋转 (Rotatable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">控制台是否装载 90° 旋转修正控制柄</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivRotatable}
+                        onChange={setIvRotatable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>关于镜像镜翻 (Mirrorable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">控制台是否装载 X 轴镜像水平平翻功能</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivMirrorable}
+                        onChange={setIvMirrorable}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>放大缩小网格 (Zoomable)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">控制台自适应放大、缩小物理缩放控制</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={ivZoomable}
+                        onChange={setIvZoomable}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SKELETON props controllers */}
+              {activeTab === 'skeleton' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>基础占位骨骼变体类型 (Variant)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'text - 单行文本条状骨架', value: 'text' },
+                        { label: 'circle - 圆形头像等占位骨架', value: 'circle' },
+                        { label: 'rect - 复合圆角卡片矩形骨架', value: 'rect' },
+                        { label: 'image - 媒体封面占位图片骨架', value: 'image' },
+                        { label: 'button - 标准操作按钮宽度骨骼', value: 'button' },
+                        { label: 'card - 带圆角的一整块高保真卡片', value: 'card' },
+                        { label: 'list - 复合多行结构文本列表占位', value: 'list' },
+                        { label: 'complex - 带有复合头像+标题等重度细节形态', value: 'complex' },
+                      ]}
+                      value={skVariant}
+                      onChange={(val) => {
+                        setSkVariant(val as any);
+                        setSkClickedLog(`用户切换骨架屏 Variant 到: "${val}"`);
+                      }}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>高阶行波过渡动画 (Animation Wave)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'wave - 带有流光往返轻微行波 (强力推荐)', value: 'wave' },
+                        { label: 'pulse - 带呼吸律动的阻尼收张', value: 'pulse' },
+                        { label: 'none - 静态低噪灰条 (无动画)', value: 'none' },
+                      ]}
+                      value={skAnimation}
+                      onChange={(val) => {
+                        setSkAnimation(val as any);
+                        setSkClickedLog(`用户切换动画 Animation 为: "${val}"`);
+                      }}
+                      size="sm"
+                    />
+                  </div>
+
+                  {['text', 'list', 'complex'].includes(skVariant) && (
+                    <div className="space-y-1.5 animate-fade-in">
+                      <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>占位行数 (Rows: 1-10)</label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={10}
+                        value={skRows}
+                        onChange={(e) => {
+                          const val = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                          setSkRows(val);
+                          setSkClickedLog(`配置骨架占位文本行数: ${val} 行`);
+                        }}
+                        size="sm"
+                      />
+                    </div>
+                  )}
+
+                  {['text', 'rect', 'circle', 'image', 'button'].includes(skVariant) && (
+                    <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-semibold text-slate-400">强制宽度 (Width)</label>
+                        <Input
+                          placeholder="例如 100%, 80px"
+                          value={skWidth}
+                          onChange={(e) => {
+                            setSkWidth(e.target.value);
+                            setSkClickedLog(`强制自定义占位宽度: "${e.target.value}"`);
+                          }}
+                          size="sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-semibold text-slate-400">强制高度 (Height)</label>
+                        <Input
+                          placeholder="例如 16px, 120px"
+                          value={skHeight}
+                          onChange={(e) => {
+                            setSkHeight(e.target.value);
+                            setSkClickedLog(`强制自定义占位高度: "${e.target.value}"`);
+                          }}
+                          size="sm"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex justify-between items-center text-xs mb-1 text-slate-500 font-bold">
+                      <span>复合子属性控制器 (Sub Flags)</span>
+                    </div>
+
+                    {['complex', 'list'].includes(skVariant) && (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示左侧圆形头像占位 (Show Avatar)</span>
+                          <span className="text-[10px] text-slate-400 block -mt-0.5">在大图或详情卡左侧拼接圆骨</span>
+                        </div>
+                        <ToggleSwitch
+                          checked={skAvatar}
+                          onChange={(v) => {
+                            setSkAvatar(v);
+                            setSkClickedLog(`切换显示左侧头像骨骼圈: ${v ? '开启' : '关闭'}`);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {['complex', 'list'].includes(skVariant) && (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>显示顶部大标题占位 (Show Title)</span>
+                          <span className="text-[10px] text-slate-400 block -mt-0.5">在多行长文上方加厚一横宽骨骼</span>
+                        </div>
+                        <ToggleSwitch
+                          checked={skTitle}
+                          onChange={(v) => {
+                            setSkTitle(v);
+                            setSkClickedLog(`切换显示顶部标题骨格条: ${v ? '开启' : '关闭'}`);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>全局骨骼激活装载中 (Active Loading)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">若设为 False 将直接释放并无缝呈现子组件真内容</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={skActive}
+                        onChange={(v) => {
+                          setSkActive(v);
+                          setSkClickedLog(`切换全局加载中 Active 态: ${v ? '开启(骨架中)' : '关闭(直露内容)'}`);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SIDEBAR props controllers */}
+              {activeTab === 'sidebar' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in">
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: tokens.colors.textPrimary }}>美学风格变体 (Variant Style)</label>
+                    <Dropdown
+                      options={[
+                        { label: 'classic - 经典卡条分界通铺风格', value: 'classic' },
+                        { label: 'modern - 浮动磨砂卡片高阶质感', value: 'modern' },
+                        { label: 'minimal - 融入背景无噪无边风格', value: 'minimal' },
+                      ]}
+                      value={sbVariant}
+                      onChange={(val) => {
+                        setSbVariant(val as any);
+                        setSbClickedLog(`用户重置侧边栏美学风格 Variant: ${val}`);
+                      }}
+                      size="sm"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-semibold text-slate-400">展开宽幅 (Width)</label>
+                      <Input
+                        type="number"
+                        min={150}
+                        max={350}
+                        value={sbWidth}
+                        onChange={(e) => {
+                          const w = Math.max(150, Math.min(350, parseInt(e.target.value) || 240));
+                          setSbWidth(w);
+                          setSbClickedLog(`强制自定义展开宽幅: ${w}px`);
+                        }}
+                        size="sm"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-semibold text-slate-400">收纳窄宽 (Folded)</label>
+                      <Input
+                        type="number"
+                        min={40}
+                        max={100}
+                        value={sbCollapsedWidth}
+                        onChange={(e) => {
+                          const fw = Math.max(40, Math.min(100, parseInt(e.target.value) || 64));
+                          setSbCollapsedWidth(fw);
+                          setSbClickedLog(`强制自定收缩窄幅: ${fw}px`);
+                        }}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t space-y-3 animate-fade-in" style={{ borderColor: tokens.colors.border }}>
+                    <div className="flex justify-between items-center text-xs mb-1 text-slate-500 font-bold">
+                      <span>行为/布局微配置 (Fine Tuning)</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>菜单受控收折 (Collapsed)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">控制侧边栏当前处于展开还是收缩</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={sbCollapsed}
+                        onChange={(v) => {
+                          setSbCollapsed(v);
+                          setSbClickedLog(`通过外置中控切变收折状态：${v ? '[缩窄]' : '[展开]'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>内置底端折叠按键 (Collapse Button)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">加载底边快捷一键折叠控柄</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={sbShowCollapseButton}
+                        onChange={(v) => {
+                          setSbShowCollapseButton(v);
+                          setSbClickedLog(`切换显示底部快捷折叠开关: ${v ? '加载' : '隐藏'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>品牌顶头标牌 (Header Logo)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">装载带物理卡片的大纲 Logo 头区块</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={sbShowHeader}
+                        onChange={(v) => {
+                          setSbShowHeader(v);
+                          setSbClickedLog(`切换显示顶部标牌 Header: ${v ? '显示' : '隐藏'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>底部雇员名片 (Footer Profile)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">侧边栏底部加载高级人员资料卡</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={sbShowFooter}
+                        onChange={(v) => {
+                          setSbShowFooter(v);
+                          setSbClickedLog(`切换显示底部资料卡 Footer: ${v ? '显示' : '隐藏'}`);
+                        }}
                       />
                     </div>
                   </div>

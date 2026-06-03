@@ -32,6 +32,11 @@ import { DatePicker } from './atoms/DatePicker';
 import { Slider } from './atoms/Slider';
 import { Progress } from './atoms/Progress';
 import { Loading } from './atoms/Loading';
+import { Tag } from './atoms/Tag';
+import { Skeleton } from './atoms/Skeleton';
+import { Sidebar } from './atoms/Sidebar';
+import { List } from './atoms/List';
+import { Table } from './atoms/Table';
 import { Home } from 'lucide-react';
 import {
   Server,
@@ -475,6 +480,107 @@ export const ScenarioSandbox: React.FC = () => {
                       tip={child.props?.tip}
                       tipPosition={child.props?.tipPosition || 'bottom'}
                       backdrop={child.props?.backdrop}
+                    />
+                  );
+                }
+                if (child.element === 'Skeleton') {
+                  return (
+                    <Skeleton
+                      key={`ai-skeleton-${idx}`}
+                      variant={child.props?.variant || 'text'}
+                      width={child.props?.width}
+                      height={child.props?.height}
+                      animation={child.props?.animation || 'wave'}
+                      rows={child.props?.rows}
+                      avatar={child.props?.avatar !== false}
+                      title={child.props?.title !== false}
+                      active={child.props?.active !== false}
+                    >
+                      {child.props?.children}
+                    </Skeleton>
+                  );
+                }
+                if (child.element === 'Sidebar') {
+                  return (
+                    <Sidebar
+                      key={`ai-sidebar-${idx}`}
+                      items={child.props?.items || []}
+                      activeId={child.props?.activeId || ''}
+                      onChange={(id) => console.log('Runtime sidebar clicked:', id)}
+                      collapsed={child.props?.collapsed || false}
+                      variant={child.props?.variant || 'classic'}
+                      width={child.props?.width}
+                      collapsedWidth={child.props?.collapsedWidth}
+                      showCollapseButton={child.props?.showCollapseButton !== false}
+                    />
+                  );
+                }
+                if (child.element === 'Tag') {
+                  return (
+                    <Tag
+                      key={`ai-tag-${idx}`}
+                      type={child.props?.type || 'primary'}
+                      variant={child.props?.variant || 'soft'}
+                      size={child.props?.size || 'md'}
+                      closable={child.props?.closable}
+                      onClose={() => console.log('Runtime tag closed')}
+                    >
+                      {child.props?.children || 'Tag'}
+                    </Tag>
+                  );
+                }
+                if (child.element === 'List') {
+                  const items = child.props?.dataSource || [];
+                  return (
+                    <List
+                      key={`ai-list-${idx}`}
+                      dataSource={items}
+                      bordered={child.props?.bordered !== false}
+                      split={child.props?.split !== false}
+                      transparent={child.props?.transparent === true}
+                      hoverable={child.props?.hoverable !== false}
+                      onRowClick={(item, index) => {
+                        console.log('List Runtime Row Clicked:', item, index);
+                      }}
+                      size={child.props?.size || 'md'}
+                      loading={child.props?.loading}
+                      emptyText={child.props?.emptyText}
+                      renderItem={(item: any) => {
+                        if (typeof item === 'string') return <span className="text-sm">{item}</span>;
+                        return (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="font-semibold text-slate-700 dark:text-slate-200">
+                              {item.name || item.title || JSON.stringify(item)}
+                            </span>
+                            {item.value && <span className="font-mono text-slate-400">{item.value}</span>}
+                          </div>
+                        );
+                      }}
+                    />
+                  );
+                }
+                if (child.element === 'Table') {
+                  const items = child.props?.dataSource || [];
+                  const defaultCols = [
+                    { key: 'id', title: '资源标识', dataIndex: 'id', align: 'left' },
+                    { key: 'name', title: '模块名称', dataIndex: 'name', align: 'left' },
+                    { key: 'value', title: '监控数值', dataIndex: 'value', align: 'right' }
+                  ];
+                  const cols = child.props?.columns || defaultCols;
+                  return (
+                    <Table
+                      key={`ai-table-${idx}`}
+                      columns={cols}
+                      dataSource={items}
+                      bordered={child.props?.bordered !== false}
+                      striped={child.props?.striped === true}
+                      hoverable={child.props?.hoverable !== false}
+                      size={child.props?.size || 'sm'}
+                      loading={child.props?.loading}
+                      emptyText={child.props?.emptyText}
+                      onRowClick={(item, index) => {
+                        console.log('Table Runtime Row Clicked:', item, index);
+                      }}
                     />
                   );
                 }

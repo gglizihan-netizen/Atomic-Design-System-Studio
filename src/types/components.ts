@@ -76,7 +76,8 @@ export type IconName =
   | 'more-horizontal' | 'more-vertical' | 'drag'
   | 'checkbox-checked' | 'checkbox-unchecked'
   | 'radio-checked' | 'radio-unchecked'
-  | 'ai' | 'success' | 'warning' | 'error' | 'info';
+  | 'ai' | 'success' | 'warning' | 'error' | 'info'
+  | 'zoom-in' | 'zoom-out' | 'rotate-cw' | 'rotate-ccw' | 'flip-x' | 'minimize-2';
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   name: IconName;
@@ -268,6 +269,139 @@ export interface TagProps {
   style?: React.CSSProperties; // 允许混入额外的内置 CSS
   id?: string; // 唯一 HTML DOM ID
 }
+
+// 18. 【List】高保真数据驱动通用列表原语契约
+export interface ListProps<T = any> {
+  key?: React.Key; // 允许混入内置 React key
+  dataSource: T[]; // 列表数据源
+  renderItem: (item: T, index: number) => React.ReactNode; // 列表项动态渲染函数
+  header?: React.ReactNode; // 选填：列表头部区块
+  footer?: React.ReactNode; // 选填：列表尾部区块
+  bordered?: boolean; // 是否展示卡片封套边框
+  split?: boolean; // 列表项之间是否渲染精密中性切分线
+  loading?: boolean; // 是否开启骨架或菊花遮罩加载态
+  size?: 'sm' | 'md' | 'lg'; // 列表项尺寸，SM(紧凑), MD(常规), LG(高级豪阔空灵)
+  emptyText?: string; // 空数据时的优雅中性展现文案
+  transparent?: boolean; // 选填：是否彻底去底色（透明背景）
+  hoverable?: boolean; // 选填：开启整行高亮悬停，不再需要 renderItem 层级嵌套
+  onRowClick?: (item: T, index: number) => void; // 行级别的点击交互（附带悬停效果与点击反馈）
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    onChange: (page: number) => void;
+    pageSize?: number;
+  }; // 数据集过长时伴随自带的轻型分页尾页脚
+  className?: string; // 附加 CSS 类名
+  style?: React.CSSProperties; // 附加样式
+  id?: string; // 唯一 HTML DOM ID
+}
+
+// 19. 【Table】高标高保真数据驱动通用表格原语契约
+export interface TableColumn<T = any> {
+  key: string;              // 列唯一标识 Key
+  title: string;            // 列头文本标题
+  dataIndex?: string;       // 数据对应的属性字段键名 (若不传，则可通过 render 自行操作)
+  width?: string | number;  // 列宽自适应设置权重 (如 120, '20%', 'auto')
+  align?: 'left' | 'center' | 'right'; // 文本水平对齐朝向
+  sorter?: boolean | ((a: T, b: T) => number); // 是否支持排序或排序函数
+  render?: (value: any, record: T, rowIndex: number) => React.ReactNode; // 特异化自定义渲染插槽
+}
+
+export interface TableRowSelection<T = any> {
+  selectedRowKeys: string[]; // 选中的行 key (通过 record.key 或 rowIndex 判定)
+  onChange: (selectedRowKeys: string[], selectedRows: T[]) => void; // 变更回调
+  getCheckboxProps?: (record: T) => { disabled?: boolean }; // 选填：根据记录返回 Checkbox 禁用属性变体
+}
+
+export interface TableProps<T = any> {
+  columns: TableColumn<T>[]; // 表格列配置字典数组
+  dataSource: T[];           // 物理数据源
+  rowKey?: string | ((record: T) => string); // 行标识 Key 判别机制 (默认为 'key' 或 'id')
+  bordered?: boolean;        // 是否渲染外卡片封套边线
+  striped?: boolean;         // 是否启用奇偶行色双纹理交替
+  hoverable?: boolean;       // 是否开启单行高亮悬停表现
+  loading?: boolean;         // 是否启用脉冲渐变骨架加载效果
+  size?: 'sm' | 'md' | 'lg'; // 表格行高/内间距自适应微控规格
+  emptyText?: string;        // 无数据时的优雅兜底提示文本
+  onRowClick?: (record: T, rowIndex: number) => void; // 单击整行的交互动作反馈
+  rowSelection?: TableRowSelection<T>; // 表格行多选/单选控制面板
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    onChange: (page: number) => void;
+    pageSize?: number;
+  }; // 高保真自带的尾部高密度微型分页系统
+  className?: string; // 扩充覆盖的 Tailwind 类名
+  style?: React.CSSProperties; // 覆盖的行样式
+  id?: string; // 唯一 HTML DOM ID
+  key?: React.Key; // 允许在 Schema 动态组装时伴随标准 JSX key
+}
+
+// 20. 【ImageViewer】高标高保真图片预览原语契约
+export interface ImageViewerProps {
+  src: string | string[];     // 图片源或图片源数组
+  visible: boolean;           // 是否可见/开启
+  onClose: () => void;        // 关闭回调
+  current?: number;           // 默认/受控的当前图片索引 (针对多图情况)
+  onIndexChange?: (index: number) => void; // 图片索引变更回调 (针对多图情况)
+  titles?: string | string[]; // 图片标题或标题数组
+  downloadable?: boolean;     // 是否支持展示下载动作按钮
+  enableKeyboard?: boolean;   // 是否支持键盘交互事件机制（Esc 关闭，左右键切图）
+  enableMaskClose?: boolean;  // 点击磨砂背景是否允许执行快速关闭
+  rotatable?: boolean;        // 是否支持展示旋转动作按钮
+  mirrorable?: boolean;       // 是否支持展示镜像水平翻转动作按钮
+  zoomable?: boolean;         // 是否支持展示放大缩小动作按钮与原比例badge
+  id?: string;                // 唯一 HTML DOM ID
+}
+
+// 21. 【Skeleton】高保真通用骨架屏原语契约
+export interface SkeletonProps {
+  variant?: 'circle' | 'rect' | 'text' | 'image' | 'button' | 'card' | 'list' | 'complex'; // 骨架屏的基础物理形状及预设业务场景形态
+  width?: string | number;               // 宽度配置 (例如: '100%', 200, '4rem')
+  height?: string | number;              // 高度配置 (例如: '1.25rem', 40, '150px')
+  animation?: 'pulse' | 'wave' | 'none'; // 骨架屏炫光动效：pulse、wave、none
+  rows?: number;                         // 针对 text, list 或 complex 形态支持自动输出多行
+  avatar?: boolean;                      // list 或 complex 场景下是否伴生左侧圆形头像骨架
+  title?: boolean;                       // list 或者 complex 场景下是否伴生上方标题骨架块
+  active?: boolean;                      // 默认处于骨架态；若为 false，则优雅淡出渲染包裹的子组件
+  imageLabel?: string;                   // 针对 image 变体自定义配字文字，规避英文硬编码
+  children?: React.ReactNode;            // 包裹的实际待渲染子组件
+  className?: string;                    // 额外覆盖的 className
+  style?: React.CSSProperties;           // 额外顶置的 CSS 物理层属性
+  id?: string;                           // 唯一 HTML DOM ID
+}
+
+// 22. 【Sidebar】高标高保真智能侧边栏组件契约
+export interface SidebarItem {
+  id: string;                            // 选项唯一标识 ID
+  label: string;                         // 导航标签文本
+  icon?: string;                         // 选填 Lucide 矢量名，如 'Home', 'Settings', 'Shield', 'Database'
+  disabled?: boolean;                    // 是否锁定禁用该单元项
+  badge?: string | number;               // 旁边悬挂的气泡标识
+  badgeType?: 'default' | 'primary' | 'success' | 'warning' | 'error'; // 徽标的主题类型
+  href?: string;                         // 选填，支持直链跳转
+  children?: SidebarItem[];              // 嵌套子菜单，若存在则支持手风琴式折叠展开
+}
+
+export interface SidebarProps {
+  items: SidebarItem[];                  // 侧边栏导航条目列表
+  activeId: string;                      // 当前激活的选项 ID
+  onChange: (id: string, item: SidebarItem) => void; // 菜单点击切换的回调
+  collapsed?: boolean;                   // 侧边折叠状态 (受控)
+  onCollapseChange?: (collapsed: boolean) => void; // 折叠状态变更时的回调
+  variant?: 'classic' | 'modern' | 'minimal'; // 视觉变体风格：classic（经典整洁分栏）、modern（浮置卡片毛玻璃微调）、minimal（极简无边界融合）
+  width?: string | number;               // 侧边栏展开宽度，默认 240px
+  collapsedWidth?: string | number;      // 侧边栏折叠宽度，默认 64px
+  showCollapseButton?: boolean;          // 是否显示自带的折叠切换按钮，默认 true
+  header?: React.ReactNode;              // 侧边栏顶部可置入的 LOGO / 标题区域
+  footer?: React.ReactNode;              // 侧边栏底部可置入的用户账户 / 设置动作区域
+  className?: string;                    // 额外覆盖的 className
+  style?: React.CSSProperties;           // 额外附加的 CSS 样式
+  id?: string;                           // 唯一 HTML DOM ID
+}
+
+
+
 
 
 

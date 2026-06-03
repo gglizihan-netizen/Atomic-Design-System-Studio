@@ -70,12 +70,12 @@ export const Tag: React.FC<TagProps> = ({
   const getSizeStyle = () => {
     switch (size) {
       case 'sm':
-        return 'text-[11px] px-1.5 py-0.5 leading-normal';
+        return 'text-[11px] h-5 px-2 leading-none';
       case 'lg':
-        return 'text-[14px] px-2.5 py-1 leading-normal';
+        return 'text-[14px] h-8 px-3 leading-none';
       case 'md':
       default:
-        return 'text-[12px] px-2 py-0.5 leading-normal';
+        return 'text-[12px] h-6 px-2.5 leading-none';
     }
   };
 
