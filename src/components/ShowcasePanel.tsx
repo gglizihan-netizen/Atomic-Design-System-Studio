@@ -21,6 +21,7 @@ import { Table } from './atoms/Table';
 import { ImageViewer } from './atoms/ImageViewer';
 import { Skeleton } from './atoms/Skeleton';
 import { Sidebar } from './atoms/Sidebar';
+import { AppLayout } from './atoms/AppLayout';
 import { useToast } from './atoms/Toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './atoms/Card';
 import { IconName, TabItem } from '../types/components';
@@ -118,6 +119,10 @@ export const ShowcasePanel: React.FC = () => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [inputIconLeft, setInputIconLeft] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const [inputType, setInputType] = useState<'text' | 'password' | 'number' | 'search' | 'textarea'>('text');
+  const [inputAllowClear, setInputAllowClear] = useState(false);
+  const [inputPrefix, setInputPrefix] = useState('');
+  const [inputSuffix, setInputSuffix] = useState('');
 
   // 3. Dropdown Props states
   const [dropSize, setDropSize] = useState<'sm' | 'md' | 'lg'>('md');
@@ -334,6 +339,13 @@ export const ShowcasePanel: React.FC = () => {
   const [sbShowHeader, setSbShowHeader] = useState<boolean>(true);
   const [sbShowFooter, setSbShowFooter] = useState<boolean>(true);
   const [sbClickedLog, setSbClickedLog] = useState<string>('暂无侧边栏导航变更日志');
+
+  // 12d. AppLayout Demo states
+  const [alSidebarCollapsed, setAlSidebarCollapsed] = useState<boolean>(false);
+  const [alFixedNavbar, setAlFixedNavbar] = useState<boolean>(true);
+  const [alFixedSidebar, setAlFixedSidebar] = useState<boolean>(true);
+  const [alFloatingStyle, setAlFloatingStyle] = useState<boolean>(true);
+  const [alClickedLog, setAlClickedLog] = useState<string>('暂无大盘骨架交互变更日志');
 
   const defaultSidebarItems = [
     { id: 'home', label: '工作台首页', icon: 'Home', badge: 'New', badgeType: 'primary' as const },
@@ -606,6 +618,12 @@ export const ShowcasePanel: React.FC = () => {
       setSbShowHeader(true);
       setSbShowFooter(true);
       setSbClickedLog('已重置智能侧边栏参数配置');
+    } else if (activeTab === 'appLayout') {
+      setAlSidebarCollapsed(false);
+      setAlFixedNavbar(true);
+      setAlFixedSidebar(true);
+      setAlFloatingStyle(true);
+      setAlClickedLog('已重置大盘骨架参数配置');
     }
   };
 
@@ -645,6 +663,8 @@ export const ShowcasePanel: React.FC = () => {
       propConfigStr = `variant: "${skVariant}", animation: "${skAnimation}", rows: ${skRows}, avatar: ${skAvatar}, title: ${skTitle}, active: ${skActive}${skWidth ? `, width: "${skWidth}"` : ''}${skHeight ? `, height: "${skHeight}"` : ''}`;
     } else if (activeTab === 'sidebar') {
       propConfigStr = `items: defaultSidebarItems, activeId: "${sbActiveId}", collapsed: ${sbCollapsed}, variant: "${sbVariant}", width: ${sbWidth}, collapsedWidth: ${sbCollapsedWidth}, showCollapseButton: ${sbShowCollapseButton}`;
+    } else if (activeTab === 'appLayout') {
+      propConfigStr = `sidebarCollapsed: ${alSidebarCollapsed}, fixedNavbar: ${alFixedNavbar}, fixedSidebar: ${alFixedSidebar}, floatingStyle: ${alFloatingStyle}`;
     } else {
       propConfigStr = `id: "${activeTab}", preset: "${activePreset}"`;
     }
@@ -748,6 +768,10 @@ export const ShowcasePanel: React.FC = () => {
         title: 'Sidebar 智能导航侧边栏',
         desc: '极其强大且高柔性折叠拉伸的侧边栏。支持多层嵌套子菜单（手风琴形式阻尼展开）、快捷徽标徽章角标、经典/现代/极简三大美学变体和极其流畅的原生折叠缓动阻泥压缩收纳微交互。',
       },
+      appLayout: {
+        title: 'AppLayout 大盘骨架容器',
+        desc: '极其清爽且高自由度的业务设计系统布局容器。其仅提供插槽（Tabs、Sidebar、Navbar、Footer、Children）作为标准物理布局骨架容器，不夹带任何平台、系统的特异硬编码业务逻辑。支持弹性悬浮呼吸（floatingStyle）视觉美学，适配任意独立项目。',
+      },
     };
     return data[activeTab] || { title: 'Atom Component', desc: 'React high fidelity sandbox element.' };
   };
@@ -844,17 +868,18 @@ export default function OverlayPage() {
   );
 }`;
         case 'navbar':
-          return `import { Navbar, Button } from 'atomix-ui';
+          return `import { Navbar } from 'atomix-ui';
 
 export default function HeaderLayout() {
   return (
     <Navbar
-      logo={<span>${navBrandName}</span>}
-      menuItems={[
-        { label: '智能分析', active: true },
-        { label: '系统设置', active: false }
-      ]}
-      rightActions={<Button size="sm">退出控制台</Button>}
+      brandName="${navBrandName}"
+      // 支持未来随意注入自定义操作，如个人信息等
+      rightActions={
+        <div className="flex items-center gap-2">
+          {/* 例如自定义 Profile 头像或菜单 */}
+        </div>
+      }
     />
   );
 }`;
@@ -1383,6 +1408,75 @@ export default function SidebarDemo() {
     </div>
   );
 }`;
+        case 'appLayout':
+          return `import { AppLayout, Sidebar, Navbar, Button } from 'atomix-ui';
+import { useState } from 'react';
+import { Layout, Menu, Bell, Search, Settings, HelpCircle, LogOut } from 'lucide-react';
+
+export default function AppLayoutDemo() {
+  const [collapsed, setCollapsed] = useState(${alSidebarCollapsed});
+
+  return (
+    <AppLayout
+      sidebarCollapsed={collapsed}
+      fixedNavbar={${alFixedNavbar}}
+      fixedSidebar={${alFixedSidebar}}
+      floatingStyle={${alFloatingStyle}}
+      navbar={
+        <Navbar 
+          brandName="ATOMIX CONSOLE" 
+          extra={
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded font-mono">● ONLINE</span>
+              <button className="p-1 rounded text-slate-400 hover:text-slate-600">
+                <Bell size={18} />
+              </button>
+            </div>
+          }
+        />
+      }
+      sidebar={
+        <div className="w-full flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            {!collapsed && <span className="font-bold text-sm tracking-tight text-indigo-600">管理后台系统</span>}
+            <button 
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-500"
+            >
+              <Layout size={16} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg bg-indigo-50 text-indigo-600">
+              <Menu size={16} />
+              {!collapsed && <span>大盘概览</span>}
+            </button>
+            <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg hover:bg-slate-50 text-slate-500">
+              <Settings size={16} />
+              {!collapsed && <span>系统设置</span>}
+            </button>
+          </div>
+        </div>
+      }
+      footer={
+        <div className="text-center text-slate-400 text-[10px] font-mono py-1">
+          © 2026 ATOMIX DESIGN SYSTEM. ALL RIGHTS RESERVED.
+        </div>
+      }
+    >
+      <div className="space-y-4">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
+          <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+            欢迎回到云端控制台 🚀
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            大盘物理节点及容器运行状态良好，网络心跳保活就绪。
+          </p>
+        </div>
+      </div>
+    </AppLayout>
+  );
+}`;
         default:
           return ``;
       }
@@ -1554,6 +1648,17 @@ export class AtomixDemoComponent {
           { name: 'closable', type: 'boolean', default: 'false', desc: '是否具备一键删除的能力(尾部微叉号图标交互)' },
           { name: 'icon', type: 'React.ReactNode', default: 'undefined', desc: '头部置放代表该标贴性质的状态性引导图标 (建议使用 Lucide 14px)' },
         ];
+      case 'appLayout':
+        return [
+          { name: 'navbar', type: 'React.ReactNode', default: 'undefined', desc: '顶吸导航栏（Navbar）插槽，传入标准设计系统导航契约组件' },
+          { name: 'sidebar', type: 'React.ReactNode', default: 'undefined', desc: '侧吸导航栏（Sidebar）插槽，传入标准手风琴导航契约组件' },
+          { name: 'footer', type: 'React.ReactNode', default: 'undefined', desc: '底置声明条（Footer）插槽，传入版权声明或指标遥测展示条组件' },
+          { name: 'sidebarCollapsed', type: 'boolean', default: 'false', desc: '是否强行收起/隐藏 Sidebar 侧边栏，实现自适应展开/折叠状态控制' },
+          { name: 'fixedNavbar', type: 'boolean', default: 'true', desc: '是否将顶部 Navbar 固定在页面上方，使其在子级内容滚动时不随之卷走' },
+          { name: 'fixedSidebar', type: 'boolean', default: 'true', desc: '是否将侧部 Sidebar 固定在页面左方，使其在子级内容滚动时不随之卷走' },
+          { name: 'floatingStyle', type: 'boolean', default: 'true', desc: '启用悬浮折射的“呼吸感”悬浮外观。通过把各插槽用精致卡片浮块形式悬浮呈现，展现高凝聚力调性' },
+          { name: 'children', type: 'React.ReactNode', default: 'undefined', desc: '主大盘工作区内容插槽，支持弹性自适应滚动' },
+        ];
       default:
         return [
           { name: 'preset', type: "ThemePreset", default: "'intelligent_workspace'", desc: '全局设计方案预设标签' },
@@ -1708,7 +1813,7 @@ export class AtomixDemoComponent {
                     )}
 
                     {activeTab === 'input' && (
-                      <div className="w-full max-w-sm">
+                      <div className="w-full max-w-sm animate-fade-in">
                         <Input
                           label={inputLabel}
                           description={inputDesc}
@@ -1717,6 +1822,10 @@ export class AtomixDemoComponent {
                           size={inputSize}
                           disabled={inputDisabled}
                           iconLeft={inputIconLeft ? helperIcons.mail : undefined}
+                          type={inputType}
+                          allowClear={inputAllowClear}
+                          prefix={inputPrefix || undefined}
+                          suffix={inputSuffix || undefined}
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                         />
@@ -1819,30 +1928,21 @@ export class AtomixDemoComponent {
                     )}
 
                     {activeTab === 'navbar' && (
-                      <div className="w-full border border-slate-100 rounded-lg overflow-hidden shadow-xs relative">
+                      <div className="w-full border rounded-xl overflow-hidden shadow-xs relative" style={{ borderColor: tokens.colors.border }}>
                         <Navbar
-                          logo={
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-7 h-7 flex items-center justify-center font-serif font-bold text-white rounded text-xs select-none"
-                                style={{ backgroundColor: tokens.colors.brand }}
-                              >
-                                Ω
-                              </div>
-                              <span className="text-[11px] font-bold tracking-tight token-font-heading text-slate-800">
-                                {navBrandName}
-                              </span>
-                            </div>
-                          }
-                          menuItems={[
-                            { label: '智能大纲', active: navActiveIndex === 0, onClick: () => setNavActiveIndex(0) },
-                            { label: '安全组审计', active: navActiveIndex === 1, onClick: () => setNavActiveIndex(1) },
-                            { label: '容器拓扑线', active: navActiveIndex === 2, onClick: () => setNavActiveIndex(2) },
-                          ]}
+                          brandName={navBrandName}
+                          showThemeSwitcher={true} // 启用可选的未来主题选择开关，完美展示扩展能力
                           rightActions={
-                            <Button size="sm" variant="outline">
-                              退出控制台
-                            </Button>
+                            <div className="flex items-center gap-2 border-l pl-2.5 h-6" style={{ borderColor: tokens.colors.border }}>
+                              {/* 演示未来极容易装载的个人 Profile 头像卡片 */}
+                              <div 
+                                className="w-6.5 h-6.5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-xs font-mono cursor-pointer hover:opacity-85 select-none"
+                                style={{ backgroundColor: tokens.colors.brand }}
+                                title="演示：未来自定义挂载的用户信息槽位 (Profile)"
+                              >
+                                UX
+                              </div>
+                            </div>
                           }
                           sticky={false}
                         />
@@ -2792,11 +2892,91 @@ export class AtomixDemoComponent {
                         </div>
                       </div>
                     )}
+
+                    {activeTab === 'appLayout' && (
+                      <div className="w-full h-[500px] border rounded-2xl overflow-hidden relative" style={{ borderColor: tokens.colors.border }}>
+                        <AppLayout
+                          sidebarCollapsed={alSidebarCollapsed}
+                          fixedNavbar={alFixedNavbar}
+                          fixedSidebar={alFixedSidebar}
+                          floatingStyle={alFloatingStyle}
+                          navbar={
+                            <Navbar
+                              variant={alFloatingStyle ? "transparent" : "classic"}
+                              showCollapseButton={true}
+                              sidebarCollapsed={alSidebarCollapsed}
+                              onCollapseToggle={() => {
+                                const nextCol = !alSidebarCollapsed;
+                                setAlSidebarCollapsed(nextCol);
+                                setAlClickedLog(`顶部 Navbar 一键快捷折叠侧栏：当前状态为 ${nextCol ? '[折叠窄态]' : '[展开宽幅态]'}`);
+                              }}
+                              brandName={navBrandName}
+                            />
+                          }
+                          sidebar={
+                            <Sidebar
+                              items={defaultSidebarItems}
+                              activeId={sbActiveId}
+                              onChange={(id, item) => {
+                                setSbActiveId(id);
+                                setAlClickedLog(`侧边栏点击路由到 id: [${id}] - [${item.label}]`);
+                              }}
+                              collapsed={alSidebarCollapsed}
+                              onCollapseChange={(col) => {
+                                setAlSidebarCollapsed(col);
+                                setAlClickedLog(`侧边栏一键压缩：当前为 ${col ? '[折叠窄态]' : '[展开宽幅态]'}`);
+                              }}
+                              variant={alFloatingStyle ? "minimal" : "classic"}
+                              showCollapseButton={true}
+                              width={240}
+                              collapsedWidth={60}
+                            />
+                          }
+                        >
+                          <div className="space-y-4">
+                            {/* 1. 欢迎卡片 */}
+                            <div 
+                              className="p-5 border transition-all"
+                              style={{
+                                backgroundColor: tokens.colors.bgCard,
+                                borderRadius: tokens.borders.radiusLg,
+                                borderColor: tokens.colors.border,
+                              }}
+                            >
+                              <h3 className="text-md font-extrabold tracking-tight" style={{ color: tokens.colors.textPrimary }}>
+                                智能设计系统高级大盘骨架 🚀
+                              </h3>
+                              <p className="text-xs mt-1 leading-relaxed" style={{ color: tokens.colors.textSecondary }}>
+                                这个在任何独立应用中，只需几行声明式插槽代码即可完美复现带有呼吸感的悬浮高内聚外观（通过开启 <code>floatingStyle</code> 极小调节开关即可观察）。
+                              </p>
+                            </div>
+
+                            {/* 2. 状态组卡片栅格 */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div 
+                                className="p-4 border bg-white dark:bg-slate-900/60"
+                                style={{ borderRadius: tokens.borders.radiusMd, borderColor: tokens.colors.border }}
+                              >
+                                <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block">物理心跳连接</span>
+                                <span className="text-lg font-mono font-bold block mt-1" style={{ color: tokens.colors.brand }}>Active (460h)</span>
+                              </div>
+                              <div 
+                                className="p-4 border bg-white dark:bg-slate-900/60"
+                                style={{ borderRadius: tokens.borders.radiusMd, borderColor: tokens.colors.border }}
+                              >
+                                <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block">网络延迟</span>
+                                <span className="text-lg font-mono font-bold block mt-1 text-emerald-500">~1.5ms</span>
+                              </div>
+                            </div>
+                          </div>
+                        </AppLayout>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Micro interaction logging lines nested on preview block bottom */}
-                {['breadcrumb', 'pagination', 'steps', 'tabs', 'datepicker', 'slider', 'card', 'progress', 'loading', 'alert', 'toast', 'tag', 'imageviewer', 'skeleton', 'sidebar'].includes(activeTab) && (
+                {['breadcrumb', 'pagination', 'steps', 'tabs', 'datepicker', 'slider', 'card', 'progress', 'loading', 'alert', 'toast', 'tag', 'imageviewer', 'skeleton', 'sidebar', 'appLayout'].includes(activeTab) && (
                   <div className="px-6 py-2.5 bg-slate-50/30 border-t border-slate-150 flex items-center justify-between text-[11px]">
                     <span className="text-slate-400 font-bold font-mono">📡 Interaction Logger:</span>
                     <span className="text-indigo-600 font-bold">
@@ -2815,6 +2995,7 @@ export class AtomixDemoComponent {
                       {activeTab === 'imageviewer' && ivClickedLog}
                       {activeTab === 'skeleton' && skClickedLog}
                       {activeTab === 'sidebar' && sbClickedLog}
+                      {activeTab === 'appLayout' && alClickedLog}
                     </span>
                   </div>
                 )}
@@ -3152,6 +3333,94 @@ export class AtomixDemoComponent {
                         checked={inputDisabled}
                         onChange={setInputDisabled}
                       />
+                    </div>
+
+                    <div className="pt-2 border-t space-y-3" style={{ borderColor: tokens.colors.border }}>
+                      <div className="space-y-1.5 font-sans">
+                        <label className="block text-sm font-medium mb-1" style={{ color: tokens.colors.textPrimary }}>输入框录入类型 (Type)</label>
+                        <div
+                          className="grid grid-cols-5 gap-1 p-1 rounded-xl border text-center select-none font-bold"
+                          style={{
+                            backgroundColor: tokens.colors.bgInput,
+                            borderColor: tokens.colors.border,
+                          }}
+                        >
+                          {(['text', 'password', 'number', 'search', 'textarea'] as const).map((t) => (
+                            <Button
+                              key={t}
+                              variant={inputType === t ? 'primary' : 'text'}
+                              size="sm"
+                              onClick={() => {
+                                setInputType(t);
+                                if (t === 'password') {
+                                  setInputLabel('管理账号密钥 (Password)');
+                                  setInputPlaceholder('••••••••••••');
+                                  setInputDesc('输入您的系统安全管理通行密匙');
+                                  setInputValue('adminSecretKey123!');
+                                } else if (t === 'number') {
+                                  setInputLabel('部署服务器容量 (NodesCount)');
+                                  setInputPlaceholder('8');
+                                  setInputDesc('利用两端的高速物理微调手柄可以以 1px 按压回馈作步进');
+                                  setInputValue('8');
+                                } else if (t === 'search') {
+                                  setInputLabel('全局资源过滤 (Instant Map/Search)');
+                                  setInputPlaceholder('过滤 VPC 网卡或安全组策略...');
+                                  setInputDesc('激活内置左前置放大镜以及支持右后置清空控制');
+                                  setInputValue('subnet-dbbgrk');
+                                } else if (t === 'textarea') {
+                                  setInputLabel('备注与环境规则 (Metadata Textarea)');
+                                  setInputPlaceholder('在这里可以输入包含换行的多行纯文本内容、元数据或JSON段...');
+                                  setInputDesc('根据文本自适应流动布局，保持纯粹呼吸感');
+                                  setInputValue('{\n  "env": "production",\n  "version": "1.4.2",\n  "replicas": 8\n}');
+                                } else {
+                                  setInputLabel('企业电子邮箱 (Email)');
+                                  setInputPlaceholder('example@company.com');
+                                  setInputDesc('我们会向此邮箱发送实例运行报告');
+                                  setInputValue('');
+                                }
+                              }}
+                              className={`py-1 text-[8px] font-bold h-7 rounded-lg truncate ${
+                                inputType === t ? '' : 'hover:unneutral'
+                              }`}
+                              style={{
+                                color: inputType === t ? tokens.colors.textInverse : tokens.colors.textSecondary,
+                              }}
+                              title={t}
+                            >
+                              {t === 'textarea' ? 'TXT' : t.toUpperCase()}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="block text-xs font-medium" style={{ color: tokens.colors.textSecondary }}>支持点击一键清除 (allowClear)</span>
+                        <ToggleSwitch
+                          checked={inputAllowClear}
+                          onChange={setInputAllowClear}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-semibold" style={{ color: tokens.colors.textSecondary }}>前置 Prefix</label>
+                          <Input
+                            value={inputPrefix}
+                            onChange={(e) => setInputPrefix(e.target.value)}
+                            placeholder="如: $"
+                            size="sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-semibold" style={{ color: tokens.colors.textSecondary }}>后置 Suffix</label>
+                          <Input
+                            value={inputSuffix}
+                            onChange={(e) => setInputSuffix(e.target.value)}
+                            placeholder="如: kg"
+                            size="sm"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -5330,6 +5599,86 @@ export class AtomixDemoComponent {
                         }}
                       />
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* APPLAYOUT props controllers */}
+              {activeTab === 'appLayout' && (
+                <div className="space-y-4 font-sans text-xs animate-fade-in font-normal">
+                  <div className="pt-1 space-y-3 animate-fade-in">
+                    <div className="flex justify-between items-center text-xs mb-1 text-slate-500 font-bold">
+                      <span>行为/布局微配置 (Layout Tuning)</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>悬浮呼吸视觉 (floatingStyle)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">插槽用高凝聚力卡片模块悬浮质感衬托</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alFloatingStyle}
+                        onChange={(v) => {
+                          setAlFloatingStyle(v);
+                          setAlClickedLog(`切换悬浮呼吸风格：${v ? '已开启' : '已关闭'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>顶置导航固定 (fixedNavbar)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">Navbar 固定在上方，滚动时被顶吸住</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alFixedNavbar}
+                        onChange={(v) => {
+                          setAlFixedNavbar(v);
+                          setAlClickedLog(`切换顶置导航固定：${v ? '固定' : '随内容滚动'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>侧边导航固定 (fixedSidebar)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">Sidebar 固定在左方，滚动时其静止吸附</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alFixedSidebar}
+                        onChange={(v) => {
+                          setAlFixedSidebar(v);
+                          setAlClickedLog(`切换侧部导航固定：${v ? '固定' : '随内容滚动'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold block font-bold text-xs" style={{ color: tokens.colors.textSecondary }}>菜单受控折缩 (sidebarCollapsed)</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">折叠/收展 Sidebar 缩窄至 60px</span>
+                      </div>
+                      <ToggleSwitch
+                        checked={alSidebarCollapsed}
+                        onChange={(v) => {
+                          setAlSidebarCollapsed(v);
+                          setAlClickedLog(`切换侧边折叠状态：当前为 ${v ? '[折叠窄态]' : '[展开宽幅]'}`);
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-1 pt-2">
+                      <label className="block text-[10px] font-semibold text-slate-400">大盘主标题文字 (Brand Name)</label>
+                      <Input
+                        value={navBrandName}
+                        onChange={(e) => {
+                          setNavBrandName(e.target.value);
+                          setAlClickedLog(`修改大盘主标题为 "${e.target.value}"`);
+                        }}
+                        size="sm"
+                      />
+                    </div>
+
                   </div>
                 </div>
               )}

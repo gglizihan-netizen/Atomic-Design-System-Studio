@@ -32,6 +32,16 @@
           "default": false,
           "description": "一键锁定禁用态。为 true 时界面整体呈现高透明中性灰色，阻断 hover、active、focus 等行为，移除鼠标变咸状态为 not-allowed"
         },
+        "iconLeft": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "按钮左侧的可选图标组件。建议直接传入标准的 Lucide-React 图标组件（如 iconLeft={<Plus />}），组件库内部会自动根据按钮 size 调整图标尺寸(sm/md/lg 对应 14px/16px/20px)及间距并左右对齐，模型绝对无需硬编码图标尺寸类名！"
+        },
+        "iconRight": {
+          "type": "ReactNode",
+          "required": false,
+          "description": "按钮右侧的可选图标组件。建议直接传入标准的 Lucide-React 图标组件（如 iconRight={<ArrowRight />}），组件库内部会自动根据按钮 size 调整图标尺寸及间距并左右对齐，无需配置尺寸 className"
+        },
         "children": {
           "type": "ReactNode | string",
           "required": true,
@@ -98,7 +108,7 @@
     "Dropdown": {
       "tag": "select",
       "category": "Data Selection",
-      "description": "高密度下拉单选/多选择一体化组件原语。支持内置模糊检索搜索栏栏以及选项二级副标题说明。在多选模式下提供 removable tag 药丸式微交互反馈与圆润多态复选框对齐。",
+      "description": "高密度下拉单选/多选择一体化组件原语。内置高性能 Portal 穿透定位及智能防遮挡算法，在面临各类 Card、Modal 容器溢出裁剪 (overflow-hidden) 时会自动借助 React Portal 渲染至 body 层级、自动根据视口底部剩余空间智能向上或向下翻转展开，其他 Agent 或模型在调用本组件时，无需做任何定位计算或 CSS 溢出调试，彻底免错开箱即用。",
       "props": {
         "label": {
           "type": "string",
@@ -223,6 +233,21 @@
           "type": "boolean",
           "default": true,
           "description": "是否设置为粘性物理置顶。为 true 会把 Navbar 钉在视窗最头端 (z-index: 40)，在长列表向下刷屏浏览时一并平滑滑过"
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["classic", "transparent"],
+          "default": "classic",
+          "description": "顶部导航栏的美学风格。【重要联动】：若处于开启了 floatingStyle 的 AppLayout 容器下，默认会自动感知并切换为 transparent (透明风格)。在集成时请不要显式在 Navbar 传入 variant 属性覆盖，否则会带上硬编码底色干扰呼吸悬浮卡片的无缝对齐美学。"
+        },
+        "brandName": {
+          "type": "string",
+          "description": "系统主品牌名称字样"
+        },
+        "showCollapseButton": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否在导航栏左方呈现触发侧栏折叠的 Hamburger 控制按钮"
         }
       },
       "behaviors_inherited": [
@@ -899,7 +924,7 @@
         "bordered": {
           "type": "boolean",
           "default": true,
-          "description": "是否展示表格卡片外圈物理微边框"
+          "description": "是否展现表格卡片外围圈物理微描边。⚠️【嵌套拼装极其致命防错拦截】：Table 默认自带 16px 圆角、白色底卡片及阴影，本身即是一个自闭环且精美的展示卡片。强烈建议【直接作为顶层独立模块裸平铺】在页面栅格中，绝对禁止在其外围多套一层 Card 组件！若由于其他合并业务原因等极其特殊的场景必须要嵌套在 Card 或 Modal 内部，你必须「显式传入 bordered=false」（即 `<Table bordered={false} ... />`），从而使得边框圆角可以和外围容器无缝贴合消隐，否则会形成双重白底、二级错落圆角包边、多重阴影堆叠极丑样式，造成 UI 混乱。"
         },
         "striped": {
           "type": "boolean",
@@ -935,6 +960,100 @@
       "behaviors_inherited": [
         "behaviors.motionCurve (表格排序切换及选择框淡入边缘曲线)"
       ]
+    },
+    "Card": {
+      "tag": "div",
+      "category": "Layout Container",
+      "description": "高标高保真智能物理外挂和内容区块卡片容器组件。⚠️【嵌套拼装黄金律】：Card 是极其高雅的内容容器，但若容器的核心主内容是 Table、List 这类「本身就已经内置了精美 16px 圆角、白色卡片底色、描边与微贴地阴影」的原子组件，【直接让 Table/List 自行作为顶层独立模块平铺在外部页面，绝对禁止多套一层 Card】。如果因为非要把 Table 和其他控制标题并排列在一块而迫不得已用 Card 套 Table，你【必须】将内部 Table/List 的 bordered 属性显式设为 false（即 `<Table bordered={false} ... />`、`<List bordered={false} ... />`），由此让内部原子层级面框彻底消隐融合，严防产生多重错开的套娃边框和双层圆角错落阴影！",
+      "props": {
+        "variant": {
+          "type": "string",
+          "enum": ["standard-outline", "subtle-flat", "isometric-elevated"],
+          "default": "standard-outline",
+          "description": "卡片变体风格：standard-outline (标准物理描边，伴贴地细小微阴影)；subtle-flat (色差无硬性边框和贴纸感，起极其安静温和的分块作用，推荐嵌套在别的大卡中分割内容)；isometric-elevated (气垫超深立体弥散高悬空阴影，营造高端空气层，不含生硬描边)"
+        },
+        "hoverable": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否开启鼠标悬浮时的深柔物理抬升效果(自带抗震回弹惯性，y 轴抬升 behaviors.cardHoverLift)"
+        },
+        "padding": {
+          "type": "string",
+          "enum": ["none", "xs", "sm", "md", "lg", "xl"],
+          "default": "md",
+          "description": "内置的内容呼吸内边距。xs/sm 紧凑，md 经典标准，lg/xl 豪阔，none 贴边无边距"
+        },
+        "radius": {
+          "type": "string",
+          "enum": ["none", "sm", "md", "lg", "xl", "full"],
+          "default": "lg",
+          "description": "卡片的圆角度表现，自动对接 borders.radius"
+        },
+        "glow": {
+          "type": "boolean",
+          "default": false,
+          "description": "悬浮时是否额外散逸出 brand 品牌的淡淡高科技霓虹呼吸漫反射辉光，增加数码艺术感"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (悬浮抬起回弹阻尼)",
+        "behaviors.motionDurationNormal (抬升动画平滑度周期)"
+      ]
+    },
+    "CardHeader": {
+      "tag": "div",
+      "category": "Layout Container",
+      "description": "卡片专用顶置页眉分子骨架。通常装载 CardTitle & CardDescription，配合 CardContent 和 CardFooter 使用。",
+      "props": {
+        "bordered": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否在页眉底部与主体区挂设一条极致淡雅的中性切分灰色线条，用作标题独立隔离"
+        }
+      }
+    },
+    "CardTitle": {
+      "tag": "h3",
+      "category": "Data Display",
+      "description": "卡片主标题，采用全局美学艺术字型(headingFont)，内置大字重呈现，多级视觉字号层级选择。",
+      "props": {
+        "size": {
+          "type": "string",
+          "enum": ["sm", "base", "lg", "xl", "2xl"],
+          "default": "lg",
+          "description": "主标题物理字号规范：sm (标准14px)；base (中性16px)；lg (大气18px)；xl (更显突出20px)；2xl (焦点中心大字24px)"
+        }
+      }
+    },
+    "CardDescription": {
+      "tag": "p",
+      "category": "Data Display",
+      "description": "极柔和淡灰微细辅助性内容说明段落。提供极好的解释作用。",
+      "props": {}
+    },
+    "CardContent": {
+      "tag": "div",
+      "category": "Layout Container",
+      "description": "卡片承载内容的主体核心高密度区域。自动分配剩余流，自动垂直排布。",
+      "props": {}
+    },
+    "CardFooter": {
+      "tag": "div",
+      "category": "Layout Container",
+      "description": "卡片底部操作功能工具页脚分区。通常装载 Button variant=\"outline\" 与 Button variant=\"primary\"等操作。",
+      "props": {
+        "align": {
+          "type": "string",
+          "enum": ["left", "center", "right", "between"],
+          "default": "right",
+          "description": "各操作单元的物理对齐排布朝向"
+        },
+        "bordered": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否在页脚顶部加置一条精致、安静不突兀的中性超细底切分线，实现视觉终结提示"
+        }
+      }
     },
     "ImageViewer": {
       "tag": "div",
@@ -1050,7 +1169,7 @@
           "type": "string",
           "enum": ["classic", "modern", "minimal"],
           "default": "classic",
-          "description": "侧边栏变体美学风格。classic为经典卡条式分割底色分界栏；modern为带优雅悬浮背景与毛玻璃高阶圆角卡片分栏；minimal为极简无框，与页面完全无缝融合的先锋风格"
+          "description": "侧边栏变体美学风格。classic为经典卡条式分割底色分界栏；modern为带优雅悬浮背景与毛玻璃高阶圆角卡片分栏；minimal为极简无框，与页面完全无缝融合的先锋风格。【重要关联逻辑】：若是放入开启了 floatingStyle 的 AppLayout 下，默认会自动适应为 minimal (透明无底色) 变体。一般请在此场景下保持默认、不要显式传入 variant 覆盖，否则会破坏悬浮高内聚外观"
         },
         "width": {
           "type": "string | number",
@@ -1071,6 +1190,53 @@
       "behaviors_inherited": [
         "behaviors.motionCurve (收缩和子菜单折叠弹跳动画因子)",
         "behaviors.motionDurationFast (侧边栏渐变流体收缩速)"
+      ]
+    },
+    "AppLayout": {
+      "tag": "div",
+      "category": "Layout",
+      "description": "设计系统标准高内聚骨架布局容器。专为高自由度模块化拼装定制，通过精妙的流式槽/插槽结构（Sidebar/Navbar/Footer/Children）建立悬浮、呼吸感与高级多维度主题感知。不杂糅任何特定平台特许业务，实现一键解耦套用复现。",
+      "props": {
+        "sidebar": {
+          "type": "ReactNode",
+          "description": "左侧边栏插槽 (通常直接充填并渲染组件库的 Sidebar)"
+        },
+        "navbar": {
+          "type": "ReactNode",
+          "description": "顶部横向快捷导航栏插槽 (通常充填并渲染组件库的 Navbar)"
+        },
+        "children": {
+          "type": "ReactNode",
+          "description": "主工作区域，容纳具体页面正文。支持平滑独立局部物理滚动与淡入动效"
+        },
+        "footer": {
+          "type": "ReactNode",
+          "description": "底部自适应底座信标，支持配置版权字样及系统运行微指标"
+        },
+        "sidebarCollapsed": {
+          "type": "boolean",
+          "default": false,
+          "description": "折叠控制信号。控制左侧挂载侧边栏是否收展 (支持受控/非受控双向状态管理)"
+        },
+        "fixedNavbar": {
+          "type": "boolean",
+          "default": true,
+          "description": "顶部导航顶吸固定（不随正文滚出）"
+        },
+        "fixedSidebar": {
+          "type": "boolean",
+          "default": true,
+          "description": "侧边导航左吸固定并支持局部独立物理惯性滚动"
+        },
+        "floatingStyle": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启用极具呼吸感的悬浮高内聚质感外观 (由大圆角、悬浮背景卡、边缘缝隙和自适应高阴影构建而成)。【重要关联核心机制】：当该模式为 true 时，框架会自动控制内部的 Sidebar 变体默认回退为 minimal 极简透明风格，且将内部的 Navbar 变体默认回退为 transparent 净空透明风格。拼装页面的模型和开发者不应在这两个子组件上显式注入 variant 干扰它的美化对齐耦合。"
+        }
+      },
+      "behaviors_inherited": [
+        "behaviors.motionCurve (页面结构折展变形曲线)",
+        "behaviors.motionDurationFast (主体随行收放阻尼律动)"
       ]
     }
   },

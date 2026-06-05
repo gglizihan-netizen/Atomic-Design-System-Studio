@@ -86,6 +86,30 @@ export const Button: React.FC<ButtonProps> = ({
     },
   };
 
+  // 2.5. 根据不同尺寸，自动控制图标尺寸、左右间距和 Loading 载入器大小
+  const iconConfig = {
+    sm: {
+      svgClass: '[&_svg]:w-3.5 [&_svg]:h-3.5',
+      spinnerClass: 'w-3.5 h-3.5 mr-1',
+      marginRight: 'mr-1',
+      marginLeft: 'ml-1',
+    },
+    md: {
+      svgClass: '[&_svg]:w-4 [&_svg]:h-4',
+      spinnerClass: 'w-4 h-4 mr-1.5',
+      marginRight: 'mr-1.5',
+      marginLeft: 'ml-1.5',
+    },
+    lg: {
+      svgClass: '[&_svg]:w-5 [&_svg]:h-5',
+      spinnerClass: 'w-5 h-5 mr-2',
+      marginRight: 'mr-2',
+      marginLeft: 'ml-2',
+    },
+  };
+
+  const currentIconConfig = iconConfig[size];
+
   // 3. 产生对应变体的核心基础样式
   const getVariantStyles = () => {
     const isMonoTheme = tokens.typography.headingFont === 'mono'; // 精确判别是否是黑客代码单色风
@@ -228,18 +252,20 @@ export const Button: React.FC<ButtonProps> = ({
     }
   }
 
-  // ⚠️ 行为令牌重点：我们将“多深度的按钮点击收缩变形比例”作为 inline-style 渲染在 transform 参数上！
-  // 萌系香芋糖果会收缩到93%（极大弹性感），而瑞士现代只会微收缩到97%（稳重感），极客单色全直角完全不收缩保持坚固！
-  const pressScaleEffect = isActive && !disabled && !isLoading
-    ? `scale(${tokens.behaviors.buttonPressScale})`
-    : 'scale(1)';
+  // ⚠️ 行为令牌重点：根据 buttonClickEffect 选项渲染对应的物理按压交互反馈！
+  // 1. 'translate' 模式：模仿物理键盘的垂直键程位移（translateY(1px)），保持文本与矢量图标像素完美对齐，极具高级物理质感
+  // 2. 'scale' 模式：经典的果冻捏捏等比缩放缩水反馈，活泼高弹
+  const clickEffectType = tokens.behaviors.buttonClickEffect || 'scale';
+  const pressEffect = isActive && !disabled && !isLoading
+    ? (clickEffectType === 'translate' ? 'translateY(1px)' : `scale(${tokens.behaviors.buttonPressScale})`)
+    : (clickEffectType === 'translate' ? 'translateY(0px)' : 'scale(1)');
 
   // 5. 融汇组合核心样式字典
   const finalButtonStyle: React.CSSProperties = {
     ...getVariantStyles(),
     ...sizeStyles[size],
     ...interactiveStyles,
-    transform: pressScaleEffect,
+    transform: pressEffect,
     transition: `transform ${speedFast} ${bezierCurve}, background-color ${speedFast} ${bezierCurve}, border-color ${speedFast} ${bezierCurve}, box-shadow ${speedFast} ${bezierCurve}`,
     ...style,
   };
@@ -261,20 +287,24 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {/* 载入状态控制器 */}
       {isLoading && (
-        <Loader2 className="w-4 h-4 mr-2 animate-spin shrink-0" />
+        <Loader2 className={`${currentIconConfig.spinnerClass} animate-spin shrink-0`} />
       )}
       
       {/* 按钮左侧图标渲染线 */}
       {!isLoading && iconLeft && (
-        <span className="mr-2 inline-flex items-center shrink-0">{iconLeft}</span>
+        <span className={`inline-flex items-center justify-center shrink-0 ${currentIconConfig.marginRight} ${currentIconConfig.svgClass}`}>
+          {iconLeft}
+        </span>
       )}
       
       {/* 按钮主文本核心内容 */}
-      <span className="truncate">{children}</span>
+      <span className="truncate inline-flex items-center justify-center gap-1.5">{children}</span>
       
       {/* 按钮右侧图标渲染线 */}
       {!isLoading && iconRight && (
-        <span className="ml-2 inline-flex items-center shrink-0">{iconRight}</span>
+        <span className={`inline-flex items-center justify-center shrink-0 ${currentIconConfig.marginLeft} ${currentIconConfig.svgClass}`}>
+          {iconRight}
+        </span>
       )}
     </button>
   );

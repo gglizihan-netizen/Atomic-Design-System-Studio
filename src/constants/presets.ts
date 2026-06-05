@@ -94,6 +94,7 @@ export const INTELLIGENT_WORKSPACE: DesignTokens = {
     sm: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
     md: '0 4px 12px 0 rgba(31, 41, 55, 0.04), 0 1px 2px 0 rgba(31, 41, 55, 0.02)',
     lg: '0 12px 24px -4px rgba(31, 41, 55, 0.08), 0 4px 12px -2px rgba(31, 41, 55, 0.03)',
+    ambient: '0px 0px 12px rgba(15, 48, 106, 0.01), 0px 0px 8px rgba(15, 48, 106, 0.00)',
   },
   behaviors: {
     motionDurationFast: 100,      // 极轻量响应动效 (100毫秒，操作效率核心)
@@ -101,6 +102,7 @@ export const INTELLIGENT_WORKSPACE: DesignTokens = {
     motionDurationSlow: 280,      // AI 推荐窗抽屉滑动 280ms
     motionCurve: 'smooth',        // 经典严谨流畅、无弹性扰乱交互
     buttonPressScale: 0.98,       // 灵巧物理轻扣反馈
+    buttonClickEffect: 'translate', // 键程下沉，展现沉稳工作效率
     inputFocusRing: true,         // 有外发光
     modalDismissOverlay: true,    // 允许
     listHoverReveal: true,        // 允许悬停滑出操作项
@@ -109,7 +111,7 @@ export const INTELLIGENT_WORKSPACE: DesignTokens = {
 };
 
 /**
- * 👑 预设主题 1：Swiss Modern (理性极简瑞士风格)
+ * 👑 预设主题 2：Swiss Modern (理性极简瑞士风格)
  * 调性定位：严谨、冷静、高阶排版、学术/技术、中性理性。
  * 视觉特征：冷灰色背景、深邃藏青蓝、几何小圆角、重直排版。
  * 动态表现：顺滑流畅、回弹极微、稳重利落。
@@ -187,6 +189,7 @@ export const SWISS_MODERN: DesignTokens = {
     sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
     md: '0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05)',
     lg: '0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -4px rgba(15, 23, 42, 0.1)',
+    ambient: '0px 0px 12px rgba(15, 23, 42, 0.01), 0px 0px 8px rgba(15, 23, 42, 0.00)',
   },
   behaviors: {
     motionDurationFast: 120,      // 超快响应 (按压反馈只需要120毫秒完成)
@@ -194,6 +197,7 @@ export const SWISS_MODERN: DesignTokens = {
     motionDurationSlow: 320,      // 慢动效时长
     motionCurve: 'smooth',        // 经典流畅缓入缓出 (不带浮夸弹性)
     buttonPressScale: 0.97,       // 指尖轻微凹陷体验 (97% 物理缩放)
+    buttonClickEffect: 'translate', // 国际主义严肃精密下沉键程
     inputFocusRing: true,         // 有外聚焦光轮环
     modalDismissOverlay: true,    // 允许通过点击黑色阴影遮罩区秒退弹窗
     listHoverReveal: false,       // 信息架构扁平化呈现，无需悬停披露
@@ -280,8 +284,9 @@ export const EDITORIAL_WARM: DesignTokens = {
   shadows: {
     none: 'none',
     sm: '0 1px 3px rgba(41, 24, 17, 0.04)',
-    md: '0 6px 12px -3px rgba(41, 10, 10, 0.05), ...', // 温暖漫反射投影
+    md: '0 6px 12px -3px rgba(41, 10, 10, 0.05)', // 温暖漫反射投影
     lg: '0 15px 25px -5px rgba(41, 10, 10, 0.07), 0 10px 10px -5px rgba(41, 24, 17, 0.03)',
+    ambient: '0px 0px 12px rgba(41, 24, 17, 0.01), 0px 0px 1px rgba(41, 24, 17, 0.00)',
   },
   behaviors: {
     motionDurationFast: 180,      // 极尽悠扬 (悬停状态徐徐过渡 180 毫秒)
@@ -289,6 +294,7 @@ export const EDITORIAL_WARM: DesignTokens = {
     motionDurationSlow: 420,      // 谈吐不凡的柔和遮罩升降
     motionCurve: 'smooth',        // 平滑渐隐渐现，流淌自然
     buttonPressScale: 0.99,       // 矜持的阻尼反馈 (仅收缩到 99%)
+    buttonClickEffect: 'translate', // 古典印版手工压刻物理沉降 1px
     inputFocusRing: false,        // 无科技感荧光环，仅通过输入框线优雅变红酒色提示
     modalDismissOverlay: true,    // 允许通过点击黑色阴影遮罩区秒退弹窗
     listHoverReveal: false,       // 杜绝信息乱跳，保持经典的报刊大局观排版
@@ -375,6 +381,7 @@ export const SWEET_ROUNDED: DesignTokens = {
     sm: '0 2px 4px rgba(139, 92, 246, 0.04)',
     md: '0 8px 16px -4px rgba(139, 92, 246, 0.12), 0 4px 6px -2px rgba(139, 92, 246, 0.06)',
     lg: '0 20px 24px -6px rgba(139, 92, 246, 0.18), 0 10px 10px -5px rgba(139, 92, 246, 0.08)',
+    ambient: '0px 0px 12px rgba(139, 92, 246, 0.01), 0px 0px 1px rgba(139, 92, 246, 0.00)',
   },
   behaviors: {
     motionDurationFast: 160,      // 好玩耐按的果冻拖延 (160 毫秒)
@@ -382,6 +389,7 @@ export const SWEET_ROUNDED: DesignTokens = {
     motionDurationSlow: 360,      // 大面气球浮空
     motionCurve: 'spring',        // ⚠️ 极其可爱的物理高弹反弹阻尼！果冻必备
     buttonPressScale: 0.93,       // ⚠️ 超低回缩 (93% 物理缩样)，完美果冻捏捏感反馈
+    buttonClickEffect: 'scale',   // 马卡龙橡皮泥缩放体验
     inputFocusRing: true,         // 有外聚焦环，香芋紫的光雾气
     modalDismissOverlay: true,    // 允许随便按按空白处一秒欢退弹窗
     listHoverReveal: true,        // 悬浮时，列表会有一个俏皮的小微移高度卡位展开

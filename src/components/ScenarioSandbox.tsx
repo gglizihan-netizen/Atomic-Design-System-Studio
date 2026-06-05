@@ -35,6 +35,7 @@ import { Loading } from './atoms/Loading';
 import { Tag } from './atoms/Tag';
 import { Skeleton } from './atoms/Skeleton';
 import { Sidebar } from './atoms/Sidebar';
+import { AppLayout } from './atoms/AppLayout';
 import { List } from './atoms/List';
 import { Table } from './atoms/Table';
 import { Home } from 'lucide-react';
@@ -513,6 +514,22 @@ export const ScenarioSandbox: React.FC = () => {
                       collapsedWidth={child.props?.collapsedWidth}
                       showCollapseButton={child.props?.showCollapseButton !== false}
                     />
+                  );
+                }
+                if (child.element === 'AppLayout') {
+                  return (
+                    <AppLayout
+                      key={`ai-applayout-${idx}`}
+                      sidebar={child.props?.sidebar}
+                      navbar={child.props?.navbar}
+                      footer={child.props?.footer}
+                      sidebarCollapsed={child.props?.sidebarCollapsed || false}
+                      fixedNavbar={child.props?.fixedNavbar !== false}
+                      fixedSidebar={child.props?.fixedSidebar !== false}
+                      floatingStyle={child.props?.floatingStyle !== false}
+                    >
+                      {child.props?.children}
+                    </AppLayout>
                   );
                 }
                 if (child.element === 'Tag') {

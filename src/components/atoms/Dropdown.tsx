@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useDesignTokens } from '../base/DesignTokensContext';
 import { ChevronDown, Check, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react'; // 使用 motion/react 接管动画运行时
@@ -68,17 +69,83 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredValue, setHoveredValue] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // ⚡ 视图安全保障：触发器按键、下拉选项面板底层物理节点引用
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // 1. 实现点击组件外部自动收合下拉单的外挂副作用监听
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // ⚡ 视图安全保障：精细化的空间测量和位置坐标状态管理
+  const [coords, setCoords] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    placement: 'bottom' as 'top' | 'bottom',
+  });
+
+  // ⚡ 极速物理同步引擎：在滚动或频繁改变位置时，直接操作 DOM 底层绝对样式，避免 React 虚拟 DOM 异步状态合并（Batch）以及渲染时间差带来的迟钝滞后感
+  const syncDOMPosition = () => {
+    if (!triggerRef.current || !menuRef.current) return;
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const dropdownHeight = menuRef.current.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const spaceBelow = windowHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    let placement: 'top' | 'bottom' = 'bottom';
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      placement = 'top';
+    }
+
+    let top = 0;
+    if (placement === 'bottom') {
+      top = triggerRect.bottom + 6;
+    } else {
+      top = triggerRect.top - dropdownHeight - 6;
+    }
+
+    menuRef.current.style.top = `${top}px`;
+    menuRef.current.style.left = `${triggerRect.left}px`;
+    menuRef.current.style.width = `${triggerRect.width}px`;
+  };
+
+  // ⚡ 空间计算引擎：自动决策向下/向上展开，并匹配浮层尺寸与触发器对齐线
+  const updatePosition = () => {
+    if (!triggerRef.current) return;
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    
+    // 我们定义下拉面板高度阈值（max-h-60 为 240px，加上搜索栏/选项间距大概 280-320px）
+    const dropdownHeight = menuRef.current ? menuRef.current.offsetHeight : 280;
+    const windowHeight = window.innerHeight;
+    const spaceBelow = windowHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    let placement: 'top' | 'bottom' = 'bottom';
+    // 当下方空间不足以承载面板，且上方空间比下方空间更充裕时，自动向上智能展开
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      placement = 'top';
+    }
+
+    let top = 0;
+    if (placement === 'bottom') {
+      top = triggerRect.bottom + 6;
+    } else {
+      top = triggerRect.top - dropdownHeight - 6;
+    }
+
+    // ⚡ 直接操作 DOM 样式以保障第一次挂载或属性骤变时与视图绝对一致，防 0 闪烁
+    if (menuRef.current) {
+      menuRef.current.style.top = `${top}px`;
+      menuRef.current.style.left = `${triggerRect.left}px`;
+      menuRef.current.style.width = `${triggerRect.width}px`;
+    }
+
+    setCoords({
+      top,
+      left: triggerRect.left,
+      width: triggerRect.width,
+      placement,
+    });
+  };
 
   // 2. 转换并确保 value 格式的安全运行数据结构
   const getSelectedValuesArray = (): string[] => {
@@ -97,6 +164,63 @@ export const Dropdown: React.FC<DropdownProps> = ({
     opt.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (opt.description && opt.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  // 1. 实现点击组件外部自动收合下拉单的外挂副作用监听（融合 Portal 穿透防御）
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const clickInsideTrigger = dropdownRef.current && dropdownRef.current.contains(target);
+      const clickInsideMenu = menuRef.current && menuRef.current.contains(target);
+      if (!clickInsideTrigger && !clickInsideMenu) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 1.1. 挂载全局滚动/缩放测量监听，在触发器触发拉起时精准捕捉并更新浮层绝对定位
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 唤醒瞬时执行一次极速定位
+    updatePosition();
+
+    // 启用高性能、底层 ResizeObserver 监视触发器尺寸形变
+    let resizeObserver: ResizeObserver | null = null;
+    if (triggerRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        syncDOMPosition();
+      });
+      resizeObserver.observe(triggerRef.current);
+    }
+
+    // 捕捉宿主容器/窗口以及所有层级的滚动，且在捕获阶段捕获滚动，确保无缝同步
+    const handleScrollOrResize = () => {
+      syncDOMPosition();
+    };
+
+    window.addEventListener('resize', handleScrollOrResize);
+    document.addEventListener('scroll', handleScrollOrResize, { capture: true });
+
+    return () => {
+      window.removeEventListener('resize', handleScrollOrResize);
+      document.removeEventListener('scroll', handleScrollOrResize, { capture: true });
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [isOpen]);
+
+  // 1.2. 监听过滤检索动作导致的 DOM 内部高度改变，实时驱动 Portal 定位校准
+  useEffect(() => {
+    if (isOpen) {
+      // 通过 requestAnimationFrame 分时调度性能，绕过单轮双写渲染时差
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
+    }
+  }, [searchQuery, filteredOptions.length, isOpen]);
 
   // 3. 尺寸映射器
   const sizingMap = {
@@ -149,6 +273,19 @@ export const Dropdown: React.FC<DropdownProps> = ({
     if (disabled) return;
     const nextValue = selectedValues.filter((v) => v !== val);
     onChange(nextValue);
+  };
+
+  // 🟢 智能展开折叠触发器：同步位置计算防止闪烁，并对齐状态
+  const handleToggle = () => {
+    if (disabled) return;
+    if (isOpen) {
+      setIsOpen(false);
+      setSearchQuery('');
+    } else {
+      // 首次开启前计算最新位置，防 0 闪烁
+      updatePosition();
+      setIsOpen(true);
+    }
   };
 
   // 🧬 行为令牌：计算聚焦外圈投影 (对齐截图中的呼吸外廓焦点)
@@ -221,18 +358,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const listContainerStyle: React.CSSProperties = {
-    position: 'absolute' as const,
-    zIndex: 50,
-    top: '100%',
-    left: 0,
-    marginTop: '6px',
-    width: '100%',
+    position: 'fixed' as const,
+    zIndex: 9999, // 极高图层，彻底击穿任何 Overflow Clipping 和各种 Modal 遮挡限制
+    top: `${coords.top}px`,
+    left: `${coords.left}px`,
+    width: `${coords.width}px`,
     backgroundColor: tokens.colors.bgCard || '#FFFFFF', // 下拉悬浮面板采用底板色
     borderRadius: tokens.borders.radiusLg || '10px',
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: tokens.colors.border || '#E5E7EB', // 柔和边界线
-    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.03)', // 拟真软底阴影
+    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05)', // 高清软底阴影加深
     padding: '6px', // 核心细节：通过四周留白将子选项包裹在内，绝不贴边生硬拼接
     boxSizing: 'border-box' as const,
   };
@@ -264,9 +400,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
       <div className="relative w-full">
         {/* 3. 触发器按钮 */}
         <button
+          ref={triggerRef}
           type="button"
           style={triggerStyle}
-          onClick={() => !disabled && setIsOpen(!isOpen)}
+          onClick={handleToggle}
           disabled={disabled}
         >
           {/* 已选内容容纳槽：支持单选的多态以及多选标签的精巧流体排布 */}
@@ -318,151 +455,155 @@ export const Dropdown: React.FC<DropdownProps> = ({
           />
         </button>
 
-        {/* 4. 下拉悬浮列表区 (支持 Framer Motion 物理引擎渐显插值) */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.98 }}
-              {...getMotionConfig()}
-              style={listContainerStyle}
-            >
-              {/* 可按需激活的内部即时检索搜索栏 */}
-              {enableSearch && (
-                <div
-                  className="flex items-center px-3 py-2.5 border-b"
-                  style={{ borderColor: tokens.colors.border }}
-                >
-                  <Search className="w-4 h-4 mr-2 shrink-0" style={{ color: tokens.colors.textMuted }} />
-                  <input
-                    type="text"
-                    placeholder="检索过滤选项..."
-                    className="w-full text-sm bg-transparent outline-none border-none py-0.5 h-full font-sans"
-                    style={{ color: tokens.colors.textPrimary }}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  {searchQuery && (
-                    <X
-                      size={14}
-                      className="cursor-pointer text-slate-400 hover:text-slate-600 rounded-full shrink-0 mL-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSearchQuery('');
-                      }}
+        {/* 4. 下拉悬浮列表区 (通过 React Portal 渲染至 document.body，防溢出裁剪，结合 Framer Motion 实现随动插值与完美生命周期动作) */}
+        {typeof window !== 'undefined' && document.body && createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                ref={menuRef}
+                initial={{ opacity: 0, y: coords.placement === 'bottom' ? -6 : 6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: coords.placement === 'bottom' ? -6 : 6, scale: 0.98 }}
+                {...getMotionConfig()}
+                style={listContainerStyle}
+              >
+                {/* 可按需激活的内部即时检索搜索栏 */}
+                {enableSearch && (
+                  <div
+                    className="flex items-center px-3 py-2.5 border-b"
+                    style={{ borderColor: tokens.colors.border }}
+                  >
+                    <Search className="w-4 h-4 mr-2 shrink-0" style={{ color: tokens.colors.textMuted }} />
+                    <input
+                      type="text"
+                      placeholder="检索过滤选项..."
+                      className="w-full text-sm bg-transparent outline-none border-none py-0.5 h-full font-sans"
+                      style={{ color: tokens.colors.textPrimary }}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
                     />
-                  )}
-                </div>
-              )}
-
-              {/* 真实列表视口 */}
-              <div className="max-h-60 overflow-y-auto p-1.5 space-y-1">
-                {filteredOptions.length === 0 ? (
-                  <div className="px-4 py-6 text-sm text-center" style={{ color: tokens.colors.textMuted }}>
-                    没有检索到匹配的数据
-                  </div>
-                ) : (
-                  filteredOptions.map((option) => {
-                    const isSelected = isOptionSelected(option.value);
-                    const isHovered = hoveredValue === option.value;
-                    
-                    // 💥 极致美学色彩对齐与解耦：
-                    // - 选中态：极柔和冷色柔淡选择底板色 (tokens.colors.bgActive || '#F0F4FF')，文字主亮蓝
-                    // - 悬停态：选用设计令牌 hover 背景 (tokens.colors.bgHover || '#F1F5F9') 代替硬编码值，极具物理协调感
-                    // - 其它态：纯净透明 (transparent)
-                    const optionBg = isSelected 
-                      ? (tokens.colors.bgActive || '#F0F4FF') 
-                      : isHovered 
-                      ? (tokens.colors.bgHover || '#F1F5F9') 
-                      : 'transparent';
-
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className="w-full text-left px-3 py-2 flex items-center justify-between gap-3 transition-all relative group cursor-pointer outline-none select-none"
-                        style={{
-                          backgroundColor: optionBg,
-                          borderRadius: '6px', // 配合卡片内边距留白，完美封装圆角
+                    {searchQuery && (
+                      <X
+                        size={14}
+                        className="cursor-pointer text-slate-400 hover:text-slate-600 rounded-full shrink-0 ml-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearchQuery('');
                         }}
-                        onMouseEnter={() => setHoveredValue(option.value)}
-                        onMouseLeave={() => setHoveredValue(null)}
-                        onClick={() => handleSelect(option.value)}
-                      >
-                        {/* 左侧文字与多选框包裹区 */}
-                        <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                          {/* 💥 多选时的 Checkbox 物理对齐 (对应截图二) */}
-                          {multiple && (
-                            <div className="shrink-0 pt-0.5">
-                              {isSelected ? (
-                                <div 
-                                  className="w-4.5 h-4.5 rounded flex items-center justify-center transition-all animate-scale-up"
-                                  style={{
-                                    backgroundColor: tokens.colors.brand || '#1F63D1',
-                                    borderColor: tokens.colors.brand || '#1F63D1',
-                                  }}
-                                >
-                                  <Check size={11} className="text-white fill-current stroke-[3px]" />
-                                </div>
-                              ) : (
-                                <div 
-                                  className="w-4.5 h-4.5 rounded border bg-white transition-all hover:border-slate-400"
-                                  style={{
-                                    borderColor: '#D1D5DB',
-                                  }}
-                                />
-                              )}
-                            </div>
-                          )}
+                      />
+                    )}
+                  </div>
+                )}
 
-                          {/* 本选项文案部分 */}
-                          <div className="flex-1 min-w-0">
-                            <div
-                              className="text-sm truncate"
-                              style={{
-                                color: isSelected
-                                  ? (tokens.colors.brand || '#1F63D1') 
-                                  : tokens.colors.textPrimary,
-                                fontWeight: isSelected 
-                                  ? (tokens.typography.fontWeightBold || '600') 
-                                  : (tokens.typography.fontWeightNormal || '400')
-                              }}
-                            >
-                              {option.label}
-                            </div>
-                            {showDescription && option.description && (
-                              <div
-                                className="text-xs truncate mt-0.5"
-                                style={{
-                                  color: isSelected 
-                                    ? (tokens.colors.brand || '#1F63D1') 
-                                    : tokens.colors.textMuted,
-                                  opacity: isSelected ? 0.75 : 1,
-                                }}
-                              >
-                                {option.description}
+                {/* 真实列表视口 */}
+                <div className="max-h-60 overflow-y-auto p-1.5 space-y-1">
+                  {filteredOptions.length === 0 ? (
+                    <div className="px-4 py-6 text-sm text-center" style={{ color: tokens.colors.textMuted }}>
+                      没有检索到匹配的数据
+                    </div>
+                  ) : (
+                    filteredOptions.map((option) => {
+                      const isSelected = isOptionSelected(option.value);
+                      const isHovered = hoveredValue === option.value;
+                      
+                      // 💥 极致美学色彩对齐与解耦：
+                      // - 选中态：极柔和冷色柔淡选择底板色 (tokens.colors.bgActive || '#F0F4FF')，文字主亮蓝
+                      // - 悬停态：选用设计令牌 hover 背景 (tokens.colors.bgHover || '#F1F5F9') 代替硬编码值，极具物理协调感
+                      // - 其它态：纯净透明 (transparent)
+                      const optionBg = isSelected 
+                        ? (tokens.colors.bgActive || '#F0F4FF') 
+                        : isHovered 
+                        ? (tokens.colors.bgHover || '#F1F5F9') 
+                        : 'transparent';
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className="w-full text-left px-3 py-2 flex items-center justify-between gap-3 transition-all relative group cursor-pointer outline-none select-none"
+                          style={{
+                            backgroundColor: optionBg,
+                            borderRadius: '6px', // 配合卡片内边距留白，完美封装圆角
+                          }}
+                          onMouseEnter={() => setHoveredValue(option.value)}
+                          onMouseLeave={() => setHoveredValue(null)}
+                          onClick={() => handleSelect(option.value)}
+                        >
+                          {/* 左侧文字与多选框包裹区 */}
+                          <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                            {/* 💥 多选时的 Checkbox 物理对齐 (对应截图二) */}
+                            {multiple && (
+                              <div className="shrink-0 pt-0.5">
+                                {isSelected ? (
+                                  <div 
+                                    className="w-4.5 h-4.5 rounded flex items-center justify-center transition-all animate-scale-up"
+                                    style={{
+                                      backgroundColor: tokens.colors.brand || '#1F63D1',
+                                      borderColor: tokens.colors.brand || '#1F63D1',
+                                    }}
+                                  >
+                                    <Check size={11} className="text-white fill-current stroke-[3px]" />
+                                  </div>
+                                ) : (
+                                  <div 
+                                    className="w-4.5 h-4.5 rounded border bg-white transition-all hover:border-slate-400"
+                                    style={{
+                                      borderColor: '#D1D5DB',
+                                    }}
+                                  />
+                                )}
                               </div>
                             )}
+
+                            {/* 本选项文案部分 */}
+                            <div className="flex-1 min-w-0">
+                              <div
+                                className="text-sm truncate"
+                                style={{
+                                  color: isSelected
+                                    ? (tokens.colors.brand || '#1F63D1') 
+                                    : tokens.colors.textPrimary,
+                                  fontWeight: isSelected 
+                                    ? (tokens.typography.fontWeightBold || '600') 
+                                    : (tokens.typography.fontWeightNormal || '400')
+                                }}
+                              >
+                                {option.label}
+                              </div>
+                              {showDescription && option.description && (
+                                <div
+                                  className="text-xs truncate mt-0.5"
+                                  style={{
+                                    color: isSelected 
+                                      ? (tokens.colors.brand || '#1F63D1') 
+                                      : tokens.colors.textMuted,
+                                    opacity: isSelected ? 0.75 : 1,
+                                  }}
+                                >
+                                  {option.description}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        
-                        {/* 💥 单选被选中时的高亮尊贵对勾 (对应截图一) */}
-                        {!multiple && isSelected && (
-                          <Check
-                            className="w-4 h-4 shrink-0"
-                            style={{ color: tokens.colors.brand || '#1F63D1' }}
-                          />
-                        )}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                          
+                          {/* 💥 单选被选中时的高亮尊贵对勾 (对应截图一) */}
+                          {!multiple && isSelected && (
+                            <Check
+                              className="w-4 h-4 shrink-0"
+                              style={{ color: tokens.colors.brand || '#1F63D1' }}
+                            />
+                          )}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
 
       {/* 5. 报错显示 */}

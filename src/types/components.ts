@@ -1,12 +1,38 @@
-import React from 'react';
-
 /**
- * ==========================================
- * 文件名称: /src/types/components.ts
- * 功能描述: Atomix UI 原子原语类型契约大一统字典 (Type Contracts Dictionary)
- * 目标受众: 后续接入的 AI Assistant / IDE 助手等 (用于零 Token 损耗极速查找组件声明)
- * ==========================================
+ * =========================================================================================
+ * 🚨 【AI 强校验红线与契约生命周期自锁协议】🚨 (AI Hard Constraint Contract & Self-Rule Block)
+ * =========================================================================================
+ * 
+ * ⚠️【绝对禁令 - CRITICAL FORBIDDEN ACTIONS】:
+ * 1. 锁死原子源码: 严禁执行 Glob pattern 扫描 'src/components/atoms/*' 路径！
+ * 2. 禁读原子文件: 严禁读取 (view_file) or 查看 'src/components/atoms/*.tsx' 的任何源文件！
+ * 3. 禁自研伪组件: 严禁凭空拍脑袋编造任何不存在的原子组件 (如 Badge, Avatar 等)。
+ *
+ * 🎯【当前系统存在且全量实现的 24 个原子/底座组件英文全称 (The Only Allowed Primitives)】:
+ *   AppLayout, Sidebar, Navbar, Card, Button, Input, Dropdown, Modal, Tag, Table, List,
+ *   Icon, Breadcrumb, Pagination, Steps, Tabs, DatePicker, Slider, Progress, Loading,
+ *   Alert, Toast, ImageViewer, Skeleton
+ *
+ * 🛠️【排错生命周期标准流 - CORRECT TROUBLESHOOTING DECISION PATHWAY】:
+ *   当你的代码编译报错、TS 类型缺失或出现未声明导出导入异常时，你【已被物理剥夺】读取源码的权限。
+ *   必须且只能按照以下 3 步行动，一步走错均视为严重违规：
+ * 
+ *   🔴 第一步: 精密自查 (Check This File Only)
+ *      在当前文件 (/src/types/components.ts) 中向下检索，确认是否有对应的 Props 声明。如果没有，
+ *      说明该组件根本不存在！(例如: 系统只有 Tag 没有 Badge，只有 Card 没有 Box)。请立刻选用替代组件。
+ * 
+ *   🔴 第二步: 启动逃生舱 (Activate Escape Hatch View Layer)
+ *      如果需要极其特定的组件 (如 Avatar、圆圈、拓扑节点) 且系统未实现：
+ *      不要尝试去 atoms 里翻阅，直接使用原生 div/span 基于 Tailwind 并深度融合 useDesignTokens 主题变量
+ *      进行手写拼装！(具体参阅 AI_AGENT_PROMPT.md 第三/第四章)。
+ * 
+ *   🔴 第三步: 主动求助 (Ask First Before Bypassing)
+ *      如果自查和逃生舱拼装还是无法解决，请直接发问向用户求助，严禁为了方便而破戒强行读取 atoms 源码！
+ * 
+ * =========================================================================================
  */
+
+import React from 'react';
 
 // 1. 【Button】原子按钮基础契约
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -59,12 +85,28 @@ export interface ModalProps {
   id?: string;
 }
 
+export interface NavbarItem {
+  label: string;       // 按钮文本 (例如: “系统监控统计”)
+  active?: boolean;    // 是否处于当前激活访问状态 (自动高亮加粗)
+  onClick?: () => void;// 页面跳转/切换逻辑的动作回调
+}
+
 // 5. 【Navbar】导航条契约
 export interface NavbarProps {
-  title: string;
-  logo?: React.ReactNode;
-  actions?: React.ReactNode;
+  logo?: React.ReactNode;        // 左边缘：自定义 LOGO 模块 (缺省则使用设计系统默认的希腊 Ω 质感标)
+  menuItems?: NavbarItem[];      // 中间：横向导航菜单列表
+  rightActions?: React.ReactNode;// 右边缘：操作按钮插槽 (如：[登录/注册] 或者 [主题下拉选择器])
+  sticky?: boolean;              // 是否粘性置顶固定。若 true，页面向下滚动时依然如影随形悬浮于顶部
+  variant?: 'classic' | 'transparent'; // 导航条风格变体。【重要联动】：若处于开启了 floatingStyle 的 AppLayout 容器下，默认会自动感知并切换为 transparent (透明风格)。在集成时请不要显式在 Navbar 传入 variant 属性覆盖，否则会带上硬编码底色干扰呼吸悬浮卡片的无缝对齐美学。
   id?: string;
+  brandName?: string;            // 兼容性字段：系统品牌字样
+  extra?: React.ReactNode;       // 兼容性字段：额外自定义尾部
+  showCollapseButton?: boolean;  // 功能字段：是否带有折叠侧栏的控制钮
+  sidebarCollapsed?: boolean;     // 功能字段：当前侧栏收折状态
+  onCollapseToggle?: () => void; // 功能字段：折叠侧栏状态触发回调
+  badgeCount?: number;           // 视觉字段：消息通知气泡未读数
+  onBellClick?: () => void;      // 点击消息铃铛触发
+  showThemeSwitcher?: boolean;   // 功能字段：是否展示快捷切换/控制主题面板
 }
 
 // 6. 【Icon】图标组件契约
@@ -277,7 +319,7 @@ export interface ListProps<T = any> {
   renderItem: (item: T, index: number) => React.ReactNode; // 列表项动态渲染函数
   header?: React.ReactNode; // 选填：列表头部区块
   footer?: React.ReactNode; // 选填：列表尾部区块
-  bordered?: boolean; // 是否展示卡片封套边框
+  bordered?: boolean; // 是否展示整个列表的外圈边框。⚠️【重要嵌套提示】：List 默认 bordered 为 false。如果将 List 作为独立模块平铺，建议设置 bordered 为 true，因为它拥有美观的圆角和背景。但如果外层已经套了 Card 等物理外壳，则必须保持 bordered 为 false，否则会引发极其难看的“双层圆角边框套娃”视觉灾难。
   split?: boolean; // 列表项之间是否渲染精密中性切分线
   loading?: boolean; // 是否开启骨架或菊花遮罩加载态
   size?: 'sm' | 'md' | 'lg'; // 列表项尺寸，SM(紧凑), MD(常规), LG(高级豪阔空灵)
@@ -317,7 +359,7 @@ export interface TableProps<T = any> {
   columns: TableColumn<T>[]; // 表格列配置字典数组
   dataSource: T[];           // 物理数据源
   rowKey?: string | ((record: T) => string); // 行标识 Key 判别机制 (默认为 'key' 或 'id')
-  bordered?: boolean;        // 是否渲染外卡片封套边线
+  bordered?: boolean;        // 是否展现整个表格卡片的外圈物理边框。⚠️【重要嵌套提示】：Table 默认 bordered 为 true，自带 16px 圆角、白色背景和阴影。因此 Table 本身即是一个完整的卡片，建议直接平铺在页面中，【绝对禁止】在外部多套一层 Card 组件！如果由于特定合并页眉标题等极为个别的业务场景必须要嵌套在 Card 或 Modal 内部，请务必「显式将此项设为 false」（即 <Table bordered={false} ... />），否则会导致严重的“双重白底、二级圆角多层包边、多重阴影”丑陋感。
   striped?: boolean;         // 是否启用奇偶行色双纹理交替
   hoverable?: boolean;       // 是否开启单行高亮悬停表现
   loading?: boolean;         // 是否启用脉冲渐变骨架加载效果
@@ -389,7 +431,7 @@ export interface SidebarProps {
   onChange: (id: string, item: SidebarItem) => void; // 菜单点击切换的回调
   collapsed?: boolean;                   // 侧边折叠状态 (受控)
   onCollapseChange?: (collapsed: boolean) => void; // 折叠状态变更时的回调
-  variant?: 'classic' | 'modern' | 'minimal'; // 视觉变体风格：classic（经典整洁分栏）、modern（浮置卡片毛玻璃微调）、minimal（极简无边界融合）
+  variant?: 'classic' | 'modern' | 'minimal'; // 视觉变体风格：classic (经典整洁分栏)、modern (浮置卡片毛玻璃微调)、minimal (极简无边界融合)。【重要联动】：当此组件嵌套于开启了 floatingStyle 的 AppLayout 下时，默认会自动感知并切换为 minimal (透明风格) 以实现浑然一体的呼吸感贴合。此时请不要显式传 variant 属性（即保持未传入默认状态），传入其他物理底色风格会覆盖大盘智能，破坏美观。
   width?: string | number;               // 侧边栏展开宽度，默认 240px
   collapsedWidth?: string | number;      // 侧边栏折叠宽度，默认 64px
   showCollapseButton?: boolean;          // 是否显示自带的折叠切换按钮，默认 true
@@ -398,6 +440,62 @@ export interface SidebarProps {
   className?: string;                    // 额外覆盖的 className
   style?: React.CSSProperties;           // 额外附加的 CSS 样式
   id?: string;                           // 唯一 HTML DOM ID
+}
+
+// 23. 【AppLayout】设计系统骨架组件契约
+export interface AppLayoutProps {
+  sidebar?: React.ReactNode;             // 传入的左侧侧边栏组件实例
+  navbar?: React.ReactNode;              // 传入的顶部导航栏组件实例
+  children?: React.ReactNode;            // 主体内容区域
+  footer?: React.ReactNode;              // 底部版权/运行状态信息条
+  sidebarCollapsed?: boolean;            // 侧边栏是否处于收起折叠状态
+  onSidebarCollapseChange?: (collapsed: boolean) => void; // 折叠状态变化时的回调
+  fixedNavbar?: boolean;                 // 顶部导航是否固定（不随内容滚动）
+  fixedSidebar?: boolean;                // 侧边栏是否固定（独立滚动）
+  floatingStyle?: boolean;               // 是否启用富有呼吸感的悬浮高内聚外观 (Floating Panel Style)。【核心联动机制】：当开启此项(为true)时，大盘内部将自动使用 React 上下文联动强制让内部的 Sidebar 适配极简透明变体 minimal，Navbar 适配透明变体 transparent。拼装页面的模型和开发者不应在此两子项中重复显式声明 variant 属性。
+  className?: string;                    // 额外覆盖的 className
+  style?: React.CSSProperties;           // 额外顶置的 CSS 样式
+  id?: string;                           // 唯一 HTML DOM ID
+}
+
+// 24. 【Card】高标高保真智能物理外壳及卡片容器组件契约
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  // 核心视觉美学变体类型：'standard-outline'(物理线框，白色底+1px轻边+贴地微影)；'subtle-flat'(安静色平铺，极轻灰色底去边线无影，适合在已有卡片中分类小块)；'isometric-elevated'(特级悬浮气垫层，高弥散深度阴影)
+  variant?: 'standard-outline' | 'subtle-flat' | 'isometric-elevated';
+  
+  // 是否在鼠标悬浮时激活精妙的物理浮动微交互（y轴轻微抬升 + 强化中度扩散阴影）
+  hoverable?: boolean;
+  
+  // 卡片内边距标准间隙：'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  padding?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  
+  // 圆角大小，拉通 borders 定义：'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  radius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  
+  // 悬停时是否额外在边缘散射出品牌的微光漫反射辉光 (Glow-wave effect)
+  glow?: boolean;
+  
+  // 自定义容器的 HTML DOM 标签，如 'div' | 'section' | 'article'
+  as?: keyof React.JSX.IntrinsicElements;
+  
+  // ⚠️【嵌套拼装黄金律】：Card 是极其高雅的容器。但若容器核心内容是 Table、List 这类「本身就已经内置了精美圆角白底、卡片描边与阴影」的原子组件，【直接让 Table/List 自行作为顶层平铺即可，绝对禁止多套一层 Card】。如果因为非要把 Table 和其他标题放一起而必须要 Card 套 Table，你必须「将内部 Table/List 的 bordered 属性显式设为 false」（即 <Table bordered={false} ... />），以此使得两者面框无缝合并。
+}
+
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  // 是否在卡片页眉底部加上一条极细淡雅的切分横线，默认无
+  bordered?: boolean;
+}
+
+export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  // 卡片主标题的字号：'sm'(14px) | 'base'(16px) | 'lg'(18px厚度) | 'xl'(20px) | '2xl'(24px大焦)
+  size?: 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+}
+
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  // 底部按钮区域的对齐方向：'left' | 'center' | 'right' | 'between'
+  align?: 'left' | 'center' | 'right' | 'between';
+  // 是否在页脚上方加上一条极细淡雅的分隔横线
+  bordered?: boolean;
 }
 
 

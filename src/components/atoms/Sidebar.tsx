@@ -9,16 +9,20 @@
  *    - classic: 经典卡条式分割底色分界栏，具备极高信息密度。
  *    - modern: 带优雅悬浮卡片、磨砂玻璃与高阶投影的未来感风格。
  *    - minimal: 极简无框，与承载主体完全融合，无边框零噪点。
+ *    ℹ️【重要联动逻辑】：当此组件嵌套于开启了 `floatingStyle={true}`的 `AppLayout` 内时，
+ *      默认会自动感知并切换为 `minimal`（极简透明），与外部呼吸感卡片完美贴合。
+ *      模型/开发者在此集成模式下请保持 `variant` 未指定，显式指定会覆盖此自适应表现。
  * 3. 完美内置可伸缩折叠状态机 (Collapsed State)，支持内外受控。
  * 4. 树形多级手风琴结构 (Tree Accordion Collapse)，子菜单可无级展开且自带高度弹性吸入曲线。
  * 5. 自适应并动态加载任意 Lucide-React 矢量图标，彻底避免业务层硬编码图标。
  * ==========================================
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDesignTokens } from '../base/DesignTokensContext';
 import { SidebarProps, SidebarItem } from '../../types/components';
+import { AppLayoutContext } from './AppLayout';
 import * as Icons from 'lucide-react';
 
 /**
@@ -49,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onChange,
   collapsed: controlledCollapsed,
   onCollapseChange,
-  variant = 'classic',
+  variant: propVariant,
   width = 240,
   collapsedWidth = 64,
   showCollapseButton = true,
@@ -60,10 +64,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   id,
 }) => {
   const { tokens } = useDesignTokens();
+  const layoutCtx = useContext(AppLayoutContext);
+
+  const variant = propVariant !== undefined
+    ? propVariant
+    : (layoutCtx?.floatingStyle ? 'minimal' : 'classic');
 
   // 1. 本地状态治理：兼顾折叠状态的受控与非受控机制
   const [localCollapsed, setLocalCollapsed] = useState(false);
-  const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : localCollapsed;
+  const isCollapsed = controlledCollapsed !== undefined 
+    ? controlledCollapsed 
+    : (layoutCtx ? layoutCtx.sidebarCollapsed : localCollapsed);
 
   // 2. 本地项目状态：存储哪些一排大菜单（拥有子项的父菜单）当前处于手风琴“展开”状态
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
@@ -93,7 +104,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleToggleCollapse = () => {
     const nextVal = !isCollapsed;
     if (controlledCollapsed === undefined) {
-      setLocalCollapsed(nextVal);
+      if (layoutCtx) {
+        layoutCtx.setSidebarCollapsed(nextVal);
+      } else {
+        setLocalCollapsed(nextVal);
+      }
     }
     if (onCollapseChange) {
       onCollapseChange(nextVal);
@@ -227,13 +242,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
     // 经典字体字重随 tokens
     const itemFontWeight = isActive ? 'font-semibold' : 'font-medium';
 
+    const isChild = level > 0;
+    const paddingClass = isChild ? 'py-2 pl-2.5 pr-2' : 'py-2.5 px-3';
+    const textClass = isChild ? 'text-[12.5px]' : 'text-sm';
+    const gapClass = isChild ? 'gap-2' : 'gap-3';
+
     return (
       <div key={item.id} className="w-full">
         {/* 单条导航触摸卡 */}
         <button
           onClick={() => handleItemClick(item)}
           disabled={item.disabled}
-          className={`w-full group relative flex items-center justify-between text-left cursor-pointer py-2.5 px-3 mb-1 rounded-lg outline-none select-none transition-colors duration-150`}
+          className={`w-full group relative flex items-center justify-between text-left cursor-pointer ${paddingClass} mb-0.5 rounded-lg outline-none select-none transition-colors duration-150`}
           style={{
             backgroundColor: itemBgColor,
             borderRadius: tokens.borders.radiusMd || '8px',
@@ -243,7 +263,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           title={isCollapsed ? item.label : undefined}
         >
           {/* 左侧主要区域 */}
-          <div className="flex items-center min-w-0 flex-1 gap-3">
+          <div className={`flex items-center min-w-0 flex-1 ${gapClass}`}>
             {/* 动态图标 */}
             {item.icon ? (
               <div
@@ -252,7 +272,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   color: isActive ? (tokens.colors.brand || '#4f46e5') : 'inherit',
                 }}
               >
-                <DynamicIcon name={item.icon} className="w-4 h-4" />
+                <DynamicIcon name={item.icon} className={isChild ? "w-3.5 h-3.5" : "w-4 h-4"} />
               </div>
             ) : (
               // 缩略折叠且属于一级节点时自动生成文字首字母标志
@@ -272,16 +292,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* 标签文字 (支持收折起伏淡出动画) */}
             {!isCollapsed && (
               <span
-                className={`truncate text-sm ${itemFontWeight}`}
+                className={`truncate ${textClass} ${itemFontWeight}`}
               >
                 {item.label}
               </span>
             )}
           </div>
 
-          {/* 右侧微交互区：角标和箭头 */}
+          {/* 右侧微交互区：角标 and 展开角 */}
           {!isCollapsed && (
-            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            <div className="flex items-center gap-1.5 shrink-0 ml-1">
               {/* Badge 徽标 */}
               {item.badge !== undefined && (
                 <span
@@ -333,7 +353,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   duration: 0.22,
                   ease: motionEase,
                 }}
-                className="overflow-hidden pl-4 border-l ml-5 space-y-0.5"
+                className="overflow-hidden pl-3 border-l ml-[18px] space-y-0.5"
                 style={{ borderColor: tokens.colors.border || 'rgba(15, 23, 42, 0.06)' }}
               >
                 {item.children?.map((child) => renderMenuItem(child, level + 1))}

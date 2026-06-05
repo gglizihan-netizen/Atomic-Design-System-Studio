@@ -278,6 +278,7 @@ function StudioLayout() {
     { id: 'imageviewer' as const, label: '图片预览', en: 'ImageViewer' },
     { id: 'skeleton' as const, label: '骨架屏', en: 'Skeleton' },
     { id: 'sidebar' as const, label: '智能侧边栏', en: 'Sidebar' },
+    { id: 'appLayout' as const, label: '大盘骨架', en: 'AppLayout' },
   ];
 
   const presetsList = [

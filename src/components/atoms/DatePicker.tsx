@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDesignTokens } from '../base/DesignTokensContext';
 import { DatePickerProps } from '../../types/components';
@@ -32,6 +33,95 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const { tokens } = useDesignTokens();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // ⚡ 视图安全保障：触发器与弹出面板底层物理节点引用
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // ⚡ 视图安全保障：精细化的空间测量和位置坐标状态管理
+  const [coords, setCoords] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    placement: 'bottom' as 'top' | 'bottom',
+  });
+
+  // ⚡ 极速物理同步引擎：在滚动或频繁改变位置时，直接操作 DOM 底层绝对样式，避免 React 虚拟 DOM 异步状态合并（Batch）以及渲染时间差带来的迟钝滞后感
+  const syncDOMPosition = () => {
+    if (!triggerRef.current || !menuRef.current) return;
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const dropdownHeight = menuRef.current.offsetHeight || 330;
+    const windowHeight = window.innerHeight;
+    const spaceBelow = windowHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    let placement: 'top' | 'bottom' = 'bottom';
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      placement = 'top';
+    }
+
+    let top = 0;
+    if (placement === 'bottom') {
+      top = triggerRect.bottom + 6;
+    } else {
+      top = triggerRect.top - dropdownHeight - 6;
+    }
+
+    menuRef.current.style.top = `${top}px`;
+    menuRef.current.style.left = `${triggerRect.left}px`;
+    menuRef.current.style.width = `${triggerRect.width}px`;
+  };
+
+  // ⚡ 空间计算引擎：自动决策向下/向上展开，并匹配浮层尺寸与触发器对齐线
+  const updatePosition = () => {
+    if (!triggerRef.current) return;
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    
+    const dropdownHeight = menuRef.current ? menuRef.current.offsetHeight : 330;
+    const windowHeight = window.innerHeight;
+    const spaceBelow = windowHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    let placement: 'top' | 'bottom' = 'bottom';
+    // 当下方空间不足以承载面板，且上方空间比下方空间更充裕时，自动向上智能展开
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      placement = 'top';
+    }
+
+    let top = 0;
+    if (placement === 'bottom') {
+      top = triggerRect.bottom + 6;
+    } else {
+      top = triggerRect.top - dropdownHeight - 6;
+    }
+
+    // ⚡ 直接操作 DOM 样式以保障第一次挂载或属性骤变时与视图绝对一致，防 0 闪烁
+    if (menuRef.current) {
+      menuRef.current.style.top = `${top}px`;
+      menuRef.current.style.left = `${triggerRect.left}px`;
+      menuRef.current.style.width = `${triggerRect.width}px`;
+    }
+
+    setCoords({
+      top,
+      left: triggerRect.left,
+      width: triggerRect.width,
+      placement,
+    });
+  };
+
+  // 🟢 智能展开折叠触发器：同步位置计算防止闪烁，并在打开前先测定最新坐标
+  const handleToggle = () => {
+    if (disabled) return;
+    if (isOpen) {
+      setIsOpen(false);
+      setPanelMode('days');
+    } else {
+      // 开启前先更新一次相对定位，杜绝延迟闪烁
+      updatePosition();
+      setIsOpen(true);
+    }
+  };
 
   // 面板三段视图管理：'days' (天数日历) | 'years' (年份九宫格网格) | 'months' (月份十二宫格)
   const [panelMode, setPanelMode] = useState<'days' | 'years' | 'months'>('days');
@@ -85,21 +175,68 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     }
   }, [value]);
 
-  // 点击外部收回弹窗
+  // 1. 点击外部收回弹窗 (融合 Portal 穿透防御)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      // 触发器容器
+      const clickInsideTrigger = containerRef.current && containerRef.current.contains(target);
+      // 弹出面板
+      const clickInsideMenu = menuRef.current && menuRef.current.contains(target);
+      if (!clickInsideTrigger && !clickInsideMenu) {
         setIsOpen(false);
         setPanelMode('days'); // 回复默认主日历屏
       }
     };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside, { capture: true });
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside, { capture: true });
     };
   }, [isOpen]);
+
+  // 1.1. 挂载全局滚动/缩放测量监听，在触发器触发拉起时精准捕捉并更新浮层绝对定位
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 唤醒瞬间执行一次极速定位
+    updatePosition();
+
+    // 启用高性能、底层 ResizeObserver 监视触发器尺寸形变
+    let resizeObserver: ResizeObserver | null = null;
+    if (triggerRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        syncDOMPosition();
+      });
+      resizeObserver.observe(triggerRef.current);
+    }
+
+    // 捕捉宿主容器/窗口以及所有层级的滚动，确保无缝随动同步，无任何肉眼可见延迟
+    const handleScrollOrResize = () => {
+      syncDOMPosition();
+    };
+
+    window.addEventListener('resize', handleScrollOrResize);
+    document.addEventListener('scroll', handleScrollOrResize, { capture: true });
+
+    return () => {
+      window.removeEventListener('resize', handleScrollOrResize);
+      document.removeEventListener('scroll', handleScrollOrResize, { capture: true });
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [isOpen]);
+
+  // 1.2. 监听日历面板模式切换，实时驱动 Portal 定位校准
+  useEffect(() => {
+    if (isOpen) {
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
+    }
+  }, [panelMode, isOpen]);
 
   // 从 tokens 检索动效阻尼度
   const getCurveValue = () => {
@@ -320,8 +457,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
       {/* 3. 日期选择触发面板 */}
       <div
+        ref={triggerRef}
         id={id}
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onClick={handleToggle}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -373,34 +511,34 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         </p>
       )}
 
-      {/* 5. 悬浮日历时间集成控制卡片 (与上方触发器 100% 严密对齐宽度) */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: parseFloat(speedNormal) / 1000, ease: 'easeOut' }}
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              width: '100%',
-              minWidth: '280px',
-              zIndex: 50,
-              marginTop: '6px',
-              backgroundColor: tokens.colors.bgCard,
-              borderRadius: tokens.borders.radiusLg,
-              boxShadow: tokens.shadows.lg,
-              border: `1px solid ${tokens.colors.border}`,
-              padding: tokens.spacings.md,
-              backdropFilter: 'blur(16px)',
-              display: 'flex',
-              flexDirection: 'column',
-              boxSizing: 'border-box'
-            }}
-          >
+      {/* 5. 悬浮日历时间集成控制卡片 (与上方触发器 100% 严密对齐宽度，并借助 Portal 及高性能随动算法抗遮挡) */}
+      {typeof window !== 'undefined' && document.body && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={menuRef}
+              initial={{ opacity: 0, y: coords.placement === 'bottom' ? -6 : 6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: coords.placement === 'bottom' ? -6 : 6, scale: 0.98 }}
+              transition={{ duration: parseFloat(speedNormal) / 1000, ease: 'easeOut' }}
+              style={{
+                position: 'fixed',
+                top: `${coords.top}px`,
+                left: `${coords.left}px`,
+                width: `${coords.width}px`,
+                minWidth: '280px',
+                zIndex: 9999,
+                backgroundColor: tokens.colors.bgCard,
+                borderRadius: tokens.borders.radiusLg,
+                boxShadow: tokens.shadows.lg,
+                border: `1px solid ${tokens.colors.border}`,
+                padding: tokens.spacings.md,
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                flexDirection: 'column',
+                boxSizing: 'border-box'
+              }}
+            >
             {/* ==================== A. 顶部高保真控制大栏 (左年右月，无 select) ==================== */}
             <div className="flex items-center justify-between mb-3 pb-2.5 border-b" style={{ borderColor: tokens.colors.border }}>
               <div className="flex items-center gap-1">
@@ -668,9 +806,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
-    </div>
-  );
+      </AnimatePresence>,
+      document.body
+    )}
+  </div>
+);
 };
 
 export default DatePicker;

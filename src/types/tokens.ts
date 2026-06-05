@@ -111,6 +111,7 @@ export interface ShadowSet {
   sm: string;   // 轻量阴影 (沉浸式卡片的微妙边缘，不易被察觉但能增加实体感)
   md: string;   // 常规阴影 (按钮悬停、普通下拉菜单，带起恰到好处的立体感)
   lg: string;   // 深度阴影 (大弹窗、模态对话框，制造极强的视觉压平感)
+  ambient: string; // 匀称弥散呼吸柔和投影 (四周均匀受光，极少偏置，用于大盘悬浮骨架)
 }
 
 /**
@@ -123,6 +124,7 @@ export interface BehavioralSet {
   motionDurationSlow: number;    // 慢动效时长 (毫秒，用于大模态窗升起、路由层切换，300ms - 450ms)
   motionCurve: 'spring' | 'smooth' | 'rigid'; // 动效个性表现 (spring:有可爱的弹性反弹, smooth:经典流畅缓入缓出, rigid:极致硬朗干脆直达)
   buttonPressScale: number;      // 按钮按压交互负反馈 (1.0表示无变化，0.95-0.97表示轻微果冻式按压，增加点击实感)
+  buttonClickEffect?: 'scale' | 'translate' | 'none'; // 💎 按钮点击物理质感交互方案 (scale:等比缩放/果冻捏捏感，translate:键程下沉，none:扁平无变化)
   inputFocusRing: boolean;       // 重聚焦外光圈圈 (如为true，输入框聚焦时不仅加深边框，还会有一圈温和的外发光或额外环套)
   modalDismissOverlay: boolean;  // 模态弹窗是否允许点击黑色遮罩区一键关闭 (true为易关闭利于阅读，false为强控制必须通过确认按钮)
   listHoverReveal: boolean;      // 列表项悬停时，是否允许动态改变高度、背景或者滑出操作栏 (提高AI对主次要信息的隐藏策略)
